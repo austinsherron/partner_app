@@ -1,0 +1,188 @@
+{% extends 'templates/common.html' %}
+{% block content %}
+{% if student %}
+  <br>
+  <div class="row">
+	<div class="small-6 column small-offset-4">
+  	  <h3>Hello {{ student.first_name }} {{ student.last_name }}</h3>
+	</div>
+  </div>
+
+  {% if message %}
+    <div class="row text-center">
+	  <div class="small-12 column">
+   	    <h3>{{ message }}</h3>
+	  </div>
+    </div>
+  {% endif %}
+
+
+  <br>
+
+  <div class="row">
+	<div class="small-5 column panel text-center small-1-offset" style="height:500px">
+	  <h6 class="success label">Important dates for assignment {{ current.number }}:</h6>
+      <h6>
+	    Please choose a partner by: 
+		{% if current.due_date.hour > 12 %}
+		  {% set hour = current.due_date.hour - 12 %}
+		  {% set am_pm = 'PM' %}
+		{% else %}
+		  {% set hour = current.due_date.hour %}
+		  {% set am_pm = 'AM' %}
+	  	{% endif %}
+		<br>
+	    {{ days[current.due_date.weekday()] }},
+		{{ current.due_date.month }}-{{ current.due_date.day }}-{{ current.due_date.year }} 
+	    at {{ hour }}:{{ current.due_date.minute }} {{ am_pm }}
+	  </h6>
+	  <h6>
+		{% if current.eval_open_date.hour > 12 %}
+		  {% set hour = current.eval_open_date.hour - 12 %}
+		  {% set am_pm = 'PM' %}
+		{% else %}
+		  {% set hour = current.eval_open_date.hour %}
+		  {% set am_pm = 'AM' %}
+	  	{% endif %}
+	    Evaluation opens:
+		<br>
+	    {{ days[current.eval_open_date.weekday()] }},
+		{{ current.eval_open_date.month }}-{{ current.eval_open_date.day }}-{{ current.eval_open_date.year }} 
+	    at {{ hour }}:{{ current.eval_open_date.minute }} {{ am_pm }}
+	  </h6>
+	  <h6>
+		{% if current.due_date.hour > 12 %}
+		  {% set hour = current.due_date.hour - 12 %}
+		  {% set am_pm = 'PM' %}
+		{% else %}
+		  {% set hour = current.due_date.hour %}
+		  {% set am_pm = 'AM' %}
+	  	{% endif %}
+	    Evaluation closes:
+		<br>
+	    {{ days[current.eval_date.weekday()] }},
+	    {{ current.eval_date.month }}-{{ current.eval_date.day }}-{{ current.eval_date.year }} 
+	    at {{ hour }}:{{ current.eval_date.minute }} {{ am_pm }}
+      </h6>
+		{% if not eval.number == current.number %}
+	  	  <h6 class="success label">Important dates for assignment {{ eval.number }}:</h6>
+		{% endif %}
+	  <h6>
+		{% if eval.eval_open_date.hour > 12 %}
+		  {% set hour = eval.eval_open_date.hour - 12 %}
+		  {% set am_pm = 'PM' %}
+		{% else %}
+		  {% set hour = eval.eval_open_date.hour %}
+		  {% set am_pm = 'AM' %}
+	  	{% endif %}
+	    Evaluation opens:
+		<br>
+	    {{ days[eval.eval_open_date.weekday()] }},
+		{{ eval.eval_open_date.month }}-{{ eval.eval_open_date.day }}-{{ eval.eval_open_date.year }} 
+	    at {{ hour }}:{{ eval.eval_open_date.minute }} {{ am_pm }}
+	  </h6>
+	  <h6>
+		{% if eval.due_date.hour > 12 %}
+		  {% set hour = eval.due_date.hour - 12 %}
+		  {% set am_pm = 'PM' %}
+		{% else %}
+		  {% set hour = eval.due_date.hour %}
+		  {% set am_pm = 'AM' %}
+	  	{% endif %}
+	    Evaluation closes:
+		<br>
+	    {{ days[eval.eval_date.weekday()] }},
+	    {{ eval.eval_date.month }}-{{ eval.eval_date.day }}-{{ eval.eval_date.year }} 
+	    at {{ hour }}:{{ eval.eval_date.minute }} {{ am_pm }}
+      </h6>
+      {% if current_partner %}
+	    {% if current_partner == 'No Partner' %}
+	      <h5 class="alert-box info">
+			Your TA gave you permission to work without a partner for this assignment
+		  </h5>
+		{% else %}
+	      <h5 class="alert-box info">
+			Your partner for assignment {{ current.number }}
+			is {{ current_partner.last_name }}, {{ current_partner.first_name }}
+		  </h5>
+	    {% endif %}
+      {% else %}
+	    <h5 class="alert-box warning">You don't yet have a partner for assignment {{ current.number }}</h5>
+	    {% if dropped %}
+	      <h5 class="alert-box alert">
+		    Note: Your most recent partner
+		    has accepted another partner.
+		    <br>
+		    If this wasn't anticipated, please contact her/him.
+		    <br>
+		    If you can't find a partner, please contact your TA.
+	      </h5> 
+	    {% endif %}
+      {% endif %}
+	  {% if received_invitations %}
+		<h5 class="alert-box info">You have received partnership invitations</h5>
+      {% endif %}
+
+	  <hr size="3px">
+
+	  <a href="/partner/history" class="button expand">Partner/Evaluation History</a>
+
+	</div>
+
+	<div class="small-5 column panel" style="height:500px">
+
+	  <a href="/partner/selection" data-reveal-id="selectionModal" class="button expand"
+		data-reveal-ajax="true">Send Invitations</a>
+		<div class="reveal-modal small" id="selectionModal" data-reveal></div>
+
+	  <a href="/partner/confirm" data-reveal-id="confirmModal"
+		class="button expand" data-reveal-ajax="true">Received Invitations</a>
+		<div class="reveal-modal small" id="confirmModal" data-reveal></div>
+
+	  <a href="/partner/evaluation" data-reveal-id="evalModal" 
+		class="button expand" data-reveal-ajax="true">Partner Evaluation</a>
+		<div class="reveal-modal small" id="evalModal" data-reveal></div>
+
+      {% if sent_invitations %}
+	    <h5>You've sent partnership invitations (for assignment {{
+		    current.number }}) to the following students:</h5>
+	      <ul>
+		    {% for invitation in sent_invitations %}
+		      {% set student = invitation.invitee.get() %}
+		      <li>{{ student.last_name}}, {{ student.first_name }} - {{ student.ucinetid }}</li>	
+		    {% endfor %}
+	      </ul>
+      {% else %}
+	    <h5>You don't have any open, sent invitations for this assignment</h5>
+      {% endif %}
+	</div>
+  </div>
+{% else %}
+  <br>
+  <div class="row text-center">
+	<div class="small-12 column panel">
+	  <h3>Uh-oh</h3>
+	  <div class="row">
+		<div class="small-6 column small-offset-3 text-justify">
+		  <p>
+			We're having some trouble finding you in our database. 
+			<br>
+			<br>
+			The email address that the system is detecting for you is 
+			<strong>{{ email }}</strong>.
+			<br>
+			<br>
+			Please make sure that you're signing in with your UCI gmail account.  
+			Sign out <a href="{{ sign_out }}">here</a>, and sign back in with
+			your UCI Gmail credentials.
+			<br>
+			<br>
+			If you continue to experience problems, please contact
+			the ics 31 course manager at 31-manager@ics.uci.edu
+		  </p>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

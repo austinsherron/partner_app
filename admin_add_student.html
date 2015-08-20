@@ -1,0 +1,37 @@
+<!DOCTYPE hmtl>
+<html>
+  <body>
+	{% if message %}
+	  <h3>{{ message }}</h3>
+	{% endif %}
+	<form action="/admin/student/add" method="post" enctype="multipart/form-data">
+	  <label>Student ID:</label>
+	  <input name="studentid"><br>
+	  <label>First Name:</label>
+	  <input name="first_name"><br>
+	  <label>Last Name:</label>
+	  <input name="last_name"><br>
+	  <label>UCInetID:</label>
+	  <input name="ucinetid"><br>
+	  <label>Email:</label>
+	  <input name="email"><br>
+	  <label>Lab Section:</label>
+	  <input name="lab"><br> 
+	  <label>Quarter:</label>
+	  <select name="quarter">
+		<option value="1">Fall</option>
+		<option value="2">Winter</option>
+		<option value="3">Spring</option>
+		<option value="4">Summer</option>
+	  </select>
+	  <br>
+	  <label>Year:</label>
+	  <input type="number" name="year" value="{{ year }}">
+	  <br>
+	  <input type="submit" value="Add">
+	</form>
+	<br>
+	<a href="/admin">Back</a>
+  </body>
+</html>
+

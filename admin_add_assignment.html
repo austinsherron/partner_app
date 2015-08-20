@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+{% autoescape true %}
+
+<html>
+  <body>
+	<form action="/admin/assignment/add" method="post" enctype="multipart/form-data">
+	  <div>
+		<label>Year</label><br>
+		<select name="year">
+		  <option value="2012">2012</option>
+		  <option value="2013">2013</option>
+		  <option value="2014" selected>2014</option>
+		  <option value="2015">2015</option>
+		  <option value="2016">2016</option>
+		  <option value="2017">2017</option>
+		  <option value="2018">2018</option>
+		</select>
+	  </div>
+	  <div>
+		<label>Quarter</label><br>
+		<select name="quarter">
+		  <option value="1">Fall</option>
+		  <option value="2">Winter</option>
+		  <option value="3">Spring</option>
+		  <option value="4">Summer</option>
+		</select>
+	  </div>
+	  <div>
+		<label>Assignment Number</label><br>
+		<input name="assign_num" type="number">
+	  </div>
+	  <div>
+		<label>Current Assignment?</label><br>
+		<select name="current">
+		  <option value="True">Yes</option>
+		  <option value="False">No</option>
+		</select>
+	  </div>
+      <label>Fade In Date/Time</label><br>
+	  <div><input name="fade_in_date" type="date" value="{{ year }}-01-01"></div>
+	  <div><input name="fade_in_time" type="time" value="00:00"></div>
+      <label>Due Date/Time (should have partner by now)</label><br>
+	  <div><input name="due_date" type="date" value="{{ year }}-01-01"></div>
+	  <div><input name="due_time" type="time" value="00:00"></div>
+      <label>Close Date/Time (no more parter selection)</label><br>
+	  <div><input name="close_date" type="date" value="{{ year }}-01-01"></div>
+	  <div><input name="close_time" type="time" value="00:00"></div>
+      <label>Eval Open Date/Time</label><br>
+	  <div><input name="eval_open_date" type="date" value="{{ year }}-01-01"></div>
+	  <div><input name="eval_open_time" type="time" value="00:00"></div>
+      <label>Eval Close Date/Time</label><br>
+	  <div><input name="eval_date" type="date" value="{{ year }}-01-01"></div>
+	  <div><input name="eval_time" type="time" value="00:00"></div>
+      <label>Fade Out Date/Time</label><br>
+	  <div><input name="fade_out_date" type="date" value="{{ year }}-01-01"></div>
+	  <div><input name="fade_out_time" type="time" value="00:00"></div>
+	  <div><input type="submit" value="Save"><div>
+	</form> 
+	<br>
+	<a href="/admin">Back</a>
+  </body>
+</html>
+
+{% endautoescape %}

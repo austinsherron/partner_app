@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+  <body>
+	<h3>Are you ABSOLUTELY sure you want to CLEAR the database?!?!</h3>
+	<form action="/admin/cleardb" method="post" enctype="multipart/form-data">
+	  <select name="choice">
+		<option value="True">Yes</option>
+		<option value="False">No</option>
+	  </select>
+	  <input type="submit" value="Confirm">
+	</form>
+  <a href="/admin">Back</a>
+  <br>
+  </body>
+</html>
+{% endautoescape %}

@@ -1,0 +1,47 @@
+{% extends 'templates/base.html' %}
+{% block content %}
+<a class="close-reveal-modal">&#215;</a>
+<div class="row">
+{% if selection_closed %}
+<h5 class="text-center">
+  Partner selection for assignment {{ current.number }} has closed
+</h5>
+{% else %}
+  {% if selector %}
+    {% if error %}
+  	  <h4 class="text-center">{{ error }}</h4>
+    {% endif %}
+    <h3 class="text-center">Time to pick a partner for assignment {{ current.number }}</h3>
+    <form action="/partner/selection" method="post" enctype="multipart/form-data">
+	  <select name="selected_partner">
+	    {% for student in selectees %}
+		  {% if selector.ucinetid != student.ucinetid %}
+		    <option value="{{ student.studentid }}">
+			  {{ student.last_name }}, {{ student.first_name }} - {{
+			  student.ucinetid }}
+		    </option>
+		  {% endif %}
+	    {% endfor %}
+	  </select>
+	  <input class="button expand" type="submit" value="Submit">
+    </form>
+  <div class="text-center">
+    <h5>
+      If your partner isn't listed here, please contact the ICS 31 course
+      manager at 31-manager@ics.uci.edu
+    </h5>
+	<h5>
+	  Remember that your partner must be someone enrolled in your lab section that 
+	  you haven't worked with before.
+	</h5>
+    <h5>
+      If you think you have a legitimate reason to work alone or to repeat a partnership,
+      please contact your TA.
+    </h5>
+  </div>
+  {% endif %}
+{% endif %}
+</div>
+
+{% endblock %}
+

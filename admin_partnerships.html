@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+  <body>
+  {% if view_by %}
+	<table>
+	  <tr>
+		<th>StudentID</th>
+		<th>UCInetID</th>
+		<th>Last Name</th>
+		<th>First Name</th>
+		<th>Lab</th>
+	  </tr>
+	{% for k, v in partnerships %}
+	  <tr>
+		<td>{{ k[0] }}</td>
+		<td>{{ k[1] }}</td>
+		<td>{{ k[2] }}</td>
+		<td>{{ k[3] }}</td>
+		<td>{{ k[4] }}</td>
+		{% for partner in v %}
+		  <td>{{ partner }}</td>
+		{% endfor %}
+	  </tr>
+	{% endfor %}
+	</table>
+  {% else %}
+	<form action="/admin/partners/view" method="post" enctype="multipart/form-data">
+	  <label>Quarter:</label>
+	  <select name="quarter">
+		<option value="1">Fall</option>
+		<option value="2">Winter</option>
+		<option value="3">Spring</option>
+		<option value="4">Summer</option>
+	  </select><br>
+	  <label>Year:</label>
+	  <input name="year" type="number" value="{{ year }}">
+	  <br>
+	  <label>View By:</label>
+	  <select name="view_by">
+		<option value="class">Class</option>
+		<option value="lab">Lab</option>
+	  </select><br>
+	  <label>Lab:</label>
+		<input type=number name="lab"><br>
+	  <input type="submit" value="Submit">
+	</form>
+  {% endif %}
+  </body>
+</html>
+{% endautoescape %}

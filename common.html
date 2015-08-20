@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+  <head>
+		<link type="text/css" rel="stylesheet" href="/foundation/css/foundation.css "/>
+  </head>
+
+  <body>
+
+		<nav class="top-bar" data-topbar role="navigation">
+			<ul class="title-area">
+				<li class="name">
+					{% if user %}
+						<h1><a href="/partner">Partner App</a></h1>
+					{% else %}
+						<h1><a href="/">Partner App</a></h1>
+					{% endif %}
+				</li>
+			</ul>
+
+			<section class="top-bar-section">
+				{% if user %}
+					<ul class="left">
+						<li>
+							<a href="/partner/history">History</a>
+						</li>
+						<li>
+							<a href="/partner/edit/profile">Profile</a>
+						</li>
+					</ul>
+				{% endif %}
+				<ul class="right">
+					<li>
+						<a href="partner/instructions">Help</a>
+					</li>
+					{% if sign_out %}
+						<li class="active">
+							<a href="{{ sign_out }}">Logout</a>
+						</li>
+					{% elif sign_in %}
+						<li class="active">
+							<a href="{{ sign_in }}">Login</a>
+						</li>
+					{% endif %}
+				</ul>
+			</section>
+		</nav>
+
+		{% block content %}
+		{% endblock %}
+
+		<script src="foundation/js/vendor/jquery.js"></script>
+		<script src="foundation/js/vendor/fastclick.js"></script>
+		<script src="foundation/js/foundation.min.js"></script>
+		<script>
+			$(document).foundation();
+		</script>
+
+  </body>
+</html>
+{% endautoescape %}

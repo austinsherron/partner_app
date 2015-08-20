@@ -1,0 +1,56 @@
+<!DOCTYPE hmtl>
+{% autoescape true %}
+<html>
+  <body>
+  {% if evals %}
+	<h3>Evaluations for assignment {{ current }}, Quarter {{ quarter }}, {{ year }}</h3>
+	<table>
+	  <tr>
+		<th>Evaluator</th>
+		<th>Evaluatee</th>
+	    <th>Question 1</th>
+	    <th>Question 2</th>
+	    <th>Question 3</th>
+	    <th>Question 4</th>
+	    <th>Question 5</th>
+	    <th>Comments</th>
+	    <th>Question 7</th>
+	    <th>Question 8</th>
+	    <th>Question 9</th>
+	    <th>Question 10</th>
+	  </tr>
+	  {% for eval in evals %}
+		<tr>
+		  {% set evaluatee = eval.evaluatee.get() %}
+		  <td>{{ eval.evaluator.get().email }}</td>
+		  <td>{{ evaluatee.last_name }}, {{ evaluatee.first_name }} - {{ evaluatee.ucinetid }}</td>
+		  {% for response in eval.responses %}
+			<td>{{ response }}</td>
+		  {% endfor %}
+		</tr>
+	  {% endfor %}
+	  {% for solo in solos %}
+		{% set student = solo.initiator.get() %}
+		  <td>{{ student.email }}</td>
+		  <td>No Partner</td>
+	  {% endfor %}
+	</table>
+  {% else %}
+	<form action="/admin/evaluations/view" method="post" enctype="multipart/form-data">
+	  <select name="quarter">
+		<option value="1">Fall</option>
+		<option value="2">Winter</option>
+		<option value="3">Spring</option>
+		<option value="4">Summer</option>
+	  </select>
+	  <br>
+	  <input name="year" type="number" value="{{ year }}">
+	  <br>
+	  <input name="assign_num" type="number" value="{{ current.number }}">
+	  <br>
+	  <input type="submit" value="Submit">
+	</form>
+  {% endif %}
+  </body>
+</html>
+{% endautoescape %}

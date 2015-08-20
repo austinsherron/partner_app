@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+  <body>
+  {% if message %}
+	<h3>{{ message }}</h3>
+  {% endif %}
+	<ul>
+	  <li><a href="/admin/roster/upload">Upload Roster</a></li>
+	  <li><a href="/admin/roster/view">View Roster</a></li>
+	  <li><a href="/admin/student/add">Add Student</a></li>
+	  <li><a href="/admin/assignment/add">Add Assignment</a></li>
+	  <li><a href="/admin/assignment/view">View Assignments</a></li>
+	  <li><a href="/admin/partners/view">View Partnerships</a></li>
+	  <li><a href="/admin/partners/add">Add Partnerships</a></li>
+	  <li><a href="/admin/evaluations/view">View Evaluations</a></li>
+	  <li><a href="/admin/cleardb">Clear Database</a></li>
+	  <li><a href="/admin/timing/update">Set Current Quarter/Year</a></li>
+	</ul>
+  </body>
+</html>
+
+{% endautoescape %}

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <body>
+	<form action="/admin/assignment/edit" method="post" enctype="multipart/form-data">
+	  <label>Assignment Number:</label>
+	  <input name="number" value="{{ a.number }}" readonly>
+	  <br>
+	  <br>
+	  <label>Fade In Date:</label>
+	  <input type="date" name="fade_in_date" value="{{ fid }}">
+	  <br>
+	  <br>
+	  <label>Fade In Time:</label>
+	  <input type="time" name="fade_in_time" value="{{ fit }}">
+	  <br>
+	  <br>
+	  <label>Due Date:</label>
+	  <input type="date" name="due_date" value="{{ dd }}">
+	  <br>
+	  <br>
+	  <label>Due Time:</label>
+	  <input type="time" name="due_time" value="{{ dt }}">
+	  <br>
+	  <br>
+	  <label>Close Date:</label>
+	  <input type="date" name="close_date" value="{{ cd }}">
+	  <br>
+	  <br>
+	  <label>Close Time:</label>
+	  <input type="time" name="close_time" value="{{ ct }}">
+	  <br>
+	  <br>
+	  <label>Eval Open Date:</label>
+	  <input type="date" name="eval_open_date" value="{{ eod }}">
+	  <br>
+	  <br>
+	  <label>Eval Open Time:</label>
+	  <input type="time" name="eval_open_time" value="{{ eot }}">
+	  <br>
+	  <br>
+	  <label>Eval Close Date:</label>
+	  <input type="date" name="eval_date" value="{{ ecd }}">
+	  <br>
+	  <br>
+	  <label>Eval Close Time:</label>
+	  <input type="time" name="eval_time" value="{{ ect }}">
+	  <br>
+	  <br>
+	  <label>Fade Out Date:</label>
+	  <input type="date" name="fade_out_date" value="{{ fod }}">
+	  <br>
+	  <br>
+	  <label>Fade Out Time:</label>
+	  <input type="time" name="fade_out_time" value="{{ fot }}">
+	  <br>
+	  <br>
+	  <label>Current?:</label>
+	  <select name="current">
+		<option value="True">Yes</option>
+		<option value="False">No</option>
+	  </select>
+	  <br>
+	  <br>
+	  <label>Quarter:</label>
+	  <input name="quarter" value="{{ a.quarter }}" readonly>
+	  <br>
+	  <br>
+	  <label>Year:</label>
+	  <input name="year" value="{{ a.year }}" readonly>
+	  <br>
+	  <br>
+	  <input type="submit" value="Submit">
+	</form>
+  </body>
+</html>

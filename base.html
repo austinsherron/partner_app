@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+  <head>
+		<link type="text/css" rel="stylesheet" href="/foundation/css/foundation.css "/>
+  </head>
+
+  <body>
+
+		{% block content %}
+		{% endblock %}
+
+		<script src="foundation/js/vendor/jquery.js"></script>
+		<script src="foundation/js/vendor/fastclick.js"></script>
+		<script src="foundation/js/foundation.min.js"></script>
+		<script>
+			$(document).foundation();
+		</script>
+
+  </body>
+</html>
+{% endautoescape %}

@@ -1,0 +1,43 @@
+{% extends 'templates/common.html' %}
+{% block content %}
+  <br>
+  <div class="row">
+	<div class="small-5 column panel text-center" style="height:500px">
+      <h4 class="text-center">Partner History</h4>
+      <ul>
+	    {% for partnership in partners %}
+	      {% if partnership.initiator.get().email == student.email %}
+		    {% if partnership.acceptor %}
+		      {% set partner = partnership.acceptor.get() %}
+		    {% else %}
+		      {% set partner = 'No Partner' %}
+		    {% endif %}
+	      {% else %}
+		    {% set partner = partnership.initiator.get() %}
+	      {% endif %}
+	      <li>
+		    Assignment {{ partnership.assignment_number }}: 
+		    {% if partner == 'No Partner' %}
+		      {{ partner }}
+		    {% else %}
+		      {{partner.last_name }}, {{ partner.first_name }}
+		    {% endif %}
+	      </li>
+  	    {% endfor %}
+      </ul>
+	</div>
+
+	<div class="small-5 column panel text-center" style="height:500px">
+      <h4 class="text-center">Evaluation History</h4>
+		<ul>
+		  {% for eval in evals %}
+		    <li>
+			  {% set evaluatee = eval.evaluatee.get() %}
+			  Assignment {{ eval.assignment_number }}:
+			  {{ evaluatee.last_name }}, {{ evaluatee.first_name }}
+		    </li>
+		  {% endfor %}
+		</ul>
+	</div>
+  </div>
+{% endblock %}

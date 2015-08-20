@@ -1,0 +1,30 @@
+{% extends 'templates/base.html' %}
+{% block content %}
+<br>
+<div class="row">
+  <div class="small-12 column panel">
+    <div class="row">
+      <div class="small-6 column">
+		<h5>Current Quarter: {{ quarter }}</h5>
+		<br>
+		<h5>Current Year: {{ year }}</h5>
+      </div>
+	  <div class="small-6 column">
+		<form action="/admin/timing/update" method="post" enctype="multipart/form-data">
+		  <h5>Update Quarter/Year</h5>
+		  <label class="label">Quarter</label>
+		  <select name="quarter">
+			<option value="1">Fall</option>
+			<option value="2">Winter</option>
+			<option value="3">Spring</option>
+			<option value="4">Summer</option>
+		  </select>
+		  <label class="label">Year</label>
+		  <input type="number" value="{{ current_year }}" name="year">
+		  <input type="submit" value="Update" class="button expand">
+		</form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

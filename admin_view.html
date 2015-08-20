@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+{% autoescape true %}
+
+<html>
+  <body>
+
+  {% if not students %}
+	<form action="/admin/roster/view" method="post" enctype="multipart/form-data">
+	  <div>
+		<input name="year" type="number" value="{{ year }}">
+	  </div>
+	  <div>
+		<select name="quarter">
+		  <option value="1">Fall</option>
+		  <option value="2">Winter</option>
+		  <option value="3">Spring</option>
+		  <option value="4">Summer</option>
+		</select>
+	  </div>
+	  <div><input type="submit" value="view"<div>
+	</form> 
+  {% else %}
+    <form action="/admin/students/delete?quarter={{ quarter }}&year={{ year }}" method="post" enctype="multipart/form-data">
+	  <h3>View students for {{ quarter }} {{ year }}</h3>
+	  <table>
+	    <tr>
+		  <th>Select</th>
+		  <th>StudentID</th>
+		  <th>UCInetID</th>
+		  <th>Last Name</th>
+		  <th>First Name</th>
+		  <th>Email</th>
+		  <th>Lab</th>
+		  <th>Active</th>
+	    </tr>
+	  {% for student in students %}
+	    <tr>
+		  <td><input type="checkbox" name="student" value="{{ student.studentid }}"></td>
+	      <td>{{ student.studentid }}</td>
+	  	  <td>{{ student.ucinetid }}</td>
+	      <td>{{ student.last_name }}</td>
+	  	  <td>{{ student.first_name }}</td>
+	  	  <td>{{ student.email }}</td>
+	  	  <td>{{ student.lab }}</td>
+	  	  <td>{{ student.active }}</td>
+	  	  <td><a href="/admin/student/edit?studentid={{ student.studentid
+		  }}&quarter={{ student.quarter }}&year={{ student.year }}">edit</a></td>
+	    </tr>
+  	  {% endfor %}
+	  </table>
+	  <input class="button expand" type="submit" value="Submit">
+	</form>
+  {% endif %}
+  <br>
+  <a href="/admin">Back</a>
+  </body>
+</html>
+
+{% endautoescape %}

@@ -1,0 +1,35 @@
+{% extends 'templates/common.html' %}
+{% block content %}
+  <br>
+  <div class="row">
+	<div class="small-12 column panel text-center">
+	  <h4>Welcome to the ICS 31 Partner App</h4>
+	  {% if user %}
+	    <a href="{{ sign_out }}">Sign Out</a>
+	  {% endif %}
+	  <br>
+	  <br>
+	  <div class="row">
+		<div class="small-6 column small-offset-3 text-justify">
+		  <p>
+			You'll be using this app to select partners for lab assignments and
+			to submit evaluations for those partners. If this is your first
+			time using the app, please take the time to read its usage
+			instructions <a href="/partner/instructions">here</a>. 
+			<br>
+			<br>
+			Please note that this app requires that you be signed into your
+			UCI gmail account. If you are having problems signing into the app,
+			please <a href="{{ sign_out }}">sign out</a> and sign back into the
+			app with your UCI Gmail credentials.
+		  </p>
+		  {% if user %}
+	        <a href="/partner" class="button expand">Continue</a>
+		  {% else %}
+	    	<a href="{{ sign_in }}" class="button expand">Sign In</a>
+		  {% endif %}
+		</div>
+	  </div>
+    </div>
+  </div>
+{% endblock %}
