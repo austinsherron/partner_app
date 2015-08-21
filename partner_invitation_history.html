@@ -15,7 +15,15 @@
 				<tr>
 					<td>{{ dt }}</td>
 					{% for k,v in invite %}
-						<td>{{ v }}</td>
+						{% if v is number %}
+							<td class="text-center"><span class="label">{{ v }}</span></td>
+						{% elif v == 'True' %}
+							<td class='text-center'><span class="label success">{{ v }}</span></td>
+						{% elif v == 'False' %}
+							<td class="text-center"><span class="label alert">{{ v }}</span></td>
+						{% else %}
+							<td>{{ v }}</td>
+						{% endif %}
 					{% endfor %}
 				</tr>
 			{% endfor %}
