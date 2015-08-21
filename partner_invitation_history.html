@@ -6,8 +6,21 @@
 <div class="row">
 	<div class="small-12 columns panel">
 		<table>
+			<th>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</th>
+			{% for i,invite in invites.items() %}
+				<tr>
+					<td>{{ i }}</td>
+					{% for v in invite.values() %}
+						<td>{{ v }}</td>
+					{% endfor %}
+				</tr>
+			{% endfor %}
 		</table>
-		{{ invites }}
 	</div>
 </div>
 
