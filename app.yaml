@@ -1,0 +1,32 @@
+application: ics31-partner-app
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /foundation
+  static_dir: foundation
+
+- url: /.*
+  script: partners.application
+
+- url: /partner.*
+  login: required
+  script: partners.application
+
+- url: /admin.*
+  login: admin
+  script: partners.application
+
+libraries:
+- name: webapp2
+  version: latest
+- name: jinja2
+  version: latest
+- name: ssl
+  version: latest
+
+error_handlers:
+  - error_code: over_quota
+    file: templates/over_quota.html

@@ -1,0 +1,47 @@
+commit 64237a0259eaaad09e91ad8f74ed5fbde3acf51c
+Author: Bert Austin Sherron <mail@austinsherron.com>
+Date:   Fri Aug 21 13:39:59 2015 -0700
+
+    added phone_number field to student model; updated profile edit page w/ phone number input; implementing browse
+
+commit e24f209a96a46eba94524b0fd86490ea2dcbd996
+Author: Bert Austin Sherron <mail@austinsherron.com>
+Date:   Fri Aug 21 13:15:49 2015 -0700
+
+    enhanced invitation history interface
+
+commit 7f3e51da57ef2ffcab590ffbf89d961d77967151
+Author: Bert Austin Sherron <mail@austinsherron.com>
+Date:   Fri Aug 21 12:49:36 2015 -0700
+
+    finished invitation history page; modified invitation acceptance logic (relevant to marking an invite as accepted) in confirm partner view
+
+commit 4105675cf21456992f691412d730ac70978fe018
+Author: Bert Austin Sherron <mail@austinsherron.com>
+Date:   Fri Aug 21 10:04:34 2015 -0700
+
+    added created (datetime) and accepted (bool) fields to invitation model; implementing invitation history (small change in partner confirm view); added partner browse stub/route
+
+commit 9c1ca0d79fa1ecf439eae20f5bb8011405c089c3
+Author: Bert Austin Sherron <mail@austinsherron.com>
+Date:   Fri Aug 21 09:36:30 2015 -0700
+
+    Finished profile edit page; added image view/route; adding nav bar; handle/prevent misc error conditions; adding invitation history page
+
+commit ea3d988fd88b850555af38d70bf9de7962483148
+Author: Bert Austin Sherron <mail@austinsherron.com>
+Date:   Thu Aug 20 21:55:12 2015 -0700
+
+    Tentatively completed profile edit page; added image support
+
+commit 845c016716da6dcf9ae47af1e14bc671ce3b5ff5
+Author: Bert Austin Sherron <mail@austinsherron.com>
+Date:   Thu Aug 20 18:47:37 2015 -0700
+
+    Added profile fields to student model; implementing student profile edit page; changed eval display logic on front page
+
+commit ad08a0ee0e00ba26adfab341ef0ea0124d0dc321
+Author: Bert Austin Sherron <mail@austinsherron.com>
+Date:   Wed Aug 19 22:14:31 2015 -0700
+
+    Re-init of repo; added quarter/year params to some quries; changed current_assign/current_eval_assign queries; added EditProfile stub; misc changes
