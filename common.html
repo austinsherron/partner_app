@@ -21,8 +21,16 @@
 			<section class="top-bar-section">
 				{% if user %}
 					<ul class="left">
-						<li>
-							<a href="/partner/history">History</a>
+						<li class="has-dropdown">
+							<a href="#">History</a>
+							<ul class="dropdown">
+								<li>
+									<a href="/partner/history">Partner/Eval History</a>
+								</li>
+								<li>
+									<a href="/partner/history/invitations">Invitation History</a>
+								</li>
+							</ul>
 						</li>
 						<li>
 							<a href="/partner/edit/profile">Profile</a>

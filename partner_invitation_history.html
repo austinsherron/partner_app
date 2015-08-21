@@ -7,15 +7,14 @@
 	<div class="small-12 columns panel">
 		<table>
 			<th>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
+				{% for cat,num in fields %}
+					<td>{{ cat }}</td>
+				{% endfor %}
 			</th>
-			{% for i,invite in invites.items() %}
+			{% for dt,invite in invites %}
 				<tr>
-					<td>{{ i }}</td>
-					{% for v in invite.values() %}
+					<td>{{ dt }}</td>
+					{% for k,v in invite %}
 						<td>{{ v }}</td>
 					{% endfor %}
 				</tr>
