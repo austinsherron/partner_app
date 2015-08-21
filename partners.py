@@ -25,24 +25,33 @@ class BrowseForPartners(CustomHandler):
 	def get(self):
 		# get current user info
 		user = users.get_current_user()
+		# get current quarter/year
+		quarter,year = Setting.query().get().quarter, Setting.query().get().year
 		# use user info to find student in DB (the selector)
-		selector = self.get_student(Setting.query().get().quarter, Setting.query().get().year, user.email())
+		selector = self.get_student(quarter, year, user.email())
 		# use selector info to find students in same lab section
-		selectees = self.students_by_lab(Setting.query().get().quarter, Setting.query().get().year, selector.lab)
+		selectees = self.students_by_lab(quarter, year, selector.lab)
 		# get current assignment
-		current_assignment = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
+		current_assignment = self.current_assign(quarter, year)
 		# get error message, if any
 		e = self.request.get('error')		
 		# check to see if partner selection period has closed
 		selection_closed = (datetime.now() - timedelta(hours=7) > current_assignment.close_date)
+		# get all current_partnerships for partnership status
+		partnerships = self.all_partners_for_assign(quarter, year, current_assignment.number)
+		partnerships = {p.initiator for p in partnerships} | {p.acceptor for p in partnerships}
+		# build dict to store information about partnership status
+		selectees = sorted({s.ucinetid: (s.key in partnerships,s) for s in selectees}.items(), key=lambda x: x[1][1].last_name)
 
 		# pass template values...
 		template_values = {
 			'error': e,
 			'selector': selector,  								# ...student object
-			'selectees': selectees.order(Student.last_name),	# ...query of student objects
+			'selectees': selectees,								# ...query of student objects
 			'selection_closed': selection_closed,
-			'current': current_assignment
+			'current': current_assignment,
+			'user': user,
+			'sign_out': users.create_logout_url('/'),
 		}
 		template = JINJA_ENV.get_template('/templates/partner_browse.html')
 		self.response.write(template.render(template_values))
