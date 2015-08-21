@@ -36,12 +36,14 @@
 								</option>
 							{% endfor %}
 						</select>
+						<label class="label">Phone Number</label>
+						<input type="tel" name="phone_number" value="{{ student.phone_number if student.phone_number else '000-000-0000' }}"/>
 						<input type="file" name="avatar" />
 					</div>
 				</div>
 
 			</div>
-	
+
 			<div class="small-6 columns">
 				<div class="row">
 					<div class="small-6 columns small-centered">
