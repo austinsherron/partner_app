@@ -148,6 +148,15 @@ class CustomHandler(webapp2.RequestHandler):
 					return current_partnership.acceptor.get()
 				else:
 					return 'No Partner'
+
+
+	def all_partners_for_assign(self, quarter, year, assign_num, active=True):
+		return Partnership.query(
+			Partnership.quarter == quarter,
+			Partnership.year == year,
+			Partnership.assignment_number == assign_num,
+			Partnership.active == active,
+		).fetch()
 		
 
 	def students_by_lab(self, quarter, year, lab):
