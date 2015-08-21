@@ -3,8 +3,12 @@
 {% if student %}
   <br>
   <div class="row">
-	<div class="small-6 column small-offset-4">
-  	  <h3>Hello {{ student.first_name }} {{ student.last_name }}</h3>
+	<div class="small-12 column text-center">
+			{% if student.preferred_name %}
+  	  	<h3>Hello {{ student.preferred_name }}</h3>
+			{% else %}
+  	  	<h3>Hello {{ student.first_name }} {{ student.last_name }}</h3>
+			{% endif %}
 	</div>
   </div>
 
@@ -66,7 +70,6 @@
       </h6>
 		{% if not eval.number == current.number %}
 	  	  <h6 class="success label">Important dates for assignment {{ eval.number }}:</h6>
-		{% endif %}
 	  <h6>
 		{% if eval.eval_open_date.hour > 12 %}
 		  {% set hour = eval.eval_open_date.hour - 12 %}
@@ -95,6 +98,7 @@
 	    {{ eval.eval_date.month }}-{{ eval.eval_date.day }}-{{ eval.eval_date.year }} 
 	    at {{ hour }}:{{ eval.eval_date.minute }} {{ am_pm }}
       </h6>
+		{% endif %}
       {% if current_partner %}
 	    {% if current_partner == 'No Partner' %}
 	      <h5 class="alert-box info">
