@@ -28,36 +28,76 @@
 	  <h6 class="success label">Important dates for assignment {{ current.number }}:</h6>
       <h6>
 	    Please choose a partner by: 
+		{% if current.due_date.hour > 12 %}
+		  {% set hour = current.due_date.hour - 12 %}
+		  {% set am_pm = 'PM' %}
+		{% else %}
+		  {% set hour = current.due_date.hour %}
+		  {% set am_pm = 'AM' %}
+	  	{% endif %}
 		<br>
 	    {{ days[current.due_date.weekday()] }},
-			{{ current.due_date.strftime("%m-%d-%Y") }} at {{ current.due_date.strftime("%I:%M %p") }}
+		{{ current.due_date.month }}-{{ current.due_date.day }}-{{ current.due_date.year }} 
+	    at {{ hour }}:{{ current.due_date.minute }} {{ am_pm }}
 	  </h6>
 	  <h6>
+		{% if current.eval_open_date.hour > 12 %}
+		  {% set hour = current.eval_open_date.hour - 12 %}
+		  {% set am_pm = 'PM' %}
+		{% else %}
+		  {% set hour = current.eval_open_date.hour %}
+		  {% set am_pm = 'AM' %}
+	  	{% endif %}
 	    Evaluation opens:
 		<br>
 	    {{ days[current.eval_open_date.weekday()] }},
-			{{ current.eval_open_date.strftime("%m-%d-%Y") }} at {{ current.eval_open_date.strftime("%I:%M %p") }}
+		{{ current.eval_open_date.month }}-{{ current.eval_open_date.day }}-{{ current.eval_open_date.year }} 
+	    at {{ hour }}:{{ current.eval_open_date.minute }} {{ am_pm }}
 	  </h6>
 	  <h6>
+		{% if current.due_date.hour > 12 %}
+		  {% set hour = current.due_date.hour - 12 %}
+		  {% set am_pm = 'PM' %}
+		{% else %}
+		  {% set hour = current.due_date.hour %}
+		  {% set am_pm = 'AM' %}
+	  	{% endif %}
 	    Evaluation closes:
 		<br>
 	    {{ days[current.eval_date.weekday()] }},
-			{{ current.eval_date.strftime("%m-%d-%Y") }} at {{ current.eval_date.strftime("%I:%M %p") }}
+	    {{ current.eval_date.month }}-{{ current.eval_date.day }}-{{ current.eval_date.year }} 
+	    at {{ hour }}:{{ current.eval_date.minute }} {{ am_pm }}
       </h6>
 		{% if not eval.number == current.number %}
 	  	  <h6 class="success label">Important dates for assignment {{ eval.number }}:</h6>
-				<h6>
-					Evaluation opens:
-				<br>
-					{{ days[eval.eval_open_date.weekday()] }},
-					{{ eval.eval_open_date.strftime("%m-%d-%Y") }} at {{ eval.eval_open_date.strftime("%I:%M %p") }}
-				</h6>
-				<h6>
-					Evaluation closes:
-				<br>
-					{{ days[eval.eval_date.weekday()] }},
-					{{ eval.eval_date.strftime("%m-%d-%Y") }} at {{ eval.eval_date.strftime("%I:%M %p") }}
-					</h6>
+	  <h6>
+		{% if eval.eval_open_date.hour > 12 %}
+		  {% set hour = eval.eval_open_date.hour - 12 %}
+		  {% set am_pm = 'PM' %}
+		{% else %}
+		  {% set hour = eval.eval_open_date.hour %}
+		  {% set am_pm = 'AM' %}
+	  	{% endif %}
+	    Evaluation opens:
+		<br>
+	    {{ days[eval.eval_open_date.weekday()] }},
+		{{ eval.eval_open_date.month }}-{{ eval.eval_open_date.day }}-{{ eval.eval_open_date.year }} 
+	    at {{ hour }}:{{ eval.eval_open_date.minute }} {{ am_pm }}
+	  </h6>
+	  <h6>
+		{% if eval.due_date.hour > 12 %}
+		  {% set hour = eval.due_date.hour - 12 %}
+		  {% set am_pm = 'PM' %}
+		{% else %}
+		  {% set hour = eval.due_date.hour %}
+		  {% set am_pm = 'AM' %}
+	  	{% endif %}
+	    Evaluation closes:
+		<br>
+	    {{ days[eval.eval_date.weekday()] }},
+	    {{ eval.eval_date.month }}-{{ eval.eval_date.day }}-{{ eval.eval_date.year }} 
+	    at {{ hour }}:{{ eval.eval_date.minute }} {{ am_pm }}
+      </h6>
 		{% endif %}
       {% if current_partner %}
 	    {% if current_partner == 'No Partner' %}

@@ -292,7 +292,7 @@ class ImageHandler(CustomHandler):
 		# cast key from url from str to ndb.Key
 		key = ndb.Key(urlsafe=key)
 		# grab student associated w/ key and the corresponding avatar
-		image = key.get().avatar
+		image = key.get().avatar 
 		# set content type header...
 		self.response.headers['Content-Type'] = 'image/png'
 		# and 

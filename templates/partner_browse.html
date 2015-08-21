@@ -5,55 +5,56 @@
 
 <div class="row">
 	<div class="small-12 columns panel">
-		<form action="/partner/selection" enctype="multipart/form-data" method="POST">
 			{% for ucinetid,info in selectees %}
 				{% set status,student = info %}
 
-				<div class="row"> 
-					<div class="small-6 columns">
+		<form action="/partner/selection?selected_partner={{ student.studentid }}" enctype="multipart/form-data" method="POST">
 
-						<div class="small-12 columns">
-							{% set name = student.preferred_name if student.preferred_name else student.first_name%}
-							<h3>{{ name }} {{ student.last_name }}</h3> 
-							{% if status %}
-								<span class="alert-box warning">{{ name }} already has a partner for this assignment</span>
-							{% endif %}
-							<span class="label">{{ name }}'s bio</span>
-							<p>{{ student.bio if student.bio else '' }}</p>
-							<span class="label">{{ name }}'s programming experience</span>
-							<p>{{ student.programming_ability + ' (out of 10)' if student.programming_ability else '' }}</p>
-							<span class="label">{{ name }}'s phone number</span>
-							<p>{{ student.phone_number if student.phone_number else '' }}</p>
-							<span class="label">{{ name }}'s email address</span>
-							<p>{{ student.email }}</p>
-							<br>
-						</div>
-			
+			<div class="row"> 
+				<div class="small-6 columns">
+
+					<div class="small-12 columns">
+						{% set name = student.preferred_name if student.preferred_name else student.first_name%}
+						<h3>{{ name }} {{ student.last_name }}</h3> 
+						{% if status %}
+							<span class="alert-box warning">{{ name }} already has a partner for this assignment</span>
+						{% endif %}
+						<span class="label">{{ name }}'s bio</span>
+						<p>{{ student.bio if student.bio else '' }}</p>
+						<span class="label">{{ name }}'s programming experience</span>
+						<p>{{ student.programming_ability + ' (out of 10)' if student.programming_ability else '' }}</p>
+						<span class="label">{{ name }}'s phone number</span>
+						<p>{{ student.phone_number if student.phone_number else '' }}</p>
+						<span class="label">{{ name }}'s email address</span>
+						<p>{{ student.email }}</p>
+						<br>
 					</div>
-
-					<div class="small-6 columns">
-						<div class="small-12 columns small-centered">
-							<img src="/images/{{ student.key.urlsafe() }}"/>
-						</div>
-					</div>
-
-					<div class="row">
-						<div class="small-4 columns small-centered">
-							{% if status %}
-								<input class="button expand alert" type="submit" value="Send Invitation">
-							{% else %}
-								<input class="button expand success" type="submit" value="Send Invitation">
-							{% endif %}
-						</div>
-					</div>
-
+		
 				</div>
-					
 
-				<hr>
+				<div class="small-6 columns">
+					<div class="small-12 columns small-centered">
+						<img src="/images/{{ student.key.urlsafe() }}"/>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="small-4 columns small-centered">
+						{% if status %}
+							<input class="button expand alert" type="submit" value="Send Invitation">
+						{% else %}
+							<input class="button expand success" type="submit" value="Send Invitation">
+						{% endif %}
+					</div>
+				</div>
+
+			</div>
+				
+			<hr>
+
+		</form>
 
 			{% endfor %}
-		</form>
 	</div>
 </div>
 
