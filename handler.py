@@ -5,10 +5,19 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 from webapp2_extras import sessions, auth
 
-from models import Assignment, Student, Instructor, Invitation, Partnership, Evaluation
+from models import Assignment, Student, Instructor, Invitation, Partnership, Evaluation, Setting
 
 
 class CustomHandler(webapp2.RequestHandler):
+
+	
+	def quarter(self):
+		return Setting.query().get().quarter
+
+
+	def year(self):
+		return Setting.query().get().year
+
 
 	def get_student(self, quarter, year, identifier):
 		return Student.query(

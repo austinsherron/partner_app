@@ -1,6 +1,6 @@
 import cgi
 import csv
-import datetime
+import datetime 
 import jinja2
 import os
 import webapp2
@@ -22,7 +22,21 @@ class AddAssignment(CustomHandler):
 	#@admin_required
 	def get(self):
 		template = JINJA_ENV.get_template('/templates/admin_add_assignment.html')
-		self.response.write(template.render({'year': datetime.date.today().year}))
+		quarter = self.quarter()
+		year = self.year()
+		current_assignment = self.current_assign(quarter, year)
+		# pass map of quarter DB representations (ints) to string representation
+		# TODO:
+		#	quarters should not be hardcoded 
+		quarters = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
+		template_values = {
+			'year': year,
+			'quarter': quarter,
+			'quarters': sorted(quarters.items()),
+			'current': current_assignment,
+			'today': datetime.date.today().strftime("%Y-%m-%d"),
+		}
+		self.response.write(template.render(template_values))
 
 
 	def post(self):
@@ -105,7 +119,7 @@ class AddAssignment(CustomHandler):
 			)
 
 			# set 'current' value
-			assignment.current = eval(self.request.get('current'))
+			assignment.current = False
 
 			# if assignment is set to current...
 			if assignment.current:
@@ -123,7 +137,7 @@ class AddAssignment(CustomHandler):
 			message = 'Assignment ' + str(assignment.number) + ' for quarter '
 			message += str(assignment.quarter) + ' ' + str(assignment.year) + ' successfully added'
 
-			return self.redirect('/admin?message=' + message)
+			return self.redirect('/admin/assignment/add?message=' + message)
 
 
 
