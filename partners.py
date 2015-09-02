@@ -306,6 +306,8 @@ class MainPage(CustomHandler):
 		template = JINJA_ENV.get_template('/templates/partners.html')
 		# get current user
 		user = users.get_current_user()
+		student = None
+
 		try:
 			# use user info to find student int DB
 			student = self.get_student(Setting.query().get().quarter, Setting.query().get().year, user.email())
@@ -315,6 +317,7 @@ class MainPage(CustomHandler):
 			eval_assign = self.current_eval_assign(Setting.query().get().quarter, Setting.query().get().year)
 			# find any active invitations for the current assignment that student has sent
 			sent_invitations = self.sent_invites(student, current_assignment.number)
+
 		except (AttributeError, IndexError):
 			template_values = {
 				'user': user,
