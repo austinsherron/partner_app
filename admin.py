@@ -485,10 +485,16 @@ class ManageAssignments(CustomHandler):
 class MainAdmin(CustomHandler):
 	#@admin_required
 	def get(self):
+		user = users.get_current_user()
 		message = self.request.get('message')
 
 		template = JINJA_ENV.get_template('/templates/admin.html')
-		self.response.write(template.render({'message': message}))
+		template_values = {
+			'message': message,
+			'user': user,
+			'sign_out': users.create_logout_url('/')
+		}
+		self.response.write(template.render(template_values))
 
 
 

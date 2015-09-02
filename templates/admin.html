@@ -1,23 +1,54 @@
-<!DOCTYPE html>
-{% autoescape true %}
-<html>
-  <body>
-  {% if message %}
-	<h3>{{ message }}</h3>
-  {% endif %}
-	<ul>
-	  <li><a href="/admin/roster/upload">Upload Roster</a></li>
-	  <li><a href="/admin/roster/view">View Roster</a></li>
-	  <li><a href="/admin/student/add">Add Student</a></li>
-	  <li><a href="/admin/assignment/add">Add Assignment</a></li>
-	  <li><a href="/admin/assignment/view">View Assignments</a></li>
-	  <li><a href="/admin/partners/view">View Partnerships</a></li>
-	  <li><a href="/admin/partners/add">Add Partnerships</a></li>
-	  <li><a href="/admin/evaluations/view">View Evaluations</a></li>
-	  <li><a href="/admin/cleardb">Clear Database</a></li>
-	  <li><a href="/admin/timing/update">Set Current Quarter/Year</a></li>
-	</ul>
-  </body>
-</html>
+{% extends 'templates/admin_common.html' %}
+{% block content %}
 
-{% endautoescape %}
+
+<div class="row">
+
+	{% if message %}
+		<div class="small-12 column">
+			<div class="row text-center">
+				<div class="small-12 column">
+					<h3>{{ message }}</h3>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+
+	<br>
+	<ul class="tabs" data-tab>
+		<li class="tab-title active"><a href="#assignments">Assignments</a></li>
+		<li class="tab-title"><a href="#students">Students</a></li>
+		<li class="tab-title"><a href="#partnerships">Partnerships</a></li>
+		<li class="tab-title"><a href="#evaluations">Evaluations</a></li>
+		<li class="tab-title"><a href="#rosters">Rosters</a></li>
+		<li class="tab-title"><a href="#config">Config</a></li>
+	</ul>
+
+	<div class="tabs-content">
+		<div class="content text-center columns small-12 panel active" id="assignments">
+	  		<a class="button" href="/admin/assignment/add">Add Assignment</a>
+	  		<a class="button" href="/admin/assignment/view">View Assignments</a>
+		</div>
+		<div class="content text-center columns small-12 panel" id="students">
+			<a class="button" href="/admin/student/add">Add Student</a>
+			<a class="button" href="/admin/roster/view">View Students</a>
+		</div>
+		<div class="content text-center columns small-12 panel" id="partnerships">
+			<a class="button" href="/admin/partners/view">View Partnerships</a>
+			<a class="button" href="/admin/partners/add">Add Partnerships</a>
+		</div>
+		<div class="content text-center columns small-12 panel" id="evaluations">
+	  		<a class="button" href="/admin/evaluations/view">View Evaluations</a>
+		</div>
+		<div class="content text-center columns small-12 panel" id="rosters">
+			<a class="button" href="/admin/roster/upload">Upload Roster</a>
+			<a class="button" href="/admin/roster/view">View Roster</a>
+		</div>
+		<div class="content text-center columns small-12 panel" id="config">
+		  <a class="button" href="/admin/cleardb">Clear Database</a>
+		  <a class="button" href="/admin/timing/update">Set Current Quarter/Year</a>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
