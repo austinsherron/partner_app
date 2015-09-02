@@ -103,17 +103,21 @@
 
 		<div class="small-5 column panel" style="height:500px">
 
-			<a href="/partner/selection" data-reveal-id="selectionModal" class="button expand"
-			data-reveal-ajax="true">Send Invitations</a>
-			<div class="reveal-modal small" id="selectionModal" data-reveal></div>
+			{% if current %}
+				<a href="/partner/selection" data-reveal-id="selectionModal" class="button expand"
+				data-reveal-ajax="true">Send Invitations</a>
+				<div class="reveal-modal small" id="selectionModal" data-reveal></div>
 
-			<a href="/partner/confirm" data-reveal-id="confirmModal"
-			class="button expand" data-reveal-ajax="true">Received Invitations</a>
-			<div class="reveal-modal small" id="confirmModal" data-reveal></div>
+				<a href="/partner/confirm" data-reveal-id="confirmModal"
+				class="button expand" data-reveal-ajax="true">Received Invitations</a>
+				<div class="reveal-modal small" id="confirmModal" data-reveal></div>
+			{% endif %}
 
-			<a href="/partner/evaluation" data-reveal-id="evalModal" 
-			class="button expand" data-reveal-ajax="true">Partner Evaluation</a>
-			<div class="reveal-modal small" id="evalModal" data-reveal></div>
+			{% if eval %}
+				<a href="/partner/evaluation" data-reveal-id="evalModal" 
+				class="button expand" data-reveal-ajax="true">Partner Evaluation</a>
+				<div class="reveal-modal small" id="evalModal" data-reveal></div>
+			{% endif %}
 
       		{% if sent_invitations and current %}
 	    		<h5>You've sent partnership invitations (for assignment {{ current.number }}) to the following students:</h5>
