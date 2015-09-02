@@ -34,7 +34,10 @@ class CustomHandler(webapp2.RequestHandler):
 			Assignment.fade_in_date < dt.now() - td(hours=7)
 		).order(Assignment.fade_in_date).fetch()
 
-		return assigns_after_now[-1]
+		try:
+			return assigns_after_now[-1]
+		except IndexError:
+			return None
 
 
 	def current_eval_assign(self, quarter, year):

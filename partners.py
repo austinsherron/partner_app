@@ -33,6 +33,11 @@ class BrowseForPartners(CustomHandler):
 		selectees = self.students_by_lab(quarter, year, selector.lab)
 		# get current assignment
 		current_assignment = self.current_assign(quarter, year)
+
+		# if there are no assignments for this quarter, redirect to avoid errors
+		if not current_assignment:
+			return self.redirect('/partner?message=There are no assignments open for partner selection.' )
+			
 		# get error message, if any
 		e = self.request.get('error')		
 		# check to see if partner selection period has closed
@@ -462,6 +467,11 @@ class ViewInvitationHistory(CustomHandler):
 		# grab all invites (including inactive ones)
 		invites = self.invitation_history(student).order(Invitation.assignment_number).fetch()
 		current_assignment = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
+
+		# if there are no assignments for this quarter, render early to avoid errors
+		if not current_assignment:
+			return self.response.write(template.render({'user': user, 'sign_out': users.create_logout_url('/')}))
+
 		partners = self.partner_history(student, Setting.query().get().quarter, Setting.query().get().year)
 		# grab current partner for reporting 
 		current_partner = self.current_partner(student, partners, current_assignment.number)
