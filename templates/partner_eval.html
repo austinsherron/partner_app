@@ -1,145 +1,130 @@
 {% extends 'templates/base.html' %}
 {% block content %}
-  <a class="close-reveal-modal">&#215;</a>
-  <div class="row text-center">
-  {% if eval_closed %}
-	<h5>
-	  Evaluations for assignment {{ current.number }} open on
-		{% if current.eval_open_date.hour > 12 %}
-		  {% set hour = current.eval_open_date.hour - 12 %}
-		  {% set am_pm = 'PM' %}
-		{% else %}
-		  {% set hour = current.eval_open_date.hour %}
-		  {% set am_pm = 'AM' %}
-	  	{% endif %}
-	    {{ current.eval_open_date.month }}-{{ current.eval_open_date.day }}-{{ current.eval_open_date.year }} 
-	    at {{ hour }}:{{ current.eval_open_date.minute }} {{ am_pm }}
-	</h5>
-  {% elif current_partner == None or current_partner == 'No Partner' %}
-	<h4>
-	  You didn't work with a partner for assignment {{ eval.number }}.
-	  <br>
-	  If this is a mistake, please contact your TA.
-	</h4>
-  {% else %}
-	<h4>
-	  Evaluation for {{ current_partner.last_name }}, {{
-	  current_partner.first_name }}, assignment {{ eval.number }}
-	  <br>
-	  <br>
-	  {% if eval.eval_date.hour > 12 %}
-	  {% set hour = eval.eval_date.hour - 12 %}
-		{% set am_pm = 'PM' %}
-	  {% else %}
-		{% set hour = eval.eval_date.hour %}
-		{% set am_pm = 'AM' %}
-	  {% endif %}
-	  Due {{ eval.eval_date.month }}-{{ eval.eval_date.day }}-{{ eval.eval_date.year }} 
-	  at {{ hour }}:{{ eval.eval_date.minute }} {{ am_pm }}
-	</h4>
-	<form action="/partner/evaluation" method="post" enctype="multipart/form-data">
-	  <label>
-		Did your partner come to the scheduled meetings on time and ready to work?
-	  </label>
-	  <br>
-	  <select name="q1">
-		{% for val in rate_scale %}
-		  <option value="{{ val }}">{{ val }}</option>
-		{% endfor %}
-	  </select>
-	  <br>
-	  <label>
-		Did your partner read the assignment and preparatory materials before 
-		coming to the scheduled meetings, showing up either with specific questions 
-		or ready to contribute?
-	  </label>
-	  <br>
-	  <select name="q2">
-		{% for val in rate_scale %}
-		  <option value="{{ val }}">{{ val }}</option>
-		{% endfor %}
-	  </select>
-	  <br>
-	  <label>
-		Did your partner cooperatively follow the pair programming model 
-		(rotating roles of driver and navigator, questioning and making 
-		observations as the navigator)?
-	  </label>
-	  <br>
-	  <select name="q3">
-		{% for val in rate_scale %}
-		  <option value="{{ val }}">{{ val }}</option>
-		{% endfor %}
-	  </select>
-	  <br>
-	  <label>
-		Did your partner contribute fully, fairly, and actively, to the 
-		best of his or her ability, to the completion of the assignment?
-	  </label>
-	  <br>
-	  <select name="q4">
-		{% for val in rate_scale %}
-		  <option value="{{ val }}">{{ val }}</option>
-		{% endfor %}
-	  </select>
-	  <br>
-	  <label>
-		Was your partner's participation professional and cooperative overall?
-	  </label>
-	  <br>
-	  <select name="q5">
-		{% for val in rate_scale %}
-		  <option value="{{ val }}">{{ val }}</option>
-		{% endfor %}
-	  </select>
-	  <br>
-	  <label class="label">Comments</label>
-	  <textarea name="q6"></textarea>
-	  <br>
-	  <label>
-		How would you describe your comfort and ability with the course material on this week's lab,
-		compared to your partner's? (This is for statistical purposes, not for individual evaluation)
-	  </label>
-	  <br>
-	  <select name="q7">
-		{% for val in rate5scale %}
-		  <option value="{{ val }}">{{ val }}</option>
-		{% endfor %}
-	  </select>
-	  <br>
-	  <label>
-		On the required parts of this lab assignment, my partner and I spent about ___ hours in our scheduled
-		lab session.
-	  </label>
-	  <br>
-	  <select name="q8">
-		{% for val in rate10scale %}
-		  <option value="{{ val }}">{{ val }}</option>
-		{% endfor %}
-	  </select>
-	  <br>
-	  <label>
-		Plus about ___ hours outside of our scheduled lab.
-	  </label>
-	  <br>
-	  <select name="q9">
-		{% for val in rate10scale %}
-		  <option value="{{ val }}">{{ val }}</option>
-		{% endfor %}
-	  </select>
-	  <br>
-	  <label>
-		We [were/were not] able to to complete the assignment.
-	  </label>
-	  <br>
-	  <select name="q10">
-		<option value="were">were</option>
-		<option value="were not">were not</option>
-	  </select>
-	  <br>
-	  <br>
-	  <input type="submit" value="Evaluate" class="button expand">
-	</form>
-  {% endif %}
-  </div>
+<a class="close-reveal-modal">&#215;</a>
+<div class="row text-center">
+	{% if eval_closed %}
+		<h5>
+			Evaluations for assignment {{ current.number }} open on 
+			<br>
+			{{ current.eval_open_date.strftime("%A, %m-%d-%Y") }} at {{ current.eval_open_date.strftime("%I:%M %p") }}
+		</h5>
+	{% elif current_partner == None or current_partner == 'No Partner' %}
+		<h4>
+			You didn't work with a partner for assignment {{ eval.number }}.
+			<br>
+			If this is a mistake, please contact your TA.
+		</h4>
+	{% else %}
+		<h4>
+			Evaluation for {{ current_partner.last_name }}, {{ current_partner.first_name }}, assignment {{ eval.number }}
+			<br>
+			<br>
+			{{ eval.eval_date.strftime("%A, %m-%d-%Y") }} at {{ eval.eval_date.strftime("%I:%M %p") }}
+		</h4>
+
+		<form action="/partner/evaluation" method="post" enctype="multipart/form-data">
+			<label>
+				Did your partner come to the scheduled meetings on time and ready to work?
+			</label>
+			<br>
+			<select name="q1">
+				{% for val in rate_scale %}
+					<option value="{{ val }}">{{ val }}</option>
+				{% endfor %}
+			</select>
+			<br>
+			<label>
+			Did your partner read the assignment and preparatory materials before 
+			coming to the scheduled meetings, showing up either with specific questions 
+			or ready to contribute?
+			</label>
+			<br>
+			<select name="q2">
+				{% for val in rate_scale %}
+					<option value="{{ val }}">{{ val }}</option>
+				{% endfor %}
+			</select>
+			<br>
+			<label>
+				Did your partner cooperatively follow the pair programming model 
+				(rotating roles of driver and navigator, questioning and making 
+				observations as the navigator)?
+			</label>
+			<br>
+			<select name="q3">
+				{% for val in rate_scale %}
+					<option value="{{ val }}">{{ val }}</option>
+				{% endfor %}
+			</select>
+			<br>
+			<label>
+				Did your partner contribute fully, fairly, and actively, to the 
+				best of his or her ability, to the completion of the assignment?
+			</label>
+			<br>
+			<select name="q4">
+				{% for val in rate_scale %}
+					<option value="{{ val }}">{{ val }}</option>
+				{% endfor %}
+			</select>
+			<br>
+			<label>
+				Was your partner's participation professional and cooperative overall?
+			</label>
+			<br>
+			<select name="q5">
+				{% for val in rate_scale %}
+					<option value="{{ val }}">{{ val }}</option>
+				{% endfor %}
+			</select>
+			<br>
+			<label class="label">Comments</label>
+			<textarea name="q6"></textarea>
+			<br>
+			<label>
+				How would you describe your comfort and ability with the course material on this week's lab,
+				compared to your partner's? (This is for statistical purposes, not for individual evaluation)
+			</label>
+			<br>
+			<select name="q7">
+				{% for val in rate5scale %}
+					<option value="{{ val }}">{{ val }}</option>
+				{% endfor %}
+			</select>
+			<br>
+			<label>
+				On the required parts of this lab assignment, my partner and I spent about ___ hours in our scheduled
+				lab session.
+			</label>
+			<br>
+			<select name="q8">
+				{% for val in rate10scale %}
+					<option value="{{ val }}">{{ val }}</option>
+				{% endfor %}
+			</select>
+			<br>
+			<label>
+				Plus about ___ hours outside of our scheduled lab.
+			</label>
+			<br>
+			<select name="q9">
+				{% for val in rate10scale %}
+					<option value="{{ val }}">{{ val }}</option>
+				{% endfor %}
+			</select>
+			<br>
+			<label>
+				We [were/were not] able to to complete the assignment.
+			</label>
+			<br>
+			<select name="q10">
+				<option value="were">were</option>
+				<option value="were not">were not</option>
+			</select>
+			<br>
+			<br>
+			<input type="submit" value="Evaluate" class="button expand">
+		</form>
+	{% endif %}
+</div>
 {% endblock %}
