@@ -35,6 +35,8 @@ class AddAssignment(CustomHandler):
 			'quarters': sorted(quarters.items()),
 			'current': current_assignment,
 			'today': datetime.date.today().strftime("%Y-%m-%d"),
+			'user': users.get_current_user(),
+			'sign_out': users.create_logout_url('/'),
 		}
 		self.response.write(template.render(template_values))
 
