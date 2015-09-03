@@ -58,20 +58,22 @@
 			</section>
 
 			<section class="top-bar-section">
-				<ul class="right">
-					<li>
-						<a href="partner/instructions">Help</a>
-					</li>
-					{% if sign_out %}
-						<li class="active">
-							<a href="{{ sign_out }}">Logout</a>
-						</li>
-					{% elif sign_in %}
-						<li class="active">
-							<a href="{{ sign_in }}">Login</a>
-						</li>
-					{% endif %}
-				</ul>
+
+				<form method="GET" action=".">
+					<ul class="right">
+						<li><input name="year"/></li>
+						<li><a href="partner/instructions">Help</a></li>
+						{% if sign_out %}
+							<li class="active">
+								<a href="{{ sign_out }}">Logout</a>
+							</li>
+						{% elif sign_in %}
+							<li class="active">
+								<a href="{{ sign_in }}">Login</a>
+							</li>
+						{% endif %}
+					</ul>
+				</form>
 			</section>
 		</nav>
 

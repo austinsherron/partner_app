@@ -1,40 +1,49 @@
-<!DOCTYPE html>
-{% autoescape true %}
+{% extends '/templates/admin_common.html' %}
+{% block content %}
 
-<html>
-  <body>
+<div class="row">
 
-	<h3>View assignments for {{ quarter }} {{ year }}</h3>
-	<table>
-	  <tr>
-		<th>Number</th>
-		<th>Fade In Date/Time</th>
-		<th>Due Date/Time</th>
-		<th>Close Date/Time</th>
-		<th>Eval Open Date/Time</th>
-		<th>Eval Close Date/Time</th>
-		<th>Fade Out Date/Time</th>
-		<th>Current?</th>
-	  </tr>
-	{% for assignment in assignments %}
-		<tr>
-		  <td>{{ assignment.number }}</td>
-		  <td>{{ assignment.fade_in_date }}</td>
-		  <td>{{ assignment.due_date }}</td>
-		  <td>{{ assignment.close_date }}</td>
-		  <td>{{ assignment.eval_open_date }}</td>
-		  <td>{{ assignment.eval_date }}</td>
-		  <td>{{ assignment.fade_out_date }}</td>
-		  <td>{{ assignment.current }}</td>
-		  <td><a href="/admin/assignment/edit?number={{ assignment.number
-			}}&quarter={{ assignment.quarter }}&year={{ assignment.year }}">edit</a></td>
-		</tr>
-  	{% endfor %}
-	</table>
-  <br>
-  <a href="/admin">Back</a>
-  </body>
-</html>
+	<br>
 
-{% endautoescape %}
+	<div class="small-12 columns">
+		<h3 class="text-center">Viewing assignments for {{ quarter }} {{ year }}</h3>
+	</div>
 
+	<div class="small-12 columns panel">
+
+		<table>
+		  <tr>
+			<th class="text-center">Number</th>
+			<th class="text-center">Fade In Date/Time</th>
+			<th class="text-center">Due Date/Time</th>
+			<th class="text-center">Close Date/Time</th>
+			<th class="text-center">Eval Open Date/Time</th>
+			<th class="text-center">Eval Close Date/Time</th>
+			<th class="text-center">Current?</th>
+		  </tr>
+		{% for assignment in assignments %}
+			<tr>
+			  <td class="text-center">{{ assignment.number }}</td>
+			  <td class="text-center">{{ assignment.fade_in_date.strftime("%m-%d-%Y\n%I:%M %p") }}</td>
+			  <td class="text-center">{{ assignment.due_date.strftime("%m-%d-%Y\n%I:%M %p") }}</td>
+			  <td class="text-center">{{ assignment.close_date.strftime("%m-%d-%Y\n%I:%M %p") }}</td>
+			  <td class="text-center">{{ assignment.eval_open_date.strftime("%m-%d-%Y\n%I:%M %p") }}</td>
+			  <td class="text-center">{{ assignment.eval_date.strftime("%m-%d-%Y\n%I:%M %p") }}</td>
+			  <!--
+				Not currently used
+	
+			  	<td>{{ assignment.fade_out_date.strftime("%m-%d-%Y\n%I:%M %p") }}</td>
+			  -->
+			  <td class="text-center">
+				<span class="label">
+					<a style="color: #FFF" href="/admin/assignment/edit?number={{ assignment.number }}
+						&quarter={{ assignment.quarter }}&year={{ assignment.year }}">edit</a></td>
+				</span>
+			</tr>
+		{% endfor %}
+		</table>
+
+	</div>
+</div>
+
+{% endblock %}

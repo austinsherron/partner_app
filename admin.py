@@ -471,7 +471,9 @@ class ManageAssignments(CustomHandler):
 		template_values = {
 			'assignments': assignments.order(Assignment.number),
 			'quarter': quarter_map[int(quarter)],
-			'year': int(year)
+			'year': int(year),
+			'user': users.get_current_user(),
+			'sign_out': users.create_logout_url('/'),
 		}
 		self.response.write(template.render(template_values))
 
@@ -493,8 +495,7 @@ class MainAdmin(CustomHandler):
 			'quarter': self.session.get('quarter'),
 			'year': self.session.get('year'),
 		}
-		self.response.write(template.render(template_values))
-
+		return self.response.write(template.render(template_values))
 
 
 class UpdateQuarterYear(CustomHandler):
@@ -520,7 +521,7 @@ class UpdateQuarterYear(CustomHandler):
 
 		setting.put()
 
-		self.redirect('/admin/timing/update')
+		return self.redirect('/admin?message=Quarter and Year Updated')
 
 
 
@@ -695,3 +696,6 @@ class ViewRoster(CustomHandler):
 		self.response.write(template.render(template_values))
 		
 
+################################################################################
+################################################################################
+################################################################################
