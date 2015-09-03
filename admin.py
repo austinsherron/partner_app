@@ -1,3 +1,8 @@
+################################################################################
+## IMPORTS #####################################################################
+################################################################################
+
+
 import cgi
 import csv
 import datetime 
@@ -9,13 +14,35 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 from webapp2_extras.appengine.users import admin_required
 
-from models import Assignment, Student, Instructor, Invitation, Partnership, Evaluation, Setting
+from admin_helpers import make_date
 from handler import CustomHandler
+from models import Assignment, Student, Instructor, Invitation, Partnership, Evaluation, Setting
+
+
+################################################################################
+################################################################################
+################################################################################
+
+
+################################################################################
+## LOAD JINJA ##################################################################
+################################################################################
+
 
 JINJA_ENV = jinja2.Environment(
 	loader = jinja2.FileSystemLoader(os.path.dirname(__file__)),
 	extensions = ['jinja2.ext.autoescape'],
 	autoescape=True)
+
+
+################################################################################
+################################################################################
+################################################################################
+
+
+################################################################################
+## HANDLERS ####################################################################
+################################################################################
 
 
 class AddAssignment(CustomHandler):
@@ -49,90 +76,38 @@ class AddAssignment(CustomHandler):
 		assignment.quarter = int(self.request.get('quarter'))
 		assignment.number = int(self.request.get('assign_num'))
 
-		# if an assignment with the same PK values exist, redirect with error;
-		# assignment isn't created
-		if (Assignment.query(Assignment.year == assignment.year, 
-			Assignment.quarter == assignment.quarter, Assignment.number == assignment.number)).get():
-			
+		# if an assignment with the same PK values exist, redirect with error; assignment isn't created
+		if self.get_assign(assignment.quarter, assignment.year, assignment.number):
 			message = 'That assignment is already in the database'
-			return self.redirect('/admin?message=' + message)
+			return self.redirect('/admin/assignment/add?message=' + message)
 		else:
 			# set dates/times
-			# TODO: create helper function that handles all the dates
 			fade_in_date = str(self.request.get('fade_in_date')).split('-')
 			fade_in_time = str(self.request.get('fade_in_time')).split(':')
+			assignment.fade_in_date = make_date(fade_in_date, fade_in_time)
 
-			assignment.fade_in_date = datetime.datetime(
-				year=int(fade_in_date[0]),
-				month=int(fade_in_date[1]),
-				day=int(fade_in_date[2]),
-				hour=int(fade_in_time[0]),
-				minute=int(fade_in_time[1])
-			)
 			due_date = str(self.request.get('due_date')).split('-')
 			due_time = str(self.request.get('due_time')).split(':')
+			assignment.due_date = make_date(due_date, due_time)
 
-			assignment.due_date = datetime.datetime(
-				year=int(due_date[0]),
-				month=int(due_date[1]),
-				day=int(due_date[2]),
-				hour=int(due_time[0]),
-				minute=int(due_time[1])
-			)
 			close_date = str(self.request.get('close_date')).split('-')
 			close_time = str(self.request.get('close_time')).split(':')
+			assignment.close_date = make_date(close_date, close_time)
 
-			assignment.close_date = datetime.datetime(
-				year=int(close_date[0]),
-				month=int(close_date[1]),
-				day=int(close_date[2]),
-				hour=int(close_time[0]),
-				minute=int(close_time[1])
-			)
 			eval_date = str(self.request.get('eval_date')).split('-')
 			eval_time = str(self.request.get('eval_time')).split(':')
+			assignment.eval_date = make_date(eval_date, eval_time)
 
-			assignment.eval_date = datetime.datetime(
-				year=int(eval_date[0]),
-				month=int(eval_date[1]),
-				day=int(eval_date[2]),
-				hour=int(eval_time[0]),
-				minute=int(eval_time[1])
-			)
 			eval_open_date = str(self.request.get('eval_open_date')).split('-')
 			eval_open_time = str(self.request.get('eval_open_time')).split(':')
+			assignment.eval_open_date = make_date(eval_open_date, eval_open_time)
 
-			assignment.eval_open_date = datetime.datetime(
-				year=int(eval_open_date[0]),
-				month=int(eval_open_date[1]),
-				day=int(eval_open_date[2]),
-				hour=int(eval_open_time[0]),
-				minute=int(eval_open_time[1])
-			)
 			fade_out_date = str(self.request.get('fade_out_date')).split('-')
 			fade_out_time = str(self.request.get('fade_out_time')).split(':')
+			assignment.fade_out_date = make_date(fade_out_date, fade_out_time)
 
-			assignment.fade_out_date = datetime.datetime(
-				year=int(fade_out_date[0]),
-				month=int(fade_out_date[1]),
-				day=int(fade_out_date[2]),
-				hour=int(fade_out_time[0]),
-				minute=int(fade_out_time[1])
-			)
-
-			# set 'current' value
+			# set 'current' value (always false due to query updates)
 			assignment.current = False
-
-			# if assignment is set to current...
-			if assignment.current:
-			# ...get all assignments for year/quarter of new assignment...
-				assignments = Assignment.query(Assignment.year == assignment.year,
-					Assignment.quarter == assignment.quarter)
-			# ...and set them to inactive
-				for assign in assignments:
-					if assign != assignment:
-						assign.current = False
-						assign.put()
 
 			assignment.put()
 	

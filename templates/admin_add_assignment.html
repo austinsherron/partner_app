@@ -1,9 +1,15 @@
 {% extends 'templates/admin_common.html' %}
-{% block content%}
+{% block content %}
 
 <div class="row">
 
 	<br>
+
+	{% if message %}
+		<div class="small-12 small-centered">
+			<h3>{{ message }}</h3>
+		</div>
+	{% endif %}
 
 	<div class="small-4 columns small-offset-4">
 		<h3 class="small-centered">Add An Assignment...</h3>
