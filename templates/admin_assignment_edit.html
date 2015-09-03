@@ -1,75 +1,112 @@
-<!DOCTYPE html>
-<html>
-  <body>
-	<form action="/admin/assignment/edit" method="post" enctype="multipart/form-data">
-	  <label>Assignment Number:</label>
-	  <input name="number" value="{{ a.number }}">
-	  <br>
-	  <br>
-	  <label>Fade In Date:</label>
-	  <input type="date" name="fade_in_date" value="{{ fid }}">
-	  <br>
-	  <br>
-	  <label>Fade In Time:</label>
-	  <input type="time" name="fade_in_time" value="{{ fit }}">
-	  <br>
-	  <br>
-	  <label>Due Date:</label>
-	  <input type="date" name="due_date" value="{{ dd }}">
-	  <br>
-	  <br>
-	  <label>Due Time:</label>
-	  <input type="time" name="due_time" value="{{ dt }}">
-	  <br>
-	  <br>
-	  <label>Close Date:</label>
-	  <input type="date" name="close_date" value="{{ cd }}">
-	  <br>
-	  <br>
-	  <label>Close Time:</label>
-	  <input type="time" name="close_time" value="{{ ct }}">
-	  <br>
-	  <br>
-	  <label>Eval Open Date:</label>
-	  <input type="date" name="eval_open_date" value="{{ eod }}">
-	  <br>
-	  <br>
-	  <label>Eval Open Time:</label>
-	  <input type="time" name="eval_open_time" value="{{ eot }}">
-	  <br>
-	  <br>
-	  <label>Eval Close Date:</label>
-	  <input type="date" name="eval_date" value="{{ ecd }}">
-	  <br>
-	  <br>
-	  <label>Eval Close Time:</label>
-	  <input type="time" name="eval_time" value="{{ ect }}">
-	  <br>
-	  <br>
-	  <label>Fade Out Date:</label>
-	  <input type="date" name="fade_out_date" value="{{ fod }}">
-	  <br>
-	  <br>
-	  <label>Fade Out Time:</label>
-	  <input type="time" name="fade_out_time" value="{{ fot }}">
-	  <br>
-	  <br>
-	  <label>Current?:</label>
-	  <select name="current">
-		<option value="True">Yes</option>
-		<option value="False">No</option>
-	  </select>
-	  <br>
-	  <br>
-	  <label>Quarter:</label>
-	  <input name="quarter" value="{{ a.quarter }}" readonly>
-	  <br>
-	  <br>
-	  <label>Year:</label>
-	  <input name="year" value="{{ a.year }}" readonly>
-	  <br>
-	  <br>
-	  <input type="submit" value="Submit">
-	</form>
-  </body>
-</html>
+{% extends 'templates/admin_common.html' %}
+{% block content %}
+
+<div class="row">
+
+	<br>
+
+	{% if message %}
+		<div class="small-12 columns">
+			<h3 class="text-center">{{ message }}</h3>
+		</div>
+	{% endif %}
+
+	<div class="small-4 columns small-offset-4">
+		<h3 class="small-centered">Edit Assignment {{ number }}</h3>
+		<br>
+	</div>
+
+	<div class="small-12 columns panel">
+		<div class="row">
+			
+			<form action="/admin/assignment/add?edit=True" method="post" enctype="multipart/form-data">
+				<div class="small-6 columns">
+					<div>
+						<span class="label">Year</span><br>
+						<input type="number" name="year" value="{{ year }}" />
+					</div>
+					<div>
+						<span class="label">Quarter</span><br>
+						<select name="quarter">
+							{% for num,name in quarters %}
+								{% if num == quarter %}
+									<option value="{{ num }}" selected>{{ name }}</option>
+								{% else %}
+									<option value="{{ num }}">{{ name }}</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+					</div>
+			  		<div>
+						<span class="label">Assignment Number</span><br>
+						<input name="assign_num" type="number" value="{{ number }}"/>
+			  		</div>
+					<br>
+					<input class="button expand" type="submit" value="Save">
+					<a class="button expand alert" href="/admin/assignment/view">Cancel</a>
+				</div>
+
+				<div class="small-6 columns">
+					<div class="rows">
+						<div class="small-6 columns">
+						<span class="label">Fade In Date</span><br>
+							<input name="fade_in_date" type="date" value="{{ fid }}">
+						</div>
+						<div class="small-6 columns">
+							<span class="label">Fade In Time</span><br>
+							<input name="fade_in_time" type="time" value="{{ fit }}">
+						</div>
+					</div>
+
+					<div class="small-6 columns">
+						<span class="label">Due Date (should have partner by now)</span><br>
+						<input name="due_date" type="date" value="{{ dd }}">
+					</div>
+					<div class="small-6 columns">
+						<span class="label">Due Time</span><br>
+						<input name="due_time" type="time" value="{{ dt }}">
+					</div>
+
+					<div class="small-6 columns">
+						<span class="label">Close Date (no more parter selection)</span><br>
+						<input name="close_date" type="date" value="{{ cd }}">
+					</div>
+					<div class="small-6 columns">
+						<span class="label">Close Time</span><br>
+						<input name="close_time" type="time" value="{{ ct }}">
+					</div>
+
+					<div class="small-6 columns">
+						<span class="label">Eval Open Date</span><br>
+						<input name="eval_open_date" type="date" value="{{ eod }}">
+					</div>
+					<div class="small-6 columns">
+						<span class="label">Eval Open Time</span><br>
+						<input name="eval_open_time" type="time" value="{{ eot }}">
+					</div>
+
+					<div class="small-6 columns">
+						<span class="label">Eval Close Date</span><br>
+						<input name="eval_date" type="date" value="{{ ecd }}">
+					</div>
+					<div class="small-6 columns">
+						<span class="label">Eval Close Time</span><br>
+						<input name="eval_time" type="time" value="{{ ect }}">
+					</div>
+				
+					<!-- Not currently used -->
+
+					<div style="display: none">
+						<span class="label">Fade Out Date/Time</span><br>
+						<div><input name="fade_out_date" type="date" value="{{ year }}-01-01"></div>
+						<div><input name="fade_out_time" type="time" value="00:00"></div>
+					</div>
+
+				</div>
+			</form> 
+			<br>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

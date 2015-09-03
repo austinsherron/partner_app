@@ -6,7 +6,7 @@
 	<br>
 
 	<div class="small-12 columns">
-		<h3 class="text-center">Viewing assignments for {{ quarter }} {{ year }}</h3>
+		<h3 class="text-center">Viewing assignments for {{ quarter_name }} {{ year }}</h3>
 	</div>
 
 	<div class="small-12 columns panel">
@@ -19,7 +19,7 @@
 			<th class="text-center">Close Date/Time</th>
 			<th class="text-center">Eval Open Date/Time</th>
 			<th class="text-center">Eval Close Date/Time</th>
-			<th class="text-center">Current?</th>
+			<th class="text-center">Edit</th>
 		  </tr>
 		{% for assignment in assignments %}
 			<tr>

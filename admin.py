@@ -74,15 +74,26 @@ class AddAssignment(CustomHandler):
 
 
 	def post(self):
-		# create new assignment
-		assignment = Assignment()
-		# set PK values
-		assignment.year = int(self.request.get('year'))
-		assignment.quarter = int(self.request.get('quarter'))
-		assignment.number = int(self.request.get('assign_num'))
+		# URL will contain 'edit' argument if this request is coming from an assignment edit form
+		edit = self.request.get('edit')
+		# grab assignment info from URL
+		year = int(self.request.get('year'))			
+		quarter = int(self.request.get('quarter'))
+		number = int(self.request.get('assign_num'))
+
+		# if this request didn't come from the edit form...
+		if not edit:
+			# ...create new assignment and set PK values
+			assignment = Assignment()
+			assignment.year = int(self.request.get('year'))
+			assignment.quarter = int(self.request.get('quarter'))
+			assignment.number = int(self.request.get('assign_num'))
+		else:
+			# ...else get assignment
+			assignment = self.get_assign(quarter, year, number)
 
 		# if an assignment with the same PK values exist, redirect with error; assignment isn't created
-		if self.get_assign(assignment.quarter, assignment.year, assignment.number):
+		if self.get_assign(assignment.quarter, assignment.year, assignment.number) and not edit:
 			message = 'That assignment is already in the database'
 			return self.redirect('/admin/assignment/add?message=' + message)
 		else:
@@ -114,12 +125,18 @@ class AddAssignment(CustomHandler):
 			# set 'current' value (always false due to query updates)
 			assignment.current = False
 
+			# save assignment object
 			assignment.put()
 	
 			message = 'Assignment ' + str(assignment.number) + ' for quarter '
-			message += str(assignment.quarter) + ' ' + str(assignment.year) + ' successfully added'
+			message += str(assignment.quarter) + ' ' + str(assignment.year) 
+			# changed success message depending on whether an assignment was just create/updated
+			message += ' successfully ' + ('updated' if edit else 'added')		
 
-			return self.redirect('/admin/assignment/add?message=' + message)
+			# redirct according to action (add vs edit)
+			redirect_link = '/admin/assignment/' + ('view' if edit else 'add') 
+
+			return self.redirect(redirect_link + '?message=' + message)
 
 
 
@@ -293,12 +310,21 @@ class DeleteStudents(CustomHandler):
 
 class EditAssignment(CustomHandler):
 	def get(self):
-		assignment = Assignment.query(
-			Assignment.number == int(self.request.get('number')),
-			Assignment.year == int(self.request.get('year')),
-			Assignment.quarter == int(self.request.get('quarter')),
-		).get()
-		template_values = {
+		quarter = int(self.request.get('quarter'))						# grab quarter, year, and assign num from URL
+		year = int(self.request.get('year'))						
+		number = int(self.request.get('number'))
+		assignment = self.get_assign(quarter, year, number)				# query assignment
+
+		temp = get_sess_vals(self.session, 'quarter', 'year')			# try to grab current quarter/year from session
+		if not temp:													# redirect with error if it doesn't exist
+			return self.redirect('/admin?message=Please set a current quarter and year')
+		quarter,year = temp
+		# pass map of quarter DB representations (ints) to string representation
+		# TODO:
+		#	quarters should not be hardcoded 
+		quarters = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
+
+		template_values = {												# build template value map...
 			'a': assignment,
 			'fid': assignment.fade_in_date.strftime('%Y-%m-%d'),
 			'fit': assignment.fade_in_date.strftime('%H:%M'),
@@ -312,101 +338,15 @@ class EditAssignment(CustomHandler):
 			'ect': assignment.eval_date.strftime('%H:%M'),
 			'fod': assignment.fade_out_date.strftime('%Y-%m-%d'),
 			'fot': assignment.fade_out_date.strftime('%H:%M'),
+			'user': users.get_current_user(),
+			'sign_out': users.create_logout_url('/'),
+			'quarter': quarter,
+			'quarters': sorted(quarters.items()),
+			'year': year,
+			'number': number,
 		}
 		template = JINJA_ENV.get_template('/templates/admin_assignment_edit.html')
-		self.response.write(template.render(template_values))
-
-
-	def post(self):
-		assignment = Assignment.query(
-			Assignment.number == int(self.request.get('number')),
-			Assignment.year == int(self.request.get('year')),
-			Assignment.quarter == int(self.request.get('quarter')),
-		).get()
-
-		fade_in_date = str(self.request.get('fade_in_date')).split('-')
-		fade_in_time = str(self.request.get('fade_in_time')).split(':')
-
-		assignment.fade_in_date = datetime.datetime(
-			year=int(fade_in_date[0]),
-			month=int(fade_in_date[1]),
-			day=int(fade_in_date[2]),
-			hour=int(fade_in_time[0]),
-			minute=int(fade_in_time[1])
-		)
-		due_date = str(self.request.get('due_date')).split('-')
-		due_time = str(self.request.get('due_time')).split(':')
-
-		assignment.due_date = datetime.datetime(
-			year=int(due_date[0]),
-			month=int(due_date[1]),
-			day=int(due_date[2]),
-			hour=int(due_time[0]),
-			minute=int(due_time[1])
-		)
-		close_date = str(self.request.get('close_date')).split('-')
-		close_time = str(self.request.get('close_time')).split(':')
-
-		assignment.close_date = datetime.datetime(
-			year=int(close_date[0]),
-			month=int(close_date[1]),
-			day=int(close_date[2]),
-			hour=int(close_time[0]),
-			minute=int(close_time[1])
-		)
-		eval_open_date = str(self.request.get('eval_open_date')).split('-')
-		eval_open_time = str(self.request.get('eval_open_time')).split(':')
-
-		assignment.eval_open_date = datetime.datetime(
-			year=int(eval_open_date[0]),
-			month=int(eval_open_date[1]),
-			day=int(eval_open_date[2]),
-			hour=int(eval_open_time[0]),
-			minute=int(eval_open_time[1])
-		)
-		eval_date = str(self.request.get('eval_date')).split('-')
-		eval_time = str(self.request.get('eval_time')).split(':')
-
-		assignment.eval_date = datetime.datetime(
-			year=int(eval_date[0]),
-			month=int(eval_date[1]),
-			day=int(eval_date[2]),
-			hour=int(eval_time[0]),
-			minute=int(eval_time[1])
-		)
-		fade_out_date = str(self.request.get('fade_out_date')).split('-')
-		fade_out_time = str(self.request.get('fade_out_time')).split(':')
-
-		assignment.fade_out_date = datetime.datetime(
-			year=int(fade_out_date[0]),
-			month=int(fade_out_date[1]),
-			day=int(fade_out_date[2]),
-			hour=int(fade_out_time[0]),
-			minute=int(fade_out_time[1])
-		)
-
-		# set 'current' value
-		assignment.current = eval(self.request.get('current'))
-
-		# if assignment is set to current...
-		if assignment.current:
-		# ...get all assignments for year/quarter of new assignment...
-			assignments = Assignment.query(Assignment.year == assignment.year,
-				Assignment.quarter == assignment.quarter)
-		# ...and set them to inactive
-			for assign in assignments:
-				if assign != assignment:
-					assign.current = False
-					assign.put()
-
-		assignment.put()
-
-		message = 'Assignment ' + str(assignment.number) + ' for quarter '
-		message += str(assignment.quarter) + ', ' + str(assignment.year)
-		message += ' successfully updated'
-	
-		self.redirect('/admin?message=' + message)
-
+		return self.response.write(template.render(template_values))	# ...and render the response
 
 
 class EditStudent(CustomHandler):
@@ -460,23 +400,24 @@ class ManageAssignments(CustomHandler):
 	def get(self):
 		quarter_map = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
 
-		quarter = int(self.request.get('quarter'))							# try grabbing quarter/year from URL
-		year = int(self.request.get('year'))
+		quarter = self.request.get('quarter')								# try grabbing quarter/year from URL
+		year = self.request.get('year')
 
 		if not quarter or not year:											# if they don't exist, try grabbing from session
 			temp = get_sess_vals(self.session, 'quarter', 'year')
 
-			if temp:														# if they don't exist there, redirect with error
+			if not temp:														# if they don't exist there, redirect with error
 				return self.redirect('/admin?message=Please set a current quarter and year')
 		
 			quarter,year = temp													
 
-		assignments = self.assigns_for_quarter(quarter, year)				# grab all assignment for quarter/year
+		assignments = self.assigns_for_quarter(int(quarter), int(year))		# grab all assignment for quarter/year
 
 		template = JINJA_ENV.get_template('/templates/admin_assignment_view.html')
 		template_values = {													# build template value map...
 			'assignments': assignments.order(Assignment.number),
-			'quarter': quarter_map[int(quarter)],
+			'quarter_name': quarter_map[int(quarter)],
+			'quarter': int(quarter),
 			'year': int(year),
 			'user': users.get_current_user(),
 			'sign_out': users.create_logout_url('/'),
