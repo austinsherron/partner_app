@@ -14,7 +14,8 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 from webapp2_extras.appengine.users import admin_required
 
-from admin_helpers import make_date
+from helpers.admin_helpers import make_date
+from helpers.helpers import get_sess_val
 from handler import CustomHandler
 from models import Assignment, Student, Instructor, Invitation, Partnership, Evaluation, Setting
 
@@ -453,15 +454,18 @@ class EditStudent(CustomHandler):
 class ManageAssignments(CustomHandler):
 	#@admin_required
 	def get(self):
-		template = JINJA_ENV.get_template('/templates/admin_assignment_view.html')
-		self.response.write(template.render())
-
-	
-	def post(self):
 		quarter_map = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
-		quarter = self.request.get('quarter')
-		year = self.request.get('year')
-		assignments = Assignment.query(Assignment.year == int(year), Assignment.quarter == int(quarter))
+		quarter = int(self.request.get('quarter'))
+		year = int(self.request.get('year'))
+
+		if not quarter or not year:
+			quarter = get_sess_val(self.session, 'quarter')
+			year = get_sess_val(self.session, 'year')
+
+		if not quarter or not year:
+			return self.redirect('/admin?message=Please set a current quarter and year')
+
+		assignments = self.assigns_for_quarter(quarter, year)
 
 		template = JINJA_ENV.get_template('/templates/admin_assignment_view.html')
 		template_values = {
@@ -472,18 +476,22 @@ class ManageAssignments(CustomHandler):
 		self.response.write(template.render(template_values))
 
 
-
 class MainAdmin(CustomHandler):
 	#@admin_required
 	def get(self):
 		user = users.get_current_user()
 		message = self.request.get('message')
 
+		self.session['quarter'] = self.quarter()
+		self.session['year'] = self.year()
+
 		template = JINJA_ENV.get_template('/templates/admin.html')
 		template_values = {
 			'message': message,
 			'user': user,
-			'sign_out': users.create_logout_url('/')
+			'sign_out': users.create_logout_url('/'),
+			'quarter': self.session.get('quarter'),
+			'year': self.session.get('year'),
 		}
 		self.response.write(template.render(template_values))
 

@@ -1,17 +1,17 @@
 import cgi
-from datetime import date, datetime, timedelta
 import jinja2
 import os
 import webapp2
 
+from datetime import date, datetime, timedelta
 from google.appengine.api import images, users
 from google.appengine.ext import ndb
 from webapp2_extras.appengine.users import login_required
 
-from models import Assignment, Student, Instructor, Invitation, Partnership, Evaluation, Setting
 from admin import AddAssignment, AddStudent, ClearDB, MainAdmin, ManageAssignments, UploadRoster, ViewRoster, DeleteStudents
 from admin import AddPartnership, EditAssignment, EditStudent, ViewEvals, ViewPartnerships, UpdateQuarterYear
 from handler import CustomHandler
+from models import Assignment, Student, Instructor, Invitation, Partnership, Evaluation, Setting
 
 JINJA_ENV = jinja2.Environment(
 	loader = jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -534,6 +534,10 @@ class ViewHistory(CustomHandler):
 		self.response.write(template.render(template_values))
 
 
+config = {}
+config['webapp2_extras.sessions'] = {
+    'secret_key': 'some-secret-key',
+}
 
 application = webapp2.WSGIApplication([
 	('/', Main),
@@ -561,4 +565,4 @@ application = webapp2.WSGIApplication([
 	('/admin/students/delete', DeleteStudents),
 	('/admin/student/edit', EditStudent),
 	('/admin/timing/update', UpdateQuarterYear),
-], debug=True)
+], config=config, debug=True)

@@ -25,7 +25,11 @@
 						<a href="#">Assignments</a>
 						<ul class="dropdown">
 							<li><a href="/admin/assignment/add">Add</a></li>
-							<li><a href="/admin/assignment/view">View</a></li>
+							{% if year and quarter %}
+								<li><a href="/admin/assignment/view?quarter={{ quarter }}&year={{ year }}">View</a></li>
+							{% else %}
+								<li><a href="/admin/assignment/view">View</a></li>
+							{% endif %}
 						</ul>
 					</li>
 					<li class="has-dropdown">	

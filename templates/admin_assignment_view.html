@@ -4,30 +4,6 @@
 <html>
   <body>
 
-  {% if not assignments %}
-	<form action="/admin/assignment/view" method="post" enctype="multipart/form-data">
-	  <div>
-		<select name="year">
-		  <option value="2012">2012</option>
-		  <option value="2013">2013</option>
-		  <option value="2014" selected>2014</option>
-		  <option value="2015">2015</option>
-		  <option value="2016">2016</option>
-		  <option value="2017">2017</option>
-		  <option value="2018">2018</option>
-		</select>
-	  </div>
-	  <div>
-		<select name="quarter">
-		  <option value="1">Fall</option>
-		  <option value="2">Winter</option>
-		  <option value="3">Spring</option>
-		  <option value="4">Summer</option>
-		</select>
-	  </div>
-	  <div><input type="submit" value="view"<div>
-	</form> 
-  {% else %}
 	<h3>View assignments for {{ quarter }} {{ year }}</h3>
 	<table>
 	  <tr>
@@ -55,7 +31,6 @@
 		</tr>
   	{% endfor %}
 	</table>
-  {% endif %}
   <br>
   <a href="/admin">Back</a>
   </body>

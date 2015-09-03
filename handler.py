@@ -1,3 +1,8 @@
+################################################################################
+## IMPORTS #####################################################################
+################################################################################
+
+
 import webapp2
 
 from datetime import datetime as dt, timedelta as td
@@ -6,9 +11,20 @@ from google.appengine.ext import ndb
 from webapp2_extras import sessions, auth
 
 from models import Assignment, Student, Instructor, Invitation, Partnership, Evaluation, Setting
+from base_handler import BaseHandler
 
 
-class CustomHandler(webapp2.RequestHandler):
+################################################################################
+################################################################################
+################################################################################
+
+
+################################################################################
+## CUSTOMHANDLER ###############################################################
+################################################################################
+
+
+class CustomHandler(BaseHandler):
 
 
 ## SETTING QUERIES #############################################################
@@ -92,6 +108,13 @@ class CustomHandler(webapp2.RequestHandler):
 			Assignment.year == year,
 			Assignment.number == number,
 		).get()
+
+	
+	def assigns_for_quarter(self, quarter, year):
+		return Assignment.query(
+			Assignment.quarter == quarter,
+			Assignment.year == year,
+		)
 
 
 ## INVITATION QUERIES ##########################################################
@@ -203,8 +226,6 @@ class CustomHandler(webapp2.RequestHandler):
 		).fetch()
 
 
-		
-
 	def partners_previously(self, selector, selected):
 		return Partnership.query(
 			ndb.OR(Partnership.initiator == selector.key, Partnership.initiator == selected.key),
@@ -257,3 +278,8 @@ class CustomHandler(webapp2.RequestHandler):
 			Evaluation.quarter == quarter,
 			Evaluation.year == year
 		)
+
+
+################################################################################
+################################################################################
+################################################################################
