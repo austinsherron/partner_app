@@ -244,15 +244,22 @@ class AddStudent(CustomHandler):
 	#@admin_required
 	def get(self):
 
-		message = self.request.get('message')
+		temp = get_sess_vals(self.session, 'quarter', 'year')					# try grabbing quarter/year from session
+		if not temp:															# redirect with error if it doesn't exist
+			return self.redirect('/admin?message=Please set a current quarter and year')
+		quarter,year = temp
+
+		message = self.request.get('message')									# grab message if it exsits
 
 		template_values = {
 			'message': message,
-			'year': datetime.date.today().year
+			'user': users.get_current_user(),
+			'sign_out': users.create_logout_url('/'),
+			'quarter': quarter,
+			'year': year,
 		}
-		
 		template = JINJA_ENV.get_template('/templates/admin_add_student.html')
-		self.response.write(template.render(template_values))
+		return self.response.write(template.render(template_values))
 
 
 	def post(self):

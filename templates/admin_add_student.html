@@ -1,37 +1,57 @@
-<!DOCTYPE hmtl>
-<html>
-  <body>
-	{% if message %}
-	  <h3>{{ message }}</h3>
-	{% endif %}
-	<form action="/admin/student/add" method="post" enctype="multipart/form-data">
-	  <label>Student ID:</label>
-	  <input name="studentid"><br>
-	  <label>First Name:</label>
-	  <input name="first_name"><br>
-	  <label>Last Name:</label>
-	  <input name="last_name"><br>
-	  <label>UCInetID:</label>
-	  <input name="ucinetid"><br>
-	  <label>Email:</label>
-	  <input name="email"><br>
-	  <label>Lab Section:</label>
-	  <input name="lab"><br> 
-	  <label>Quarter:</label>
-	  <select name="quarter">
-		<option value="1">Fall</option>
-		<option value="2">Winter</option>
-		<option value="3">Spring</option>
-		<option value="4">Summer</option>
-	  </select>
-	  <br>
-	  <label>Year:</label>
-	  <input type="number" name="year" value="{{ year }}">
-	  <br>
-	  <input type="submit" value="Add">
-	</form>
-	<br>
-	<a href="/admin">Back</a>
-  </body>
-</html>
+{% extends 'templates/admin_common.html' %}
+{% block content %}
 
+<div class="row">
+
+	{% if message %}
+		<div class="small-12 columns">
+		  	<h3 class="text-center">{{ message }}</h3>
+		</div>
+	{% endif %}
+
+	<br>
+
+	<div class="small-12-columns">
+		<h3 class="text-center">Add Students...</h3>
+	</div>
+
+	<div class="small-12 columns panel">
+
+		<form action="/admin/student/add" method="post" enctype="multipart/form-data">
+			<span class="label">Student ID:</span>
+			<br>
+			<input name="studentid"><br>
+			<span class="label">First Name:</span>
+			<br>
+			<input name="first_name"><br>
+			<span class="label">Last Name:</span>
+			<br>
+			<input name="last_name"><br>
+			<span class="label">UCInetID:</span>
+			<br>
+			<input name="ucinetid"><br>
+			<span class="label">Email:</span>
+			<br>
+			<input name="email"><br>
+			<span class="label">Lab Section:</span>
+			<br>
+			<input name="lab"><br> 
+			<span class="label">Quarter:</span>
+			<br>
+			<select name="quarter">
+				<option value="1">Fall</option>
+				<option value="2">Winter</option>
+				<option value="3">Spring</option>
+				<option value="4">Summer</option>
+			</select>
+			<br>
+			<span class="label">Year:</span>
+			<input type="number" name="year" value="{{ year }}">
+			<br>
+			<input class="button" type="submit" value="Add">
+		</form>
+
+	</div>
+</div>
+
+{% endblock %}
