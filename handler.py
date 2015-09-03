@@ -10,6 +10,9 @@ from models import Assignment, Student, Instructor, Invitation, Partnership, Eva
 
 class CustomHandler(webapp2.RequestHandler):
 
+
+## SETTING QUERIES #############################################################
+
 	
 	def quarter(self):
 		return Setting.query().get().quarter
@@ -17,6 +20,9 @@ class CustomHandler(webapp2.RequestHandler):
 
 	def year(self):
 		return Setting.query().get().year
+
+
+## STUDENT QUERIES #############################################################
 
 
 	def get_student(self, quarter, year, identifier):
@@ -34,6 +40,27 @@ class CustomHandler(webapp2.RequestHandler):
 			Student.year == year, 
 			Student.active == active
 		)
+
+
+	def student_by_id(self, quarter, year, studentid, active=True):
+		return Student.query(
+			Student.quarter == quarter,
+			Student.year == year, 
+			Student.studentid == int(studentid),
+			Student.active == active
+		).get()
+
+
+	def students_by_lab(self, quarter, year, lab):
+		return Student.query(
+			Student.quarter == quarter,
+			Student.year == year, 
+			Student.lab == lab,
+			Student.active == True
+		)
+
+
+## ASSIGNMENT QUERIES ##########################################################
 
 
 	def current_assign(self, quarter, year):
@@ -59,6 +86,17 @@ class CustomHandler(webapp2.RequestHandler):
 		return evals_after_now[0]
 
 
+	def get_assign(self, quarter, year, number):
+		return Assignment.query(
+			Assignment.quarter == quarter,
+			Assignment.year == year,
+			Assignment.number == number,
+		).get()
+
+
+## INVITATION QUERIES ##########################################################
+
+
 	def received_invites(self, student, assign_num, active=True):
 		return Invitation.query(
 			Invitation.invitee == student.key,
@@ -75,15 +113,6 @@ class CustomHandler(webapp2.RequestHandler):
 		)
 		
 
-	def student_by_id(self, quarter, year, studentid, active=True):
-		return Student.query(
-			Student.quarter == quarter,
-			Student.year == year, 
-			Student.studentid == int(studentid),
-			Student.active == active
-		).get()
-		
-		
 	def open_invitations(self, confirming, being_confirmed, assign_num):
 		return Invitation.query(
 			ndb.OR(Invitation.invitee == confirming.key, Invitation.invitee == being_confirmed.key),
@@ -113,6 +142,9 @@ class CustomHandler(webapp2.RequestHandler):
 				Invitation.invitor == confirming.key, 
 				Invitation.invitee == confirming.key),
 			)
+
+
+## PARTNERSHIP QUERIES #########################################################
 		
 
 	def open_partnerships(self, confirming, being_confirmed, assign_num):
@@ -169,15 +201,8 @@ class CustomHandler(webapp2.RequestHandler):
 			Partnership.assignment_number == assign_num,
 			Partnership.active == active,
 		).fetch()
-		
 
-	def students_by_lab(self, quarter, year, lab):
-		return Student.query(
-			Student.quarter == quarter,
-			Student.year == year, 
-			Student.lab == lab,
-			Student.active == True
-		)
+
 		
 
 	def partners_previously(self, selector, selected):
@@ -203,14 +228,6 @@ class CustomHandler(webapp2.RequestHandler):
 #				return dropped.initiator.get()
 
 
-	def existing_eval(self, evaluator, current_partner, assign_num):
-		return Evaluation.query(
-			Evaluation.evaluator == evaluator.key, 
-			Evaluation.evaluatee == current_partner.key,
-			Evaluation.assignment_number == assign_num
-		)
-
-
 	def dropped_partners(self, open_partnerships, confirming, being_confirmed):
 		dropped = []
 		for partnership in open_partnerships:
@@ -222,12 +239,15 @@ class CustomHandler(webapp2.RequestHandler):
 		return dropped
 
 
-	def get_assign(self, quarter, year, number):
-		return Assignment.query(
-			Assignment.quarter == quarter,
-			Assignment.year == year,
-			Assignment.number == number,
-		).get()
+## EVAL QUERIES ################################################################
+
+
+	def existing_eval(self, evaluator, current_partner, assign_num):
+		return Evaluation.query(
+			Evaluation.evaluator == evaluator.key, 
+			Evaluation.evaluatee == current_partner.key,
+			Evaluation.assignment_number == assign_num
+		)
 
 
 	def get_eval_history(self, student, active, quarter, year):
