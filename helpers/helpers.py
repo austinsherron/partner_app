@@ -34,10 +34,44 @@ def get_sess_val(session, key):
 	the value associated with key in session, if it
 	exists, else None
 	"""
-	if val in session:
+	if key in session:
 		return session.get(key)
 	else:
 		return None
+
+
+def get_sess_vals(session, *args):
+	"""
+	This is a helper function that returns the
+	values associated associated with the keys
+	in *args if all of the keys exists in session.
+	If one key doesn't exist, the method returns
+	None.
+
+	Parameters
+	----------
+	session : dict-like, session object
+		session will be searched for 'key'
+	*args : mixed immutable types
+		the keys that session will be searched for
+
+	Returns
+	-------
+	sess_vals : tuple of mixed
+		the values associated with the keys in *args;
+		if one or more keys don't exist in session,
+		None is returned
+	"""
+	sess_vals = []
+
+	for arg in args:
+		sess_val = get_sess_val(session, arg)
+		if sess_val:
+			sess_vals.append(sess_val)
+		else:
+			return None
+
+	return tuple(sess_vals)
 
 
 ################################################################################

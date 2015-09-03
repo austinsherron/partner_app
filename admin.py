@@ -15,7 +15,7 @@ from google.appengine.ext import ndb
 from webapp2_extras.appengine.users import admin_required
 
 from helpers.admin_helpers import make_date
-from helpers.helpers import get_sess_val
+from helpers.helpers import get_sess_val, get_sess_vals
 from handler import CustomHandler
 from models import Assignment, Student, Instructor, Invitation, Partnership, Evaluation, Setting
 
@@ -50,14 +50,18 @@ class AddAssignment(CustomHandler):
 	#@admin_required
 	def get(self):
 		template = JINJA_ENV.get_template('/templates/admin_add_assignment.html')
-		quarter = self.quarter()
-		year = self.year()
-		current_assignment = self.current_assign(quarter, year)
+
+		temp = get_sess_vals(self.session, 'quarter', 'year')					# try grabbing quarter/year from session
+		if not temp:															# redirect with error if it doesn't exist
+			return self.redirect('/admin?message=Please set a current quarter and year')
+		quarter,year = temp
+
+		current_assignment = self.current_assign(quarter, year)					# grab current assignment
 		# pass map of quarter DB representations (ints) to string representation
 		# TODO:
 		#	quarters should not be hardcoded 
 		quarters = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
-		template_values = {
+		template_values = {														# build template value map...
 			'year': year,
 			'quarter': quarter,
 			'quarters': sorted(quarters.items()),
@@ -66,7 +70,7 @@ class AddAssignment(CustomHandler):
 			'user': users.get_current_user(),
 			'sign_out': users.create_logout_url('/'),
 		}
-		self.response.write(template.render(template_values))
+		return self.response.write(template.render(template_values))			# ...and render the response
 
 
 	def post(self):
@@ -455,47 +459,49 @@ class ManageAssignments(CustomHandler):
 	#@admin_required
 	def get(self):
 		quarter_map = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
-		quarter = int(self.request.get('quarter'))
+
+		quarter = int(self.request.get('quarter'))							# try grabbing quarter/year from URL
 		year = int(self.request.get('year'))
 
-		if not quarter or not year:
-			quarter = get_sess_val(self.session, 'quarter')
-			year = get_sess_val(self.session, 'year')
+		if not quarter or not year:											# if they don't exist, try grabbing from session
+			temp = get_sess_vals(self.session, 'quarter', 'year')
 
-		if not quarter or not year:
-			return self.redirect('/admin?message=Please set a current quarter and year')
+			if temp:														# if they don't exist there, redirect with error
+				return self.redirect('/admin?message=Please set a current quarter and year')
+		
+			quarter,year = temp													
 
-		assignments = self.assigns_for_quarter(quarter, year)
+		assignments = self.assigns_for_quarter(quarter, year)				# grab all assignment for quarter/year
 
 		template = JINJA_ENV.get_template('/templates/admin_assignment_view.html')
-		template_values = {
+		template_values = {													# build template value map...
 			'assignments': assignments.order(Assignment.number),
 			'quarter': quarter_map[int(quarter)],
 			'year': int(year),
 			'user': users.get_current_user(),
 			'sign_out': users.create_logout_url('/'),
 		}
-		self.response.write(template.render(template_values))
+		return self.response.write(template.render(template_values))		# ...and render the response
 
 
 class MainAdmin(CustomHandler):
 	#@admin_required
 	def get(self):
-		user = users.get_current_user()
-		message = self.request.get('message')
+		user = users.get_current_user()										# grab current user
+		message = self.request.get('message')								# grab message from URL, if it exists
 
-		self.session['quarter'] = self.quarter()
+		self.session['quarter'] = self.quarter()							# load current quarter/year into session
 		self.session['year'] = self.year()
 
 		template = JINJA_ENV.get_template('/templates/admin.html')
-		template_values = {
+		template_values = {													# build template value map...
 			'message': message,
 			'user': user,
 			'sign_out': users.create_logout_url('/'),
 			'quarter': self.session.get('quarter'),
 			'year': self.session.get('year'),
 		}
-		return self.response.write(template.render(template_values))
+		return self.response.write(template.render(template_values))		# ...and render the response
 
 
 class UpdateQuarterYear(CustomHandler):
