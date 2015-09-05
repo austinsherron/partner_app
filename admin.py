@@ -318,7 +318,7 @@ class DeactivateStudents(CustomHandler):
 		ndb.put_multi(students)														# ...and then save student objects to DB
 		
 		message = 'Students successfully deactivated'								# create success message
-		return self.redirect('/admin?message=' + message)							# render the response
+		return self.redirect('/admin/roster/view?message=' + message)				# render the response
 
 
 class EditAssignment(CustomHandler):
@@ -706,6 +706,9 @@ class ViewRoster(CustomHandler):
 
 	#@admin_required
 	def get(self):
+		# pass map of quarter DB representations (ints) to string representation
+		# TODO:
+		#	quarters should not be hardcoded 
 		quarter_map = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
 		quarter = self.request.get('quarter')								# try grabbing quarter/year from URL
 		year = self.request.get('year')
@@ -731,6 +734,8 @@ class ViewRoster(CustomHandler):
 			'student_num': active_num + inactive_num,
 			'active_num': active_num,
 			'inactive_num': inactive_num,
+			'user': users.get_current_user(),
+			'sign_out': users.create_logout_url('/'),
 		}
 		return self.response.write(template.render(template_values))		# ...and render the response
 		
