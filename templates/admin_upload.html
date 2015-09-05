@@ -1,34 +1,31 @@
-<!DOCTYPE html>
-{% autoescape true %}
+{% extends '/templates/base.html' %}
+{% block content %}
 
-<html>
-  <body>
-	<form action="/admin/roster/upload" method="post" enctype="multipart/form-data">
-	  <div>
-		<select name="year">
-		  <option value="2012">2012</option>
-		  <option value="2013">2013</option>
-		  <option value="2014" selected>2014</option>
-		  <option value="2015">2015</option>
-		  <option value="2016">2016</option>
-		  <option value="2017">2017</option>
-		  <option value="2018">2018</option>
-		</select>
-	  </div>
-	  <div>
-		<select name="quarter">
-		  <option value="1">Fall</option>
-		  <option value="2">Winter</option>
-		  <option value="3">Spring</option>
-		  <option value="4">Summer</option>
-		</select>
-	  </div>
-	  <div><input type="file" name="the_file"></div>
-	  <div><input type="submit" value="Upload"<div>
-	</form> 
-  <br>
-  <a href="/admin">Back</a>
-  </body>
-</html>
+<a class="close-reveal-modal">&#215;</a>
 
-{% endautoescape %}
+<div class="row">
+	<div class="small-12 columns">
+		<h3 class="text-center">Upload Roster</h3>
+		<form action="/admin/roster/upload" method="post" enctype="multipart/form-data">
+			<div>
+				<input name="year" value="{{ year }}" type="number" />
+			</div>
+			<div>
+				<select name="quarter">
+					{% for num,name in quarters %}
+						{% if quarter == num %}
+							<option value="{{ num }}" selected>{{ name }}</option>
+						{% else %}
+							<option value="{{ num }}">{{ name }}</option>
+						{% endif %}
+					{% endfor %}
+				</select>
+			</div>
+			<div><input type="file" name="the_file"></div>
+			<div><input class="button expand" type="submit" value="Upload"<div>
+		</form> 
+
+	</div>
+</div>
+
+{% endblock %}

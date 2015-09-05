@@ -494,12 +494,12 @@ class UploadRoster(CustomHandler):
 
 	#@admin_required
 	def get(self):
-		quarter = self.request.get('quarter')								# try grabbing quarter/year from URL
+		quarter = self.request.get('quarter')									# try grabbing quarter/year from URL
 		year = self.request.get('year')
 
-		if not quarter or not year:											# if they don't exist, try grabbing from session
-			temp = get_sess_vals(self.session, 'quarter', 'year')					# try grabbing quarter/year from session
-			if not temp:															# redirect with error if it doesn't exist
+		if not quarter or not year:												# if they don't exist, try grabbing from session
+			temp = get_sess_vals(self.session, 'quarter', 'year')				# try grabbing quarter/year from session
+			if not temp:														# redirect with error if it doesn't exist
 				return self.redirect('/admin?message=Please set a current quarter and year')
 			quarter,year = temp
 
@@ -513,7 +513,7 @@ class UploadRoster(CustomHandler):
 			'sign_out': users.create_logout_url('/'),
 			'quarter': int(quarter),
 			'year': int(year),
-			'quarters': quarters,
+			'quarters': sorted(quarters.items()),
 		}
 		template = JINJA_ENV.get_template('/templates/admin_upload.html')
 		return self.response.write(template.render(template_values))			# ...and render the response
@@ -590,7 +590,7 @@ class UploadRoster(CustomHandler):
 			# save student objects...
 			ndb.put_multi(students)
 			# ...and render the response
-			return self.redirect('/admin?message=' + 'Successfully uploaded new roster')			
+			return self.redirect('/admin/roster/view?message=' + 'Successfully uploaded new roster')			
 
 		except Exception, e:
 			return self.redirect('/admin?message=' + 'There was a problem uploading the roster: ' + str(e))			
