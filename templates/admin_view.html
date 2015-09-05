@@ -22,6 +22,9 @@
   {% else %}
     <form action="/admin/students/delete?quarter={{ quarter }}&year={{ year }}" method="post" enctype="multipart/form-data">
 	  <h3>View students for {{ quarter }} {{ year }}</h3>
+	  <h5>{{ student_num }} students</h5>
+	  <h5>{{ active_num  }} active students</h5>
+	  <h5>{{ inactive_num  }} inactive students</h5>
 	  <table>
 	    <tr>
 		  <th>Select</th>

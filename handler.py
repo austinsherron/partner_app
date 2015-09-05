@@ -99,7 +99,10 @@ class CustomHandler(BaseHandler):
 			Assignment.eval_date > dt.now() - td(hours=7)
 		).order(Assignment.eval_date).fetch()
 
-		return evals_after_now[0]
+		if len(evals_after_now) > 0
+			return evals_after_now[0]
+		else:
+			return None
 
 
 	def get_assign(self, quarter, year, number):

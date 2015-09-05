@@ -47,6 +47,7 @@ JINJA_ENV = jinja2.Environment(
 
 
 class AddAssignment(CustomHandler):
+
 	#@admin_required
 	def get(self):
 		template = JINJA_ENV.get_template('/templates/admin_add_assignment.html')
@@ -141,6 +142,7 @@ class AddAssignment(CustomHandler):
 
 
 class AddPartnership(CustomHandler):
+
 	def get(self):
 		template = JINJA_ENV.get_template('/templates/admin_add_partnership.html')
 		self.response.write(template.render())
@@ -241,6 +243,7 @@ class AddPartnership(CustomHandler):
 
 
 class AddStudent(CustomHandler):
+
 	#@admin_required
 	def get(self):
 
@@ -283,6 +286,7 @@ class AddStudent(CustomHandler):
 
 
 class ClearDB(CustomHandler):
+
 	#@admin_required
 	def get(self):
 		template = JINJA_ENV.get_template('/templates/admin_cleardb.html')
@@ -316,6 +320,7 @@ class DeleteStudents(CustomHandler):
 
 
 class EditAssignment(CustomHandler):
+
 	def get(self):
 		quarter = int(self.request.get('quarter'))						# grab quarter, year, and assign num from URL
 		year = int(self.request.get('year'))						
@@ -357,6 +362,7 @@ class EditAssignment(CustomHandler):
 
 
 class EditStudent(CustomHandler):
+
 	#@admin_required
 	def get(self):
 		student = Student.query(
@@ -403,6 +409,7 @@ class EditStudent(CustomHandler):
 
 
 class ManageAssignments(CustomHandler):
+
 	#@admin_required
 	def get(self):
 		quarter_map = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
@@ -413,7 +420,7 @@ class ManageAssignments(CustomHandler):
 		if not quarter or not year:											# if they don't exist, try grabbing from session
 			temp = get_sess_vals(self.session, 'quarter', 'year')
 
-			if not temp:														# if they don't exist there, redirect with error
+			if not temp:													# if they don't exist there, redirect with error
 				return self.redirect('/admin?message=Please set a current quarter and year')
 		
 			quarter,year = temp													
@@ -433,6 +440,7 @@ class ManageAssignments(CustomHandler):
 
 
 class MainAdmin(CustomHandler):
+
 	#@admin_required
 	def get(self):
 		user = users.get_current_user()										# grab current user
@@ -453,6 +461,7 @@ class MainAdmin(CustomHandler):
 
 
 class UpdateQuarterYear(CustomHandler):
+
 	def get(self):
 		setting = Setting.query().get()
 		template_values = {
@@ -480,52 +489,115 @@ class UpdateQuarterYear(CustomHandler):
 
 
 class UploadRoster(CustomHandler):
+
 	#@admin_required
 	def get(self):
+		quarter = self.request.get('quarter')								# try grabbing quarter/year from URL
+		year = self.request.get('year')
+
+		if not quarter or not year:											# if they don't exist, try grabbing from session
+			temp = get_sess_vals(self.session, 'quarter', 'year')					# try grabbing quarter/year from session
+			if not temp:															# redirect with error if it doesn't exist
+				return self.redirect('/admin?message=Please set a current quarter and year')
+			quarter,year = temp
+
+		# pass map of quarter DB representations (ints) to string representation
+		# TODO:
+		#	quarters should not be hardcoded 
+		quarters = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
+
+		template_values = {														# build template values...
+			'user': users.get_current_user(),
+			'sign_out': users.create_logout_url('/'),
+			'quarter': int(quarter),
+			'year': int(year),
+			'quarters': quarters,
+		}
 		template = JINJA_ENV.get_template('/templates/admin_upload.html')
-		self.response.write(template.render())
+		return self.response.write(template.render(template_values))			# ...and render the response
 
 
 	def post(self):
 		try:
-			file = self.request.get('the_file')
-			file = file.strip().split('\n')
+			file = self.request.get('the_file')									# try grabbing file...
+			file = file.strip().split('\n')										# ...and parsing it into lines
+
+			quarter = int(self.request.get('quarter'))							# grab year/quarter info
+			year = int(self.request.get('year'))
 			
+			# students to be uploaded (is set because students must be unique; be careful!)
 			students = []
+			# to check for duplicates in roster
+			student_cache = set()
+
+			# grab students in DB (active and not active) (have to do it twice because of DB limitations)
+			existing_students = self.get_active_students(quarter, year).fetch()	
+			existing_students += self.get_active_students(quarter, year, active=False).fetch()
+			# convert to dict for O(1) access time
+			existing_students = dict(map(lambda x: (int(x.studentid), x), existing_students))
+
 			for row in file:
 				row = row.split(',')
-				print('ROW =', row)
+
+				# grab student ID from current row of CSV roster
+				studentid = int(row[0].strip())
+
+				# if student w/ same studentid has already been found in roster, skip...
+				if studentid in student_cache:
+					continue
+
+				# ...else, add them to 'seen' cache
+				student_cache.add(studentid)
+
+				# if student in DB, skip to next student...
+				if studentid in existing_students:
+					existing_student = existing_students[studentid]
+
+					# ...unless they're inactive; if so, activate them...
+					if not existing_student.active:
+						existing_student.active = True
+						students.append(existing_student)
+
+					# ...to see which students have dropped the class, remove active students from existing_students
+					del existing_students[studentid]
+					# ...and continue to next student
+					continue
+
+				# create student object
 				student = Student()
 
-				student_exists = Student.query(
-					Student.studentid == int(row[0].strip()),
-					Student.quarter == int(self.request.get('quarter')),
-					Student.year == int(self.request.get('year')),
-					Student.active == True
-				).get()
+				student.studentid = studentid
+				student.last_name = row[1].strip().title()
+				student.first_name = row[2].strip().title()
+				student.ucinetid = row[3].lower().strip()
+				student.email = row[4].lower().strip()
+				student.lab = int(row[5])
+				student.quarter = quarter
+				student.year = year
+				student.active = True
+				students.append(student)
 
-				if not student_exists:
-					student.studentid = int(row[0].strip())
-					student.last_name = row[1].strip().title()
-					student.first_name = row[2].strip().title()
-					student.ucinetid = row[3].lower().strip()
-					student.email = row[4].lower().strip()
-					student.lab = int(row[5])
-					student.quarter = int(self.request.get('quarter'))
-					student.year = int(self.request.get('year'))
-					student.active = True
-					students.append(student)
+				print(student)
+				print(student.studentid in existing_students)
 
+			# deactivate students who have dropped (students left in existing_students)
+			for dropped in existing_students.values():
+				dropped.active = False
+				students.append(dropped)
+
+			# save student objects...
 			ndb.put_multi(students)
-			self.redirect('/admin?message=' + 'Successfully uploaded new roster')			
+			# ...and render the response
+			return self.redirect('/admin?message=' + 'Successfully uploaded new roster')			
 
 		except Exception, e:
-			self.redirect('/admin?message=' + 'There was a problem uploading the roster: ' + str(e))			
+			return self.redirect('/admin?message=' + 'There was a problem uploading the roster: ' + str(e))			
 
 
 
 
 class ViewEvals(CustomHandler):
+
 	def get(self):
 		current_assignment = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
 		template_values = {
@@ -565,6 +637,7 @@ class ViewEvals(CustomHandler):
 
 
 class ViewPartnerships(CustomHandler):
+
 	#@admin_required
 	def get(self):
 		template = JINJA_ENV.get_template('/templates/admin_partnerships.html')
@@ -628,26 +701,32 @@ class ViewPartnerships(CustomHandler):
 
 
 class ViewRoster(CustomHandler):
+
 	#@admin_required
 	def get(self):
 		template = JINJA_ENV.get_template('/templates/admin_view.html')
-		self.response.write(template.render({'year': datetime.date.today().year}))
+		return self.response.write(template.render({'year': datetime.date.today().year}))
 
 	
 	def post(self):
 		quarter_map = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
-		quarter = self.request.get('quarter')
-		year = self.request.get('year')
-		students = Student.query(Student.year == int(year), Student.quarter == int(quarter))
+		quarter = int(self.request.get('quarter'))
+		year = int(self.request.get('year'))
+		active_students = self.get_active_students(quarter, year).fetch()
+		inactive_students = self.get_active_students(quarter, year, active=False).fetch()
+		active_num = len(active_students)
+		inactive_num = len(inactive_students)
 
 		template = JINJA_ENV.get_template('/templates/admin_view.html')
 		template_values = {
-			'students': students.order(Student.lab, Student.last_name),
+			'students': sorted(active_students + inactive_students, key=lambda x: (x.lab, x.last_name)),
 			'quarter': quarter_map[int(quarter)],
-			'year': int(year)
+			'year': int(year),
+			'student_num': active_num + inactive_num,
+			'active_num': active_num,
+			'inactive_num': inactive_num,
 		}
-
-		self.response.write(template.render(template_values))
+		return self.response.write(template.render(template_values))
 		
 
 ################################################################################
