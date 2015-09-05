@@ -14,18 +14,17 @@
 
 	<div class="small-12 columns">
 		<h3 class="text-center">Evaluations for Assignment {{ assign_num }}, Quarter {{ quarter_name }}, {{ year }}</h3>
-		<div class="row">
-			<div class="small-12 columns">
-				<ul class="pagination">
-					{% for i in range(last_num) %}
-						{% if i + 1 == assign_num %}
-							<li class="current"><a href="/admin/evaluations/view?assign_num={{ i + 1 }}">{{ i + 1}}</a></li>
-						{% else %}
-							<li><a href="/admin/evaluations/view?assign_num={{ i + 1 }}">{{ i + 1}}</a></li>
-						{% endif %}
-					{% endfor %}
-				</ul>
-			</div>
+		<div class="row small-centered">
+			<ul class="pagination small-centered" style="display: table; margin: 0 auto">
+				{% for i in range(last_num) %}
+					{% if i + 1 == assign_num %}
+						<li class="current small-centered"><a href="/admin/evaluations/view?assign_num={{ i + 1 }}">{{ i + 1}}</a></li>
+					{% else %}
+						<li class="small-centered"><a href="/admin/evaluations/view?assign_num={{ i + 1 }}">{{ i + 1}}</a></li>
+					{% endif %}
+				{% endfor %}
+			</ul>
+			<br>
 		</div>
 	</div>
 
