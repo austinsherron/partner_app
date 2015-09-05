@@ -514,6 +514,7 @@ class UploadRoster(CustomHandler):
 			'quarter': int(quarter),
 			'year': int(year),
 			'quarters': sorted(quarters.items()),
+			'message': self.request.get('message'),
 		}
 		template = JINJA_ENV.get_template('/templates/admin_upload.html')
 		return self.response.write(template.render(template_values))			# ...and render the response
@@ -601,13 +602,45 @@ class UploadRoster(CustomHandler):
 class ViewEvals(CustomHandler):
 
 	def get(self):
-		current_assignment = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
-		template_values = {
-			'year': datetime.date.today().year,	
-			'current': current_assignment
+		# pass map of quarter DB representations (ints) to string representation
+		# TODO:
+		#	quarters should not be hardcoded 
+		quarter_map = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
+		quarter = self.request.get('quarter')										# try grabbing quarter/year from URL
+		year = self.request.get('year')
+		assign_num = self.request.get('assign_num')									# try grabbing assignment number from URL
+
+		if not quarter or not year:													# if they don't exist, try grabbing from session
+			temp = get_sess_vals(self.session, 'quarter', 'year')
+			if not temp:															# if they don't exist there, redirect with error
+				return self.redirect('/admin?message=Please set a current quarter and year')
+			quarter,year = temp													
+
+		quarter,year = int(quarter), int(year)
+		current_assignment = self.current_assign(quarter, year)						# grab current assignment
+
+		if current_assignment and not assign_num:
+			assign_num = current_assignment.number									# use assign_num if it exsits, else number of current assignment
+
+		assign_num = int(assign_num) if assign_num else 1							# (to avoid errors if there are no assignments in the DB
+		last_num = self.get_assign_n(quarter, year, -1)								# grab last assignment
+		last_num = last_num.number if last_num else assign_num						# (to avoid errors if there are no assignments in the DB)
+		evals = self.evals_for_assign(quarter, year, assign_num)					# grab evals for assignment...
+		solo_partners = self.solo_partners(quarter, year, assign_num)				# ...and grab endorsed solos (they're exempt from evals)
+		template_values = {															# build template value map...
+			'user': users.get_current_user(),
+			'sign_out': users.create_logout_url('/'),
+			'quarter': quarter,
+			'quarter_name': quarter_map[quarter],
+			'year': year,
+			'assign_num': assign_num,
+			'message': self.request.get('message'),
+			'evals': evals,
+			'solos': solo_partners,
+			'last_num': last_num,
 		}
 		template = JINJA_ENV.get_template('/templates/admin_evals_view.html')
-		self.response.write(template.render(template_values))
+		return self.response.write(template.render(template_values))			# render the response
 
 
 	def post(self):
@@ -736,6 +769,7 @@ class ViewRoster(CustomHandler):
 			'inactive_num': inactive_num,
 			'user': users.get_current_user(),
 			'sign_out': users.create_logout_url('/'),
+			'message': self.request.get('message'),
 		}
 		return self.response.write(template.render(template_values))		# ...and render the response
 		

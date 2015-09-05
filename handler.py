@@ -133,6 +133,18 @@ class CustomHandler(BaseHandler):
 		)
 
 
+	def get_assign_n(self, quarter, year, n):
+		assigns = Assignment.query(
+			Assignment.quarter == quarter,
+			Assignment.year == year,
+		).order(Assignment.number).fetch()
+
+		try:
+			return assigns[n]
+		except IndexError:
+			return None
+
+
 ## INVITATION QUERIES ##########################################################
 
 
@@ -276,6 +288,16 @@ class CustomHandler(BaseHandler):
 		return dropped
 
 
+	def solo_partners(self, quarter, year, assign_num, active=True):
+		return Partnership.query(
+			Partnership.quarter == quarter,
+			Partnership.year == year,
+			Evaluation.assignment_number == assign_num,
+			Partnership.acceptor == None,
+			Partnership.active == active
+		)
+
+
 ## EVAL QUERIES ################################################################
 
 
@@ -293,6 +315,15 @@ class CustomHandler(BaseHandler):
 			Evaluation.active == active,
 			Evaluation.quarter == quarter,
 			Evaluation.year == year
+		)
+
+
+	def evals_for_assign(self, quarter, year, assign_num, active=True):
+		return Evaluation.query(
+			Evaluation.quarter == quarter,
+			Evaluation.year == year,
+			Evaluation.assignment_number == assign_num,
+			Evaluation.active == active
 		)
 
 

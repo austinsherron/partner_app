@@ -7,6 +7,7 @@
 
 	<div class="small-12 columns">
 		<h3 class="text-center">Viewing assignments for {{ quarter_name }} {{ year }}</h3>
+		<br>
 	</div>
 
 	<div class="small-12 columns panel">
@@ -35,10 +36,11 @@
 			  	<td>{{ assignment.fade_out_date.strftime("%m-%d-%Y\n%I:%M %p") }}</td>
 			  -->
 			  <td class="text-center">
-				<span class="label">
-					<a style="color: #FFF" href="/admin/assignment/edit?number={{ assignment.number }}
-						&quarter={{ assignment.quarter }}&year={{ assignment.year }}">edit</a></td>
-				</span>
+				<a style="color: #FFF" href="/admin/assignment/edit?number={{ assignment.number }}
+					&quarter={{ assignment.quarter }}&year={{ assignment.year }}">
+				<span class="label">edit</span>
+				</a>
+			  </td>
 			</tr>
 		{% endfor %}
 		</table>

@@ -4,6 +4,8 @@
 
 <div class="row">
 
+	<br>
+
 	{% if message %}
 		<div class="small-12 columns">
 			<h3 class="text-center">{{ message }}</h3>
@@ -48,7 +50,8 @@
 						<td class="num-cell text-center">{{ student.lab }}</td>
 						<td class="num-cell text-center">{{ student.active }}</td>
 						<td class="num-cell text-center">
-							<a href="/admin/student/edit?studentid={{ student.studentid }}&quarter={{ student.quarter }}&year={{ student.year }}">edit</a>
+							<a href="/admin/student/edit?studentid={{ student.studentid }}&quarter={{ student.quarter }}&year={{ student.year }}">
+								<span class="label">edit</span></a>
 						</td>
 					</tr>
 		  		{% endfor %}
