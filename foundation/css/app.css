@@ -21,6 +21,15 @@ a {
   font-family: 'Open Sans', sans-serif;
 }
 
+.num-cell {
+  max-width: 50px;
+  width: 50px;
+}
+
+.overflow {
+  overflow-x: scroll;
+}
+
 /*
 
 .button:hover {
@@ -161,34 +170,3 @@ a {
 .label {
   font-family: 'Open Sans', sans-serif;
 }	
-
-/*
-
-
-.icon-container {
-  width: 88%;
-  position: absolute;
-  bottom: 5%;
-  z-index: 2;
-}
-
-
-.icon-container a img {
-  display: inline;
-  width: 30%;
-  height: auto;
-}
-
-.data-item {
-  background: #f2f2f2;
-  color: black;
-  padding: 3px;
-}
-
-.data-item:hover {
-  background: #00B0D4;
-  color: white;
-  padding: 3px;
-}
-
-*/

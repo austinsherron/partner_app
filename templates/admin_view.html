@@ -1,62 +1,58 @@
-<!DOCTYPE html>
-{% autoescape true %}
+{% extends 'templates/admin_common.html' %}
+{% block content %}
 
-<html>
-  <body>
 
-  {% if not students %}
-	<form action="/admin/roster/view" method="post" enctype="multipart/form-data">
-	  <div>
-		<input name="year" type="number" value="{{ year }}">
-	  </div>
-	  <div>
-		<select name="quarter">
-		  <option value="1">Fall</option>
-		  <option value="2">Winter</option>
-		  <option value="3">Spring</option>
-		  <option value="4">Summer</option>
-		</select>
-	  </div>
-	  <div><input type="submit" value="view"<div>
-	</form> 
-  {% else %}
-    <form action="/admin/students/delete?quarter={{ quarter }}&year={{ year }}" method="post" enctype="multipart/form-data">
-	  <h3>View students for {{ quarter }} {{ year }}</h3>
-	  <h5>{{ student_num }} students</h5>
-	  <h5>{{ active_num  }} active students</h5>
-	  <h5>{{ inactive_num  }} inactive students</h5>
-	  <table>
-	    <tr>
-		  <th>Select</th>
-		  <th>StudentID</th>
-		  <th>UCInetID</th>
-		  <th>Last Name</th>
-		  <th>First Name</th>
-		  <th>Email</th>
-		  <th>Lab</th>
-		  <th>Active</th>
-	    </tr>
-	  {% for student in students %}
-	    <tr>
-		  <td><input type="checkbox" name="student" value="{{ student.studentid }}"></td>
-	      <td>{{ student.studentid }}</td>
-	  	  <td>{{ student.ucinetid }}</td>
-	      <td>{{ student.last_name }}</td>
-	  	  <td>{{ student.first_name }}</td>
-	  	  <td>{{ student.email }}</td>
-	  	  <td>{{ student.lab }}</td>
-	  	  <td>{{ student.active }}</td>
-	  	  <td><a href="/admin/student/edit?studentid={{ student.studentid
-		  }}&quarter={{ student.quarter }}&year={{ student.year }}">edit</a></td>
-	    </tr>
-  	  {% endfor %}
-	  </table>
-	  <input class="button expand" type="submit" value="Submit">
-	</form>
-  {% endif %}
-  <br>
-  <a href="/admin">Back</a>
-  </body>
-</html>
+<div class="row">
+	{% if message %}
+		<div class="small-12 columns">
+			<h3 class="text-center">{{ message }}</h3>
+		</div>
+	{% endif %}
+	<div class="small-12 columns">
+		<h3 class="text-center">Viewing students for {{ quarter_name }} {{ year }}</h3>
+		<table>
+			<tr>
+				<td class="text-center"><span class="label">{{ student_num }}</span> students</td>
+				<td class="text-center"><span class="label success">{{ active_num  }}</span> active students</td>
+				<td class="text-center"><span class="label warning">{{ inactive_num  }}</span> inactive students</td>
+			</tr>
+		</table>
+	</div>
+	<br>
+	<div class="small-12 columns panel">
+		<form action="/admin/students/deactivate?quarter={{ quarter }}&year={{ year }}" method="post" enctype="multipart/form-data">
+			<table>
+				<tr>
+			  		<th class="num-cell text-center">Select</th>
+			  		<th class="text-center">StudentID</th>
+			  		<th class="text-center">UCInetID</th>
+			  		<th class="text-center">Last Name</th>
+			  		<th class="text-center">First Name</th>
+			  		<th class="text-center">Email</th>
+			  		<th class="num-cell text-center">Lab</th>
+			  		<th class="num-cell text-center">Active</th>
+				</tr>
+		  		{% for student in students %}
+					<tr>
+						<td class="num-cell text-center"><input type="checkbox" name="student" value="{{ student.studentid }}"></td>
+						<td class="text-center">{{ student.studentid }}</td>
+						<td class="text-center overflow">{{ student.ucinetid }}</td>
+						<td class="text-center overflow">{{ student.last_name }}</td>
+						<td class="text-center overflow">{{ student.first_name }}</td>
+						<td class="text-center overflow">{{ student.email }}</td>
+						<td class="num-cell text-center">{{ student.lab }}</td>
+						<td class="num-cell text-center">{{ student.active }}</td>
+						<td class="num-cell text-center"><a href="/admin/student/edit?studentid={{ student.studentid
+						}}&quarter={{ student.quarter }}&year={{ student.year }}">edit</a></td>
+					</tr>
+		  		{% endfor %}
+		  	</table>
 
-{% endautoescape %}
+			<div class="small-4 columns small-centered">
+				<input class="button expand alert" type="submit" value="Deactivate">
+			</div>
+		</form>
+	</div>
+</div>
+
+{% endblock %}

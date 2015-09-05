@@ -8,7 +8,7 @@ from google.appengine.api import images, users
 from google.appengine.ext import ndb
 from webapp2_extras.appengine.users import login_required
 
-from admin import AddAssignment, AddStudent, ClearDB, MainAdmin, ManageAssignments, UploadRoster, ViewRoster, DeleteStudents
+from admin import AddAssignment, AddStudent, ClearDB, MainAdmin, ManageAssignments, UploadRoster, ViewRoster, DeactivateStudents
 from admin import AddPartnership, EditAssignment, EditStudent, ViewEvals, ViewPartnerships, UpdateQuarterYear
 from handler import CustomHandler
 from models import Assignment, Student, Instructor, Invitation, Partnership, Evaluation, Setting
@@ -562,7 +562,7 @@ application = webapp2.WSGIApplication([
 	('/admin/roster/upload', UploadRoster),
 	('/admin/roster/view', ViewRoster),
 	('/admin/student/add', AddStudent),
-	('/admin/students/delete', DeleteStudents),
+	('/admin/students/deactivate', DeactivateStudents),
 	('/admin/student/edit', EditStudent),
 	('/admin/timing/update', UpdateQuarterYear),
 ], config=config, debug=True)

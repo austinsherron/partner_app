@@ -31,11 +31,17 @@ class CustomHandler(BaseHandler):
 
 	
 	def quarter(self):
-		return Setting.query().get().quarter
+		setting = Setting.query().get()
+
+		if setting:
+			return setting.quarter
 
 
 	def year(self):
-		return Setting.query().get().year
+		setting = Setting.query().get()
+
+		if setting:
+			return setting.year
 
 
 ## STUDENT QUERIES #############################################################
@@ -75,6 +81,13 @@ class CustomHandler(BaseHandler):
 			Student.active == True
 		)
 
+	def students_by_ids(self, quarter, year, student_ids):
+		return Student.query(
+			Student.studentid.IN(student_ids),
+			Student.year == year,
+			Student.quarter == quarter
+		)
+
 
 ## ASSIGNMENT QUERIES ##########################################################
 
@@ -99,7 +112,7 @@ class CustomHandler(BaseHandler):
 			Assignment.eval_date > dt.now() - td(hours=7)
 		).order(Assignment.eval_date).fetch()
 
-		if len(evals_after_now) > 0
+		if len(evals_after_now) > 0:
 			return evals_after_now[0]
 		else:
 			return None

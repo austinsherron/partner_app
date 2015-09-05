@@ -301,22 +301,24 @@ class ClearDB(CustomHandler):
 		self.redirect('/admin')
 
 
-class DeleteStudents(CustomHandler):
+class DeactivateStudents(CustomHandler):
 
 	def post(self):
-		quarter_dict = {'fall': 1, 'winter': 2, 'spring': 3, 'summer': 4}
-		student_ids = [int(sid) for sid in self.request.POST.getall('student')]
-		quarter = quarter_dict[self.request.get('quarter').lower()]
-		year = int(self.request.get('year'))
+		quarter = int(self.request.get('quarter'))									# grab quarter from URL
+		year = int(self.request.get('year'))										# grab year from URL
 
-		ndb.delete_multi(Student.query(
-			Student.studentid.IN(student_ids),
-			Student.year == year,
-			Student.quarter == quarter
-		).fetch(keys_only=True))
+		student_ids = [int(sid) for sid in self.request.POST.getall('student')]		# get selected student IDs
+		students = []																# init container for students to deactivate
+		to_deactivate = self.students_by_ids(quarter, year, student_ids)			# query students to deactivate
+
+		for student in to_deactivate:												# deactivate each student...
+			student.active = False
+			students.append(student)
+
+		ndb.put_multi(students)														# ...and then save student objects to DB
 		
-		message = 'Students successfully deleted'
-		self.redirect('/admin?message=' + message)
+		message = 'Students successfully deactivated'
+		return self.redirect('/admin?message=' + message)							# render the response
 
 
 class EditAssignment(CustomHandler):
@@ -704,29 +706,33 @@ class ViewRoster(CustomHandler):
 
 	#@admin_required
 	def get(self):
-		template = JINJA_ENV.get_template('/templates/admin_view.html')
-		return self.response.write(template.render({'year': datetime.date.today().year}))
-
-	
-	def post(self):
 		quarter_map = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
-		quarter = int(self.request.get('quarter'))
-		year = int(self.request.get('year'))
-		active_students = self.get_active_students(quarter, year).fetch()
+		quarter = self.request.get('quarter')								# try grabbing quarter/year from URL
+		year = self.request.get('year')
+
+		if not quarter or not year:											# if they don't exist, try grabbing from session
+			temp = get_sess_vals(self.session, 'quarter', 'year')
+			if not temp:													# if they don't exist there, redirect with error
+				return self.redirect('/admin?message=Please set a current quarter and year')
+			quarter,year = temp													
+
+		quarter,year = int(quarter), int(year)
+		active_students = self.get_active_students(quarter, year).fetch()	# grab lists of active/inactive students
 		inactive_students = self.get_active_students(quarter, year, active=False).fetch()
-		active_num = len(active_students)
+		active_num = len(active_students)									# get number of active/inactive students
 		inactive_num = len(inactive_students)
 
 		template = JINJA_ENV.get_template('/templates/admin_view.html')
-		template_values = {
+		template_values = {													# build map of template values...
 			'students': sorted(active_students + inactive_students, key=lambda x: (x.lab, x.last_name)),
-			'quarter': quarter_map[int(quarter)],
+			'quarter_name': quarter_map[int(quarter)],
+			'quarter': int(quarter),
 			'year': int(year),
 			'student_num': active_num + inactive_num,
 			'active_num': active_num,
 			'inactive_num': inactive_num,
 		}
-		return self.response.write(template.render(template_values))
+		return self.response.write(template.render(template_values))		# ...and render the response
 		
 
 ################################################################################
