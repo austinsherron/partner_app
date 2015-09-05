@@ -57,7 +57,8 @@ class AddAssignment(CustomHandler):
 			return self.redirect('/admin?message=Please set a current quarter and year')
 		quarter,year = temp
 
-		current_assignment = self.current_assign(quarter, year)					# grab current assignment
+		last_num = self.get_assign_n(quarter, year, -1)
+		last_num = 1 if not last_num else last_num.number
 		# pass map of quarter DB representations (ints) to string representation
 		# TODO:
 		#	quarters should not be hardcoded 
@@ -66,7 +67,7 @@ class AddAssignment(CustomHandler):
 			'year': year,
 			'quarter': quarter,
 			'quarters': sorted(quarters.items()),
-			'current': current_assignment,
+			'last_num': last_num,
 			'today': datetime.date.today().strftime("%Y-%m-%d"),
 			'user': users.get_current_user(),
 			'sign_out': users.create_logout_url('/'),

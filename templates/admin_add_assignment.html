@@ -39,7 +39,7 @@
 					</div>
 			  		<div>
 						<span class="label">Assignment Number</span><br>
-						<input name="assign_num" type="number" value="{{ 1 if not current else current.number + 1 }}"/>
+						<input name="assign_num" type="number" value="{{ last_num + 1 }}"/>
 			  		</div>
 					<br>
 					<input class="button expand" type="submit" value="Save">
