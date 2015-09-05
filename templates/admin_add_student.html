@@ -11,46 +11,74 @@
 
 	<br>
 
-	<div class="small-12-columns">
-		<h3 class="text-center">Add Students...</h3>
+	<div class="small-12 columns">
+		<h3 class="text-center">Add Student</h3>
+		<br>
 	</div>
 
-	<div class="small-12 columns panel">
-
+	<div class="small-12 columns panel top-level">
 		<form action="/admin/student/add" method="post" enctype="multipart/form-data">
-			<span class="label">Student ID:</span>
-			<br>
-			<input name="studentid"><br>
-			<span class="label">First Name:</span>
-			<br>
-			<input name="first_name"><br>
-			<span class="label">Last Name:</span>
-			<br>
-			<input name="last_name"><br>
-			<span class="label">UCInetID:</span>
-			<br>
-			<input name="ucinetid"><br>
-			<span class="label">Email:</span>
-			<br>
-			<input name="email"><br>
-			<span class="label">Lab Section:</span>
-			<br>
-			<input name="lab"><br> 
-			<span class="label">Quarter:</span>
-			<br>
-			<select name="quarter">
-				<option value="1">Fall</option>
-				<option value="2">Winter</option>
-				<option value="3">Spring</option>
-				<option value="4">Summer</option>
-			</select>
-			<br>
-			<span class="label">Year:</span>
-			<input type="number" name="year" value="{{ year }}">
-			<br>
-			<input class="button" type="submit" value="Add">
+			<div class="row">
+				<div class="small-12 columns small-centered">
+					<div class="row">
+						<div class="small-6 columns">
+							<span class="label">Student ID</span><br>
+							<input name="studentid" type="number" />
+						</div>
+						<div class="small-6 columns">
+							<span class="label">UCINetID</span><br>
+							<input name="ucinetid" type="text" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="small-6 columns">
+							<span class="label">First Name</span><br>
+							<input name="first_name" type="text" />
+						</div>
+						<div class="small-6 columns">
+							<span class="label">Last Name</span><br>
+							<input name="last_name" type="text" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="small-6 columns">
+							<span class="label">Email</span><br>
+							<input name="email" type="text" />
+						</div>
+						<div class="small-6 columns">
+							<span class="label">Lab Section</span><br>
+							<input name="lab" type="number" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="small-6 columns">
+							<span class="label">Quarter</span><br>
+							<select name="quarter" type="text">
+								{% for num,name in quarters%}
+									{% if num == quarter%}
+										<option value="{{ num }}" selected>{{ name }}</option>
+									{% else %}
+										<option value="{{ num }}">{{ name }}</option>
+									{% endif %}
+								{% endfor %}
+							</select>
+						</div>
+						<div class="small-6 columns">
+							<span class="label">Year</span><br>
+							<input name="year" type="number" value={{ year }} />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="small-4 columns small-centered">
+					<input class="button expand" type="submit" value="Submit"/>
+				<!--</div>
+				<div class="small-6 columns">
+					<input class="button expand" onclick="" value="Add Another"/>
+				</div>-->
+			</div>
 		</form>
-
 	</div>
 </div>
 

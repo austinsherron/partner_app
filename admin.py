@@ -246,42 +246,49 @@ class AddStudent(CustomHandler):
 
 	#@admin_required
 	def get(self):
+		# pass map of quarter DB representations (ints) to string representation
+		# TODO:
+		#	quarters should not be hardcoded 
+		quarters = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
 
 		temp = get_sess_vals(self.session, 'quarter', 'year')					# try grabbing quarter/year from session
 		if not temp:															# redirect with error if it doesn't exist
 			return self.redirect('/admin?message=Please set a current quarter and year')
 		quarter,year = temp
 
-		message = self.request.get('message')									# grab message if it exsits
-
-		template_values = {
-			'message': message,
+		template_values = {														# build map of template values...
+			'message': self.request.get('message'),								# grab message if it exists
 			'user': users.get_current_user(),
 			'sign_out': users.create_logout_url('/'),
 			'quarter': quarter,
+			'quarters': sorted(quarters.items()),
 			'year': year,
 		}
 		template = JINJA_ENV.get_template('/templates/admin_add_student.html')
-		return self.response.write(template.render(template_values))
+		return self.response.write(template.render(template_values))			# ...and render the request
 
 
 	def post(self):
-		student = Student()
-		student.studentid = int(self.request.get('studentid').strip())
-		student.first_name = self.request.get('first_name').strip().title()	
-		student.last_name = self.request.get('last_name').strip().title()
-		student.ucinetid = self.request.get('ucinetid').strip().lower()
-		student.email = self.request.get('email').strip().lower()
-		student.lab = int(self.request.get('lab').strip())
-		student.quarter = int(self.request.get('quarter').strip())
-		student.year = int(self.request.get('year').strip())
-		student.active = True
+		try:																	# try to create student from form values
+			student = Student()
+			student.studentid = int(self.request.get('studentid').strip())
+			student.first_name = self.request.get('first_name').strip().title()	
+			student.last_name = self.request.get('last_name').strip().title()
+			student.ucinetid = self.request.get('ucinetid').strip().lower()
+			student.email = self.request.get('email').strip().lower()
+			student.lab = int(self.request.get('lab').strip())
+			student.quarter = int(self.request.get('quarter').strip())
+			student.year = int(self.request.get('year').strip())
+			student.active = True
+
+		except Exception, e:													# on error, redirect with message
+			return self.redirect('/admin?message=' + 'There was a problem uploading the roster: ' + str(e))			
 		
-		student.put()
+		student.put()															# save student
 
-		message = 'Student ' + student.ucinetid + ' has been added'
+		message = 'Student ' + student.ucinetid + ' has been added'				# create success message
 
-		self.redirect('/admin/student/add?message=' + message)
+		return self.redirect('/admin/student/add?message=' + message)			# render response
 
 
 
@@ -528,12 +535,12 @@ class UploadRoster(CustomHandler):
 			quarter = int(self.request.get('quarter'))							# grab year/quarter info
 			year = int(self.request.get('year'))
 			
-			# students to be uploaded (is set because students must be unique; be careful!)
+			# students to be uploaded 
 			students = []
 			# to check for duplicates in roster
 			student_cache = set()
 
-			# grab students in DB (active and not active) (have to do it twice because of DB limitations)
+			# grab students in DB (active and not active) 
 			existing_students = self.get_active_students(quarter, year).fetch()	
 			existing_students += self.get_active_students(quarter, year, active=False).fetch()
 			# convert to dict for O(1) access time
@@ -579,9 +586,6 @@ class UploadRoster(CustomHandler):
 				student.year = year
 				student.active = True
 				students.append(student)
-
-				print(student)
-				print(student.studentid in existing_students)
 
 			# deactivate students who have dropped (students left in existing_students)
 			for dropped in existing_students.values():
@@ -643,34 +647,6 @@ class ViewEvals(CustomHandler):
 		return self.response.write(template.render(template_values))			# render the response
 
 
-	def post(self):
-		evaluations = Evaluation.query(
-			Evaluation.year == int(self.request.get('year')),
-			Evaluation.quarter == int(self.request.get('quarter')),
-			Evaluation.assignment_number == int(self.request.get('assign_num')),
-			Evaluation.active == True
-		)
-
-		solo_partners = Partnership.query(
-			Partnership.year == int(self.request.get('year')),
-			Partnership.quarter == int(self.request.get('quarter')),
-			Evaluation.assignment_number == int(self.request.get('assign_num')),
-			Partnership.acceptor == None,
-			Partnership.active == True
-		)
-
-		template_values = {
-			'year': self.request.get('year'),
-			'quarter': self.request.get('quarter'),
-			'evals': evaluations,
-			'solos': solo_partners,
-			'current': self.request.get('assign_num')
-		}
-		template = JINJA_ENV.get_template('/templates/admin_evals_view.html')
-		self.response.write(template.render(template_values))
-
-
-
 class ViewPartnerships(CustomHandler):
 
 	#@admin_required
@@ -696,12 +672,12 @@ class ViewPartnerships(CustomHandler):
 				Student.lab == int(self.request.get('lab'))
 			).fetch()
 
+		current_assign = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
+
 		partnership_dict = {}
 		for student in students:
 			student_info = (student.studentid, student.ucinetid, student.last_name, 
 				student.first_name, student.lab)
-
-			current_assign = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
 
 			partners = []
 			for i in range(1, current_assign.number + 1):

@@ -513,11 +513,15 @@ class ViewHistory(CustomHandler):
 		user = users.get_current_user()
 
 		try:
+			quarter = Setting.query().get().quarter
+			year = Setting.query().get().year
 			student = self.get_student(Setting.query().get().quarter, Setting.query().get().year, user.email())
 			current_assignment = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
 			partners = self.partner_history(student, Setting.query().get().quarter, Setting.query().get().year)
 			evaluations = self.get_eval_history(student, True, Setting.query().get().quarter, Setting.query().get().year,
 				).order(Evaluation.assignment_number)
+			last_num = self.get_assign_n(quarter, year, -1)
+			last_num = last_num.number if last_num else current_assignment.number
 
 		except AttributeError:
 			self.redirect('/partner')
@@ -529,9 +533,10 @@ class ViewHistory(CustomHandler):
 			'student': student,
 			'partners': partners,
 			'evals': evaluations,
-			'sign_out': users.create_logout_url('/')
+			'sign_out': users.create_logout_url('/'),
+			'last_num': last_num,
 		}
-		self.response.write(template.render(template_values))
+		return self.response.write(template.render(template_values))
 
 
 config = {}
