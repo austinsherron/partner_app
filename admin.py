@@ -317,7 +317,7 @@ class DeactivateStudents(CustomHandler):
 
 		ndb.put_multi(students)														# ...and then save student objects to DB
 		
-		message = 'Students successfully deactivated'
+		message = 'Students successfully deactivated'								# create success message
 		return self.redirect('/admin?message=' + message)							# render the response
 
 
