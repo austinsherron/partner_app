@@ -58,7 +58,7 @@ class AddAssignment(CustomHandler):
 		quarter,year = temp
 
 		last_num = self.get_assign_n(quarter, year, -1)
-		last_num = 1 if not last_num else last_num.number
+		last_num = 0 if not last_num else last_num.number
 		# pass map of quarter DB representations (ints) to string representation
 		# TODO:
 		#	quarters should not be hardcoded 
@@ -305,6 +305,7 @@ class ClearDB(CustomHandler):
 		if bool(self.request.get('choice')):
 			ndb.delete_multi(Student.query().fetch(keys_only=True))
 			ndb.delete_multi(Assignment.query().fetch(keys_only=True))
+			ndb.delete_multi(Setting.query().fetch(keys_only=True))
 
 		self.redirect('/admin')
 
@@ -456,8 +457,13 @@ class MainAdmin(CustomHandler):
 		user = users.get_current_user()										# grab current user
 		message = self.request.get('message')								# grab message from URL, if it exists
 
-		self.session['quarter'] = self.quarter()							# load current quarter/year into session
-		self.session['year'] = self.year()
+		quarter,year = self.quarter(), self.year()
+
+		if (not quarter or not year) and not message:
+			message = 'Please set a current year and quarter'
+
+		self.session['quarter'] = quarter 									# load current quarter/year into session
+		self.session['year'] = year
 
 		template = JINJA_ENV.get_template('/templates/admin.html')
 		template_values = {													# build template value map...
