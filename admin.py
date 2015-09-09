@@ -283,7 +283,7 @@ class AddStudent(CustomHandler):
 			student.active = True
 
 		except Exception, e:													# on error, redirect with message
-			return self.redirect('/admin?message=' + 'There was a problem uploading the roster: ' + str(e))			
+			return self.redirect('/admin?message=' + 'There was a problem adding that student: ' + str(e))			
 		
 		student.put()															# save student
 
