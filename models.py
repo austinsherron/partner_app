@@ -143,6 +143,7 @@ class Evaluation(ndb.Model):
 class Setting(ndb.Model):
 	year = ndb.IntegerProperty()
 	quarter = ndb.IntegerProperty()
+	num_labs = ndb.IntegerProperty()
 
 
 ################################################################################

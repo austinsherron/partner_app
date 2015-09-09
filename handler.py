@@ -44,6 +44,13 @@ class CustomHandler(BaseHandler):
 			return setting.year
 
 
+	def num_labs(self):
+		setting = Setting.query().get()
+
+		if setting:
+			return setting.num_labs
+
+
 ## STUDENT QUERIES #############################################################
 
 
@@ -73,12 +80,12 @@ class CustomHandler(BaseHandler):
 		).get()
 
 
-	def students_by_lab(self, quarter, year, lab):
+	def students_by_lab(self, quarter, year, lab, active=True):
 		return Student.query(
 			Student.quarter == quarter,
 			Student.year == year, 
 			Student.lab == lab,
-			Student.active == True
+			Student.active == active
 		)
 
 	def students_by_ids(self, quarter, year, student_ids):
@@ -212,13 +219,30 @@ class CustomHandler(BaseHandler):
 		)
 
 	
-	def partner_history(self, student, quarter, year):
-		return Partnership.query(
+	def partner_history(self, student, quarter, year, fill_gaps=None):
+		history = Partnership.query(
 			ndb.OR(Partnership.initiator == student.key, Partnership.acceptor == student.key),
 			Partnership.active == True,
 			Partnership.quarter == quarter,
 			Partnership.year == year
 		).order(Partnership.assignment_number)
+
+		if type(fill_gaps) is int:
+			partners = []
+			for i in range(1, fill_gaps + 1):
+				partnership = history.filter(Partnership.assignment_number == i).get()
+
+				if not partnership:
+					partners.append('No Selection')
+				elif partnership.acceptor and partnership.initiator:
+					acceptor = partnership.acceptor
+					initiator = partnership.initiator
+					partners.append(acceptor.get().email if acceptor != student.key else initiator.get().email)
+				elif partnership.initiator and not partnership.acceptor:
+					partners.append('No Partner')
+			return partners
+
+		return history
 
 
 	def all_partner_history(self, student, quarter, year):

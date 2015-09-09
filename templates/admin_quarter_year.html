@@ -12,15 +12,17 @@
 	  <div class="small-6 column">
 		<form action="/admin/timing/update" method="post" enctype="multipart/form-data">
 		  <h5>Update Quarter/Year</h5>
-		  <label class="label">Quarter</label>
+		  <span class="label">Quarter</span>
 		  <select name="quarter">
 			<option value="1">Fall</option>
 			<option value="2">Winter</option>
 			<option value="3">Spring</option>
 			<option value="4">Summer</option>
 		  </select>
-		  <label class="label">Year</label>
+		  <span class="label">Year</span>
 		  <input type="number" value="{{ current_year }}" name="year">
+		  <span class="label">Number of Labs</span>
+		  <input type="number" value="1" name="num_labs">
 		  <input type="submit" value="Update" class="button expand">
 		</form>
       </div>

@@ -10,6 +10,7 @@ import jinja2
 import os
 import webapp2
 
+from collections import defaultdict
 from google.appengine.api import users
 from google.appengine.ext import ndb
 from webapp2_extras.appengine.users import admin_required
@@ -476,7 +477,7 @@ class MainAdmin(CustomHandler):
 		return self.response.write(template.render(template_values))		# ...and render the response
 
 
-class UpdateQuarterYear(CustomHandler):
+class UpdateSettings(CustomHandler):
 
 	def get(self):
 		setting = Setting.query().get()
@@ -486,7 +487,7 @@ class UpdateQuarterYear(CustomHandler):
 			'current_year': datetime.date.today().year
 		}
 		template = JINJA_ENV.get_template('/templates/admin_quarter_year.html')
-		self.response.write(template.render(template_values))
+		return self.response.write(template.render(template_values))
 
 
 	def post(self):
@@ -497,6 +498,7 @@ class UpdateQuarterYear(CustomHandler):
 
 		setting.year = int(self.request.get('year'))
 		setting.quarter = int(self.request.get('quarter'))
+		setting.num_labs = int(self.request.get('num_labs'))
 
 		setting.put()
 
@@ -651,71 +653,60 @@ class ViewEvals(CustomHandler):
 			'last_num': last_num,
 		}
 		template = JINJA_ENV.get_template('/templates/admin_evals_view.html')
-		return self.response.write(template.render(template_values))			# render the response
+		return self.response.write(template.render(template_values))			# ...and render the response
 
 
 class ViewPartnerships(CustomHandler):
 
 	#@admin_required
 	def get(self):
-		template = JINJA_ENV.get_template('/templates/admin_partnerships.html')
-		self.response.write(template.render({'year': datetime.date.today().year}))
+		# pass map of quarter DB representations (ints) to string representation
+		# TODO:
+		#	quarters should not be hardcoded 
+		quarter_map = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
+		quarter = self.request.get('quarter')										# try grabbing quarter/year from URL
+		year = self.request.get('year')
 
+		if not quarter or not year:													# if they don't exist, try grabbing from session
+			temp = get_sess_vals(self.session, 'quarter', 'year')
+			if not temp:															# if they don't exist there, redirect with error
+				return self.redirect('/admin?message=Please set a current quarter and year')
+			quarter,year = temp													
 
-	def post(self):
-		quarter = int(self.request.get('quarter'))
-		year = int(self.request.get('year'))
-		view_by = self.request.get('view_by')
+		quarter,year = int(quarter), int(year)
+		view_by = self.request.get('view_by')										# check URL for 'view by' options (lab vs class)
+		view_by = view_by if view_by else 1
 
-		if view_by == 'class':
-			students = Student.query(
-				Student.year == year,
-				Student.quarter == quarter
-			).fetch()
+		if view_by == 'class':														# if user wants to veiw by class, or the view by option wasn't specified...
+			students = self.get_active_students(quarter, year).fetch()				# ...grab all active students
 		else:
-			students = Student.query(
-				Student.year == year,
-				Student.quarter == quarter,
-				Student.lab == int(self.request.get('lab'))
-			).fetch()
+			students = self.students_by_lab(quarter, year, int(view_by)).fetch()	# ...otherwise, grab students for the lab specified
 
-		current_assign = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
+		last_assign = self.get_assign_n(quarter, year, -1)							# grab most recent assignment...
+		last_num = 1 if not last_assign else last_assign.number						# ...and its number
 
-		partnership_dict = {}
+		partnership_dict = defaultdict(list)										# create mapping of students to sequential partner emails
 		for student in students:
-			student_info = (student.studentid, student.ucinetid, student.last_name, 
-				student.first_name, student.lab)
+			student_info = (student.studentid, student.ucinetid, student.last_name, student.first_name, student.lab)
+			# grab partner history (with 'No Partners' and 'No Selections' included
+			partners = self.partner_history(student, quarter, year, fill_gaps=last_num)
+			partnership_dict[student_info] = partners
 
-			partners = []
-			for i in range(1, current_assign.number + 1):
-				partnership = Partnership.query(
-					ndb.OR(Partnership.acceptor == student.key, Partnership.initiator == student.key),
-					Partnership.assignment_number == i,
-					Partnership.active == True,
-				).get()
-				
-				if partnership and student and partnership.initiator.get():
-					if partnership.initiator.get().studentid != student.studentid:
-						partners.append(partnership.initiator.get().email)
-					else:
-						if partnership.acceptor.get():
-							partners.append(partnership.acceptor.get().email)
-						else:
-							partners.append('No Partner')
-				else:
-					partners.append('No Selection')
+		partnership_dict = sorted(partnership_dict.items(), key=lambda x: (x[0][4], x[0][2]))
+		num_labs = self.num_labs()
 
-				partnership_dict[student_info] = partners
-
-
-		template_values = {
-			'partnerships': sorted(partnership_dict.items(), key=lambda x: (x[0][4], x[0][2])),
-			'view_by': view_by,
-			'year': datetime.date.today().year
+		template_values = {															# build map of template values...
+			'partnerships': partnership_dict,
+			'view_by': str(view_by),
+			'year': year,
+			'quarter': quarter,
+			'num_labs': num_labs if num_labs else 0,
+			'last_num': last_num,
+			'user': users.get_current_user(),
+			'sign_out': users.create_logout_url('/'),
 		}
 		template = JINJA_ENV.get_template('/templates/admin_partnerships.html')
-		self.response.write(template.render(template_values))
-			
+		return self.response.write(template.render(template_values))				# ...and render the response
 
 
 class ViewRoster(CustomHandler):
