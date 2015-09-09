@@ -484,6 +484,7 @@ class UpdateSettings(CustomHandler):
 		template_values = {
 			'year': setting.year if setting else None,
 			'quarter': setting.quarter if setting else None,
+			'num_labs': setting.num_labs if setting else None,
 			'current_year': datetime.date.today().year
 		}
 		template = JINJA_ENV.get_template('/templates/admin_quarter_year.html')
@@ -543,6 +544,7 @@ class UploadRoster(CustomHandler):
 
 			quarter = int(self.request.get('quarter'))							# grab year/quarter info
 			year = int(self.request.get('year'))
+			num_labs = 0
 			
 			# students to be uploaded 
 			students = []
@@ -557,6 +559,10 @@ class UploadRoster(CustomHandler):
 
 			for row in file:
 				row = row.split(',')
+
+				# save highest lab number found
+				if int(row[5]) > num_labs:
+					num_labs = int(row[5])
 
 				# grab student ID from current row of CSV roster
 				studentid = int(row[0].strip())
@@ -603,6 +609,11 @@ class UploadRoster(CustomHandler):
 
 			# save student objects...
 			ndb.put_multi(students)
+			# ...save num_labs...
+			setting = Setting.query().get()
+			setting = setting if setting else Setting()
+			setting.num_labs = num_labs
+			setting.put()
 			# ...and render the response
 			return self.redirect('/admin/roster/view?message=' + 'Successfully uploaded new roster')			
 
@@ -688,7 +699,7 @@ class ViewPartnerships(CustomHandler):
 		partnership_dict = defaultdict(list)										# create mapping of students to sequential partner emails
 		for student in students:
 			student_info = (student.studentid, student.ucinetid, student.last_name, student.first_name, student.lab)
-			# grab partner history (with 'No Partners' and 'No Selections' included
+			# grab partner history (with 'No Partners' and 'No Selections' included)
 			partners = self.partner_history(student, quarter, year, fill_gaps=last_num)
 			partnership_dict[student_info] = partners
 
