@@ -89,10 +89,21 @@ class ConfirmPartner(CustomHandler):
 	def post(self):
 		# get current user
 		user = users.get_current_user()
-		# use user info to find student in DB (the invitee)
-		confirming = self.get_student(Setting.query().get().quarter, Setting.query().get().year, user.email())
-		# find student being confirmed (the invitor)
-		being_confirmed = self.student_by_id(Setting.query().get().quarter, Setting.query().get().year, self.request.get('confirmed'))
+
+		confirming_key = self.request.get('confirming')
+		being_confirmed_key = self.request.get('being_confirmed')
+
+		if not confirming_key or not being_confirmed_key:
+			# use user info to find student in DB (the invitee)
+			confirming = self.get_student(Setting.query().get().quarter, Setting.query().get().year, user.email())
+			# find student being confirmed (the invitor)
+			being_confirmed = self.student_by_id(Setting.query().get().quarter, Setting.query().get().year, self.request.get('confirmed'))
+			admin = False
+		else:
+			confirming = ndb.Key(urlsafe=confirming_key)
+			being_confirmed = ndb.Key(urlsafe=being_confirmed_key)
+			admin = True
+
 		# find current assignment
 		current_assignment = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
 		# find all open invitation involving both the student being confirmed and the student confirming
@@ -130,11 +141,16 @@ class ConfirmPartner(CustomHandler):
 		# ...and save it
 		partnership.put()
 
-		message = 'Partnership with ' + str(being_confirmed.last_name) + ', ' 
-		message += str(being_confirmed.first_name) + ' confirmed.'
-		message += ' Please refresh the page.'
-
-		self.redirect('/partner?message=' + message)
+		if not admin:
+			message = 'Partnership with ' + str(being_confirmed.last_name) + ', ' 
+			message += str(being_confirmed.first_name) + ' confirmed.'
+			message += ' Please refresh the page.'
+			return self.redirect('/partner?message=' + message)
+		else:
+			message = 'Partnership between ' + str(being_confirmed.ucinetid) + ' and ' 
+			message += confirming.ucinetid + ' successfully created.'
+			return self.redirect('/admin?message=' + message)
+			
 
 
 class EditProfile(CustomHandler):

@@ -36,6 +36,7 @@
 			  		<th class="num-cell text-center">Lab</th>
 			  		<th class="num-cell text-center">Active</th>
 			  		<th class="num-cell text-center">Edit</th>
+			  		<th class="num-cell text-center">View</th>
 				</tr>
 		  		{% for student in students %}
 					<tr>
@@ -51,7 +52,11 @@
 						<td class="num-cell text-center">{{ student.active }}</td>
 						<td class="num-cell text-center">
 							<a href="/admin/student/edit?studentid={{ student.studentid }}&quarter={{ student.quarter }}&year={{ student.year }}">
-								<span class="label">edit</span></a>
+								<span class="label warning">edit</span></a>
+						</td>
+						<td class="num-cell text-center">
+							<a href="/admin/student/view?studentid={{ student.studentid }}&quarter={{ student.quarter }}&year={{ student.year }}">
+								<span class="label">View</span></a>
 						</td>
 					</tr>
 		  		{% endfor %}

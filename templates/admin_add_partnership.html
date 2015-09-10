@@ -1,59 +1,69 @@
-<!DOCTYPE html>
-{% autoescape true %}
-<html>
-  <body>
-  {% if students %}
-	<form action="/admin/partners/add" method="post" enctype="multipart/form-data">
-	  <label>Assignment Number:</label>
-	  <br>
-	  <input name="assign_num" value="{{ current.number }}" type="number">
-	  <br>
-	  <select name="initiator">
-		{% for student in students %}
-		  <option value="{{ student.studentid }}">
-			{{ student.last_name }}, {{ student.first_name }} - {{ student.ucinetid }}
-		  </option>
-		{% endfor %}
-	  </select>
-	  <select name="acceptor">
-		<option value="None">No Partner</option>
-		{% for student in students %}
-		  <option value="{{ student.studentid }}">
-			{{ student.last_name }}, {{ student.first_name }} - {{ student.ucinetid }}
-		  </option>
-		{% endfor %}
-	  </select>
-	  <input name="quarter" value="{{ quarter }}" style="display:none">
-	  <input name="year" value="{{ year }}" style="display:none">
-	  <br>
-	  <label>Active?</label>
-	  <select name="active">
-		<option value="True">Yes</option>
-		<option value="False">No</option>
-	  </select>
-	  <br>
-	  <input name="form_2" type="submit" value="Submit">
-	</form>
-  {% else %}
-	<h4>Add a partnership for lab:</h4>
-	<form action="/admin/partners/add" method="post" enctype="multipart/form-data">
-		<label>Year:</label>
-		<input type="number" name="year" value="2014">
-		<br>
-		<label>Quarter:</label>
-		<select name="quarter">
-		  <option value="1">Fall</option>
-		  <option value="2">Winter</option>
-		  <option value="3">Spring</option>
-		  <option value="4">Summer</option>
-		</select><br>
-		<label>Lab:</label>
-		<input type="number" name="lab" value="1">
-		<br>
-		<input name="form_1" type="submit" value="Submit">
-	</form>
-  {% endif %}
-  </body>
-</html>
+{% extends '/templates/admin_common.html' %}
+{% block content %}
 
-{% endautoescape %}
+<div class="row">
+
+	<br>
+
+	{% if message %}
+		<div class="small-12 columns">
+			<h3 class="text-center">{{ message }}</h3>
+		</div>
+	{% endif %}
+
+	<div class="small-12 columns">
+		<h3 class="text-center">Add Partnership</h3>
+		<br>
+	</div>
+
+	<div class="small-12 columns panel">
+
+		<form action="/admin/partners/add" method="post" enctype="multipart/form-data">
+			
+			<div class="row">
+				<div class="small-12 columns"> 
+					<span class="label">Assignment Number</span>
+					<br>
+					<input name="assign_num" value="{{ current_num }}" type="number">
+					<span class="label">Partner 1</span>
+					<br>
+					<select name="initiator">
+						{% for student in students %}
+							<option value="{{ student.studentid }}">
+								{{ student.last_name }}, {{ student.first_name }} - {{ student.ucinetid }}
+							</option>
+						{% endfor %}
+					</select>
+					<span class="label">Partner 2</span>
+					<br>
+					<select name="acceptor">
+						<option value="None">No Partner</option>
+						{% for student in students %}
+							<option value="{{ student.studentid }}">
+								{{ student.last_name }}, {{ student.first_name }} - {{ student.ucinetid }}
+							</option>
+						{% endfor %}
+					</select>
+					<input name="quarter" value="{{ quarter }}" style="display:none">
+					<input name="year" value="{{ year }}" style="display:none">
+					<br>
+					<span class="label">Active?</span>
+					<select name="active">
+						<option value="True">Yes</option>
+						<option value="False">No</option>
+					</select>
+					<br>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="small-4 columns small-centered">
+					<input class="button expand" name="form_2" type="submit" value="Submit">
+				</div>
+			</div>
+		</form>
+
+	</div>
+</div>
+
+{% endblock %}

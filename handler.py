@@ -322,6 +322,23 @@ class CustomHandler(BaseHandler):
 		)
 
 
+	def all_partners(self, quarter, year, active=True):
+		return Partnership.query(
+			Partnership.quarter == quarter,
+			Partnership.year == year,
+			Partnership.active == active,
+		)
+
+
+	def all_partners_for_lab(self, quarter, year, lab, active=True):
+
+		return Partnership.query(
+			Partnership.quarter == quarter,
+			Partnership.year == year,
+			Partnership.active == active,
+		)
+
+
 ## EVAL QUERIES ################################################################
 
 

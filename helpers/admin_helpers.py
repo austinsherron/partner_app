@@ -4,6 +4,7 @@
 
 
 import datetime as dt
+from collections import defaultdict
 
 
 ################################################################################
@@ -40,6 +41,87 @@ def make_date(date, time):
 		hour=int(time[0]),
 		minute=int(time[1])
 	)
+
+
+def keys_to_partners(all_partners):
+	"""
+	This is a function that maps student keys to the partnership objects in which
+	a key exists as either an acceptor or an initiator.
+	
+	Parameters
+	----------
+	all_partners : list (iterable)
+		iterable of partnership obejcts
+	
+	Returns
+	-------
+	k_to_p : defaultdict of dicts
+		mapping of keys to dicts of partnership objects
+
+	TODO
+	----
+	Generalize
+	"""
+	k_to_p = defaultdict(dict)
+	for partnership in all_partners:
+		if partnership.initiator:
+			k_to_p[partnership.initiator][partnership.assignment_number] = partnership
+
+		if partnership.acceptor:
+			k_to_p[partnership.acceptor][partnership.assignment_number] = partnership
+
+	return k_to_p
+
+
+def student_info_to_partner_list(last_num, keys_to_partnerships, keys_to_students, students):
+	"""
+	This function creates and returns a tuple--containing student info--to list--containing
+	partnership history info (strings)--mapping.
+
+	Parameters
+	----------
+	last_num : int
+		number of the last assignment for a given term
+	keys_to_partnerships : dict<ndb.Key,Partnership objects>
+		mapping of student object keys to the relevant partnership objects 
+		(returned by the function 'keys_to_partners')
+	keys_to_students : dict<ndb.Key,Student objects>
+		mapping of student object keys to their associated objects
+	students : list (iterable) of student objects
+
+	Returns
+	-------
+	partnership_dict : dict<(str),[str]>
+		mapping of student info to partnership strings
+
+	TODO
+	----
+	Generalize
+	Rethink logic
+	"""
+	partnership_dict = defaultdict(list)						# create mapping of students to sequential partner emails
+	for student in students:
+		student_info = (student.studentid,student.ucinetid,student.last_name,student.first_name,student.lab)
+		for i in range(1, last_num + 1):							# need to check for each assignment, as gaps in partner history may exist
+			to_append = 'No Selection'								# default status is 'No Selection'
+
+			if i in keys_to_partnerships[student.key]:				# if 'i' isn't there, that student doesn't have a partnership for that assignment 
+				partnership = keys_to_partnerships[student.key][i]	
+
+				if partnership.acceptor and partnership.initiator:	
+					if partnership.initiator != student.key:
+						initiator = partnership.initiator.get() if partnership.initiator not in keys_to_students else keys_to_students[partnership.initiator]
+						to_append = initiator.email
+					else:
+						acceptor = partnership.acceptor.get() if partnership.acceptor not in keys_to_students else keys_to_students[partnership.acceptor]
+						to_append = acceptor.email
+
+				elif not partnership.acceptor and partnership.initiator:
+					to_append = 'No Partner'
+
+			partnership_dict[student_info].append(to_append)
+
+	return partnership_dict
 
 
 ################################################################################
