@@ -28,7 +28,11 @@
 			  <td class="text-center">{{ assignment.fade_in_date.strftime("%m-%d-%Y\n%I:%M %p") }}</td>
 			  <td class="text-center">{{ assignment.due_date.strftime("%m-%d-%Y\n%I:%M %p") }}</td>
 			  <td class="text-center">{{ assignment.close_date.strftime("%m-%d-%Y\n%I:%M %p") }}</td>
-			  <td class="text-center">{{ assignment.eval_open_date.strftime("%m-%d-%Y\n%I:%M %p") }}</td>
+			  {% if assignment.eval_open_date %}
+			  	<td class="text-center">{{ assignment.eval_open_date.strftime("%m-%d-%Y\n%I:%M %p") }}</td>
+			  {% else %}
+				<td class="text-center">None</td>
+			  {% endif %}
 			  <td class="text-center">{{ assignment.eval_date.strftime("%m-%d-%Y\n%I:%M %p") }}</td>
 			  <!--
 				Not currently used
