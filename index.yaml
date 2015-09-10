@@ -1,11 +1,5 @@
 indexes:
 
-- kind: Assignment
-  properties:
-  - name: quarter
-  - name: year
-  - name: fade_in_date 
-
 - kind: Student
   properties:
   - name: active
@@ -28,6 +22,12 @@ indexes:
   - name: quarter
   - name: year
   - name: eval_date
+
+- kind: Assignment
+  properties:
+  - name: quarter
+  - name: year
+  - name: fade_in_date
 
 - kind: Assignment
   properties:

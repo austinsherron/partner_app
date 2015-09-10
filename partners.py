@@ -29,14 +29,15 @@ class BrowseForPartners(CustomHandler):
 		quarter,year = Setting.query().get().quarter, Setting.query().get().year
 		# use user info to find student in DB (the selector)
 		selector = self.get_student(quarter, year, user.email())
+		if not selector:
+			return self.redirect('/partner')
 		# use selector info to find students in same lab section
 		selectees = self.students_by_lab(quarter, year, selector.lab)
 		# get current assignment
 		current_assignment = self.current_assign(quarter, year)
-
 		# if there are no assignments for this quarter, redirect to avoid errors
 		if not current_assignment:
-			return self.redirect('/partner?message=There are no assignments open for partner selection.' )
+			return self.redirect('/partner?message=There are no assignments open for partner selection.')
 			
 		# get error message, if any
 		e = self.request.get('error')		
