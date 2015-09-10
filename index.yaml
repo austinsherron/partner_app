@@ -33,12 +33,6 @@ indexes:
   properties:
   - name: quarter
   - name: year
-  - name: fade_in_date
-
-- kind: Assignment
-  properties:
-  - name: quarter
-  - name: year
   - name: number
 
 - kind: Evaluation
