@@ -169,6 +169,13 @@ class CustomHandler(BaseHandler):
 			Invitation.active == active, 
 			Invitation.assignment_number == assign_num 
 		)
+
+
+	def all_invites_for_student(self, student, assign_num, active=True, combine=True):
+		if combine:
+			return self.received_invites(student, assign_num, active).fetch() + self.sent_invites(student, assign_num, active).fetch()
+		else:
+			return (self.received_invites(student, assign_num, active),self.sent_invites(student, assign_num, active))
 		
 
 	def open_invitations(self, confirming, being_confirmed, assign_num):
@@ -276,6 +283,16 @@ class CustomHandler(BaseHandler):
 			Partnership.assignment_number == assign_num,
 			Partnership.active == active,
 		).fetch()
+
+
+	def students_partners_for_assign(self, student, quarter, year, assign_num, active=True):
+		return Partnership.query(
+			ndb.OR(Partnership.initiator == student.key, Partnership.acceptor == student.key),
+			Partnership.quarter == quarter,
+			Partnership.year == year,
+			Partnership.assignment_number == assign_num,
+			Partnership.active == active,
+		)
 
 
 	def partners_previously(self, selector, selected):

@@ -161,7 +161,7 @@ class AddPartnership(CustomHandler):
 
 		quarter,year = int(quarter), int(year)
 		view = self.request.get('view')												# check URL for 'view by' options (lab vs class)
-		view = view if view else 1
+		view = view if view else 'class'
 
 		if view == 'class':															# if user wants to veiw by class, or the view by option wasn't specified...
 			students = self.get_active_students(quarter, year).fetch()				# ...grab all active students
@@ -173,7 +173,7 @@ class AddPartnership(CustomHandler):
 
 		template = JINJA_ENV.get_template('/templates/admin_add_partnership.html')
 		template_values = {
-			'students': students,
+			'students': sorted(students, key=lambda x: x.last_name),
 			'view': str(view),
 			'quarter': quarter,
 			'year': year,

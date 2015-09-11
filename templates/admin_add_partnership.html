@@ -18,7 +18,7 @@
 
 	<div class="small-12 columns panel">
 
-		<form action="/admin/partners/add" method="post" enctype="multipart/form-data">
+		<form action="/partner/confirm" method="post" enctype="multipart/form-data">
 			
 			<div class="row">
 				<div class="small-12 columns"> 
@@ -27,19 +27,19 @@
 					<input name="assign_num" value="{{ current_num }}" type="number">
 					<span class="label">Partner 1</span>
 					<br>
-					<select name="initiator">
+					<select name="admin_being_confirmed">
 						{% for student in students %}
-							<option value="{{ student.studentid }}">
+							<option value="{{ student.key.urlsafe() }}">
 								{{ student.last_name }}, {{ student.first_name }} - {{ student.ucinetid }}
 							</option>
 						{% endfor %}
 					</select>
 					<span class="label">Partner 2</span>
 					<br>
-					<select name="acceptor">
+					<select name="admin_confirming">
 						<option value="None">No Partner</option>
 						{% for student in students %}
-							<option value="{{ student.studentid }}">
+							<option value="{{ student.key.urlsafe() }}">
 								{{ student.last_name }}, {{ student.first_name }} - {{ student.ucinetid }}
 							</option>
 						{% endfor %}
@@ -49,7 +49,7 @@
 					<br>
 					<span class="label">Active?</span>
 					<select name="active">
-						<option value="True">Yes</option>
+						<option value="True" selected>Yes</option>
 						<option value="False">No</option>
 					</select>
 					<br>

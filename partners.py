@@ -91,8 +91,11 @@ class ConfirmPartner(CustomHandler):
 		# get current user
 		user = users.get_current_user()
 
-		confirming_key = self.request.get('confirming')
-		being_confirmed_key = self.request.get('being_confirmed')
+		confirming_key = self.request.get('admin_confirming')
+		being_confirmed_key = self.request.get('admin_being_confirmed')
+
+		quarter = Setting.query().get().quarter
+		year = Setting.query().get().year
 
 		if not confirming_key or not being_confirmed_key:
 			# use user info to find student in DB (the invitee)
@@ -101,16 +104,25 @@ class ConfirmPartner(CustomHandler):
 			being_confirmed = self.student_by_id(Setting.query().get().quarter, Setting.query().get().year, self.request.get('confirmed'))
 			admin = False
 		else:
-			confirming = ndb.Key(urlsafe=confirming_key)
-			being_confirmed = ndb.Key(urlsafe=being_confirmed_key)
+			being_confirmed = ndb.Key(urlsafe=being_confirmed_key).get()
+			confirming = ndb.Key(urlsafe=confirming_key).get() if confirming_key != 'None' else None
 			admin = True
 
 		# find current assignment
 		current_assignment = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
 		# find all open invitation involving both the student being confirmed and the student confirming
-		invitations = self.all_invitations(confirming, being_confirmed, current_assignment.number)
+		# invitations = self.all_invitations(confirming, being_confirmed, current_assignment.number)
+		if confirming:
+			invitations = self.all_invites_for_student(confirming, current_assignment.number)
+			invitations += self.all_invites_for_student(being_confirmed, current_assignment.number)
+			open_partnerships = self.students_partners_for_assign(confirming, quarter, year, current_assignment.number).fetch()
+			open_partnerships += self.students_partners_for_assign(being_confirmed, quarter, year, current_assignment.number).fetch()
+		else:
+			invitations = self.all_invites_for_student(being_confirmed, current_assignment.number)
+			open_partnerships = self.students_partners_for_assign(being_confirmed, quarter, year, current_assignment.number).fetch()
+
 		# find any active partnerships for confirming student and the student  being confirmed
-		open_partnerships = self.open_partnerships(confirming, being_confirmed, current_assignment.number)
+		# open_partnerships = self.open_partnerships(confirming, being_confirmed, current_assignment.number)
 
 		# deactivate those partnerships
 		for partnership in open_partnerships:
@@ -129,15 +141,15 @@ class ConfirmPartner(CustomHandler):
 			invitation.active = False
 
 			# set the accepted invitation to accepted == True
-			if invitation.invitor == being_confirmed.key and invitation.invitee == confirming.key:
+			if confirming and (invitation.invitor == being_confirmed.key and invitation.invitee == confirming.key):
 				invitation.accepted = True
 
 			invitation.put()
 
 		# create new partnership...
-		partnership = Partnership(initiator = being_confirmed.key, acceptor = confirming.key,
+		partnership = Partnership(initiator = being_confirmed.key, acceptor = confirming.key if confirming else None,
 			assignment_number = current_assignment.number, active = True,
-			year = confirming.year, quarter = confirming.quarter)
+			year = being_confirmed.year, quarter = being_confirmed.quarter)
 
 		# ...and save it
 		partnership.put()
@@ -149,7 +161,7 @@ class ConfirmPartner(CustomHandler):
 			return self.redirect('/partner?message=' + message)
 		else:
 			message = 'Partnership between ' + str(being_confirmed.ucinetid) + ' and ' 
-			message += confirming.ucinetid + ' successfully created.'
+			message += (confirming.ucinetid if confirming else '"No Partner"') + ' successfully created.'
 			return self.redirect('/admin?message=' + message)
 			
 
