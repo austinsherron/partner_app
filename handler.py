@@ -310,12 +310,6 @@ class CustomHandler(BaseHandler):
 			Partnership.active == False
 		)
 		return dropped
-#		if dropped:
-#			if dropped.initiator.get().studentid == student.studentid:
-#				if dropped.acceptor:
-#					return dropped.acceptor.get()
-#			else:
-#				return dropped.initiator.get()
 
 
 	def dropped_partners(self, open_partnerships, confirming, being_confirmed):
