@@ -180,6 +180,7 @@ class AddPartnership(CustomHandler):
 			'user': users.get_current_user(),
 			'sign_out': users.create_logout_url('/'),
 			'current_num': current_num,
+			'num_labs': self.num_labs() if self.num_labs() else 1,
 		}
 		return self.response.write(template.render(template_values))
 

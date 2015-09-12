@@ -12,8 +12,27 @@
 	{% endif %}
 
 	<div class="small-12 columns">
-		<h3 class="text-center">Add Partnership</h3>
+		<h3 class="text-center">Add Partnerships 
+		{{ 'for Whole Class' if view == 'class' else 'for Lab ' + view }}</h3>
 		<br>
+		<div class="row small-centered">
+			<ul class="pagination small-centered" style="display: table; margin: 0 auto">
+				{% for i in range(num_labs) %}
+					{% if (i + 1)|string == view %}
+						<li class="current small-centered"><a href="/admin/partners/add?view={{ i + 1 }}">Lab {{ i + 1}}</a></li>
+					{% else %}
+						<li class="small-centered"><a href="/admin/partners/add?view={{ i + 1 }}">Lab {{ i + 1}}</a></li>
+					{% endif %}
+				{% endfor %}
+
+				{% if view == 'class' %}
+					<li class="current small-centered"><a href="/admin/partners/add?view=class">Class</a></li>
+				{% else %}
+					<li class="small-centered"><a href="/admin/partners/add?view=class">Class</a></li>
+				{% endif %}
+			</ul>
+			<br>
+		</div>
 	</div>
 
 	<div class="small-12 columns panel">
