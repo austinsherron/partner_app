@@ -2,11 +2,11 @@
 {% block content %}
 <a class="close-reveal-modal">&#215;</a>
 <div class="row text-center">
-	{% if eval_closed %}
+	{% if eval_closed and eval %}
 		<h5>
-			Evaluations for assignment {{ current.number }} open on 
+			Evaluations for assignment {{ eval.number }} open on 
 			<br>
-			{{ current.eval_open_date.strftime("%A, %m-%d-%Y") }} at {{ current.eval_open_date.strftime("%I:%M %p") }}
+			{{ eval.eval_open_date.strftime("%A, %m-%d-%Y") }} at {{ eval.eval_open_date.strftime("%I:%M %p") }}
 		</h5>
 	{% elif current_partner == None or current_partner == 'No Partner' %}
 		<h4>
