@@ -185,100 +185,6 @@ class AddPartnership(CustomHandler):
 		return self.response.write(template.render(template_values))
 
 
-	def post(self):
-		if self.request.get('form_1'):
-			students = Student.query(
-				Student.year == int(self.request.get('year')),
-				Student.quarter == int(self.request.get('quarter')),
-				Student.active == True,
-			)
-
-			current_assignment = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
-
-			template_values = {
-				'students': students.order(Student.last_name),
-				'quarter': int(self.request.get('quarter')),
-				'year': int(self.request.get('year')),
-				'current': current_assignment
-			}
-			template = JINJA_ENV.get_template('/templates/admin_add_partnership.html')
-			self.response.write(template.render(template_values))
-		elif self.request.get('form_2'):
-		
-			initiator = Student.query(
-				Student.studentid == int(self.request.get('initiator')),
-				Student.year == int(self.request.get('year')),
-				Student.quarter == int(self.request.get('quarter')),
-			).get()
-
-			if self.request.get('acceptor') != 'None':
-				acceptor = Student.query(
-					Student.studentid == int(self.request.get('acceptor')),
-					Student.year == int(self.request.get('year')),
-					Student.quarter == int(self.request.get('quarter')),
-				).get()
-			else:
-				acceptor = None
-
-			assign_num = int(self.request.get('assign_num'))
-
-			if acceptor:
-				invitations = Invitation.query(
-					ndb.OR(Invitation.invitee == initiator.key, Invitation.invitee == acceptor.key),
-					ndb.OR(Invitation.invitor == initiator.key, Invitation.invitor == acceptor.key),
-					Invitation.assignment_number == assign_num,
-					Invitation.active == True
-				)
-			else:
-				invitations = Invitation.query(
-					ndb.OR(Invitation.invitee == initiator.key, Invitation.invitor == initiator.key),
-					Invitation.assignment_number == assign_num,
-					Invitation.active == True
-				)
-
-			if acceptor:
-				open_partnerships = Partnership.query(
-					ndb.OR(
-							ndb.OR(
-								Partnership.initiator == initiator.key, 
-								Partnership.initiator == acceptor.key),
-							ndb.OR(
-								Partnership.acceptor == initiator.key,
-								Partnership.acceptor == acceptor.key)),
-					Partnership.assignment_number == assign_num,
-					Partnership.active == True
-				)
-			else:
-				open_partnerships = Partnership.query(
-					ndb.OR(Partnership.initiator == initiator.key, Partnership.acceptor == initiator.key),
-					Partnership.assignment_number == assign_num,
-					Partnership.active == True
-				)
-			
-			# deactivate those partnerships
-			for partnership in open_partnerships:
-				partnership.active = False
-				partnership.put()
-
-			# set invitations between invitor and invitee (for current assignment)
-			# to inactive
-			for invitation in invitations:
-				invitation.active = False
-				invitation.put()
-
-			partnership = Partnership(initiator = initiator.key, acceptor = acceptor.key if acceptor else None, 
-				assignment_number = assign_num, active = eval(self.request.get('active')),
-				year = initiator.year, quarter = initiator.quarter)
-
-			partnership.put()
-
-			message = 'Partnership between ' + initiator.ucinetid + ' and '
-			message += (acceptor.ucinetid if acceptor else 'No Partner') + ' added'
-
-			self.redirect('/admin?message=' + message)
-
-
-
 class AddStudent(CustomHandler):
 
 	#@admin_required
@@ -654,8 +560,6 @@ class UploadRoster(CustomHandler):
 
 		except Exception, e:
 			return self.redirect('/admin?message=' + 'There was a problem uploading the roster: ' + str(e))			
-
-
 
 
 class ViewEvals(CustomHandler):
