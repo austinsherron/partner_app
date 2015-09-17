@@ -444,8 +444,11 @@ class SelectPartner(CustomHandler):
 		user = users.get_current_user()
 		# use user info to find student in DB (the selector)
 		selector = self.get_student(Setting.query().get().quarter, Setting.query().get().year, user.email())
-		# use selector info to find students in same lab section
-		selectees = self.students_by_lab(Setting.query().get().quarter, Setting.query().get().year, selector.lab)
+		# if cross section partnership aren't allowed, use selector info to find students in same lab section
+		if not self.cross_section_partners():
+			selectees = self.students_by_lab(Setting.query().get().quarter, Setting.query().get().year, selector.lab)
+		else:
+			selectees = self.get_active_students(Setting.query().get().quarter, Setting.query().get().year)				
 		# get current assignment
 		current_assignment = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
 		# get error message, if any
@@ -481,7 +484,7 @@ class SelectPartner(CustomHandler):
 
 		# redirect with error...
 		# ...if selected and selector have worked together previously
-		if previous_partners:
+		if previous_partners and not self.repeat_partners():
 			e = 'Sorry, you\'ve already worked with, or are currently working with '
 			e += str(selected.last_name) + ', ' + str(selected.first_name)
 			e += '. If you think you have a legitimate reason to repeat a partnership'

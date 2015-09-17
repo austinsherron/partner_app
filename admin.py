@@ -431,7 +431,7 @@ class MainAdmin(CustomHandler):
 		user = users.get_current_user()										# grab current user
 		message = self.request.get('message')								# grab message from URL, if it exists
 
-		quarter,year = self.quarter(), self.year()
+		quarter,year = self.quarter(),self.year()
 
 		if (not quarter or not year) and not message:
 			message = 'Please set a current year and quarter'
@@ -453,14 +453,24 @@ class MainAdmin(CustomHandler):
 class UpdateSettings(CustomHandler):
 
 	def get(self):
-		setting = Setting.query().get()
+		# pass map of quarter DB representations (ints) to string representation
+		# TODO:
+		#	quarters should not be hardcoded 
+		quarters = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
+		quarter,year = self.quarter(),self.year()
+		num_labs = self.num_labs()
+
 		template_values = {
-			'year': setting.year if setting else None,
-			'quarter': setting.quarter if setting else None,
-			'num_labs': setting.num_labs if setting else None,
-			'current_year': datetime.date.today().year
+			'repeat_partners': self.repeat_partners(),
+			'cross_section_partners': self.cross_section_partners(),
+			'year': year,
+			'quarter': quarter,
+			'quarters': sorted(quarters.items()),
+			'num_labs': num_labs if num_labs else 1,
+			'user': users.get_current_user(),
+			'sign_out': users.create_logout_url('/'),
 		}
-		template = JINJA_ENV.get_template('/templates/admin_quarter_year.html')
+		template = JINJA_ENV.get_template('/templates/admin_edit_settings.html')
 		return self.response.write(template.render(template_values))
 
 
@@ -473,6 +483,8 @@ class UpdateSettings(CustomHandler):
 		setting.year = int(self.request.get('year'))
 		setting.quarter = int(self.request.get('quarter'))
 		setting.num_labs = int(self.request.get('num_labs'))
+		setting.repeat_partners = eval(self.request.get('repeat_partners'))
+		setting.cross_section_partners = eval(self.request.get('cross_section_partners'))
 
 		setting.put()
 

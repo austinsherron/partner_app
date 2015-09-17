@@ -51,6 +51,20 @@ class CustomHandler(BaseHandler):
 			return setting.num_labs
 
 
+	def repeat_partners(self):
+		setting = Setting.query().get()
+
+		if setting:
+			return setting.repeat_partners
+
+
+	def cross_section_partners(self):
+		setting = Setting.query().get()
+
+		if setting:
+			return setting.cross_section_partners
+
+
 ## STUDENT QUERIES #############################################################
 
 

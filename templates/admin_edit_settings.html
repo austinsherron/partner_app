@@ -1,0 +1,67 @@
+{% extends 'templates/admin_common.html' %}
+{% block content %}
+
+<div class="row">
+
+	{% if message %}
+		<div class="small-12 columns">
+			<h3 class="text-center">{{ message }}</h3>
+		</div>
+	{% endif %}
+
+	<br>
+
+	<div class="small-12 columns">
+		<h3 class="text-center">Update Settings</h3>
+		<br>
+	</div>
+
+	<form action="/admin/timing/update" method="post" enctype="multipart/form-data">
+  		<div class="small-12 column panel">
+    		<div class="row">
+	  			<div class="small-6 column">
+		  			<span class="label">Quarter</span>
+		  			<select name="quarter">
+						{% for n,q in quarters %}
+							{% if q == quarter %}
+								<option value="{{ n }}" selected>{{ q }}</option>
+							{% else %}
+								<option value="{{ n }}">{{ q }}</option>
+							{% endif %}
+						{% endfor %}
+		  			</select>
+		  			<span class="label">Year</span>
+		  			<input type="number" value="{{ year }}" name="year">
+		  			<span class="label">Number of Labs</span>
+		  			<input type="number" value="{{ num_labs }}" name="num_labs">
+      			</div>
+      			<div class="small-6 column">
+					<span class="label">Allow Repeat Partnerships?</span>
+					<select name="repeat_partners">
+						{% if repeat_partners %}
+							<option value="True" selected>True</option>
+							<option value="False">False</option>
+						{% else %}
+							<option value="True">True</option>
+							<option value="False" selected>False</option>
+						{% endif %}
+					</select>
+					<span class="label">Allow Cross Section Partnerships?</span>
+					<select name="cross_section_partners">
+						{% if cross_section_partners %}
+							<option value="True" selected>True</option>
+							<option value="False">False</option>
+						{% else %}
+							<option value="True">True</option>
+							<option value="False" selected>False</option>
+						{% endif %}
+					</select>
+      			</div>
+    		</div>
+			<div class="small-4 columns small-centered">
+			  <input type="submit" value="Update" class="button expand">
+			</div>
+ 		</div>
+ 	</form>
+</div>
+{% endblock %}

@@ -144,6 +144,9 @@ class Setting(ndb.Model):
 	year = ndb.IntegerProperty()
 	quarter = ndb.IntegerProperty()
 	num_labs = ndb.IntegerProperty()
+	repeat_partners = ndb.BooleanProperty(default=False)
+	cross_section_partners = ndb.BooleanProperty(default=False)
+	
 
 
 ################################################################################
