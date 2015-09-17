@@ -15,14 +15,12 @@
 			If this is a mistake, please contact your TA.
 		</h4>
 	{% else %}
-		<h5>
+		<h4>
 			Evaluation for {{ current_partner.last_name }}, {{ current_partner.first_name }}, Assignment {{ eval.number }}
 			<br>
-			<br>
-			{{ eval.eval_date.strftime("%A, %m-%d-%Y") }} at {{ eval.eval_date.strftime("%I:%M %p") }}
-		</h5>
+		</h4>
 
-		<div class="text-justify">
+		<div class="text-left">
 			<form action="/partner/evaluation" method="post" enctype="multipart/form-data">
 				<span class="label">1</span>
 				<label>
@@ -35,11 +33,12 @@
 					{% endfor %}
 				</select>
 				<br>
+				<br>
 				<span class="label">2</span>
 				<label>
-				Did your partner read the assignment and preparatory materials before 
-				coming to the scheduled meetings, showing up either with specific questions 
-				or ready to contribute?
+					Did your partner read the assignment and preparatory materials before 
+					coming to the scheduled meetings, showing up either with specific questions 
+					or ready to contribute?
 				</label>
 				<br>
 				<select name="q2">
@@ -47,6 +46,7 @@
 						<option value="{{ val }}">{{ val }}</option>
 					{% endfor %}
 				</select>
+				<br>
 				<br>
 				<span class="label">3</span>
 				<label>
@@ -61,6 +61,7 @@
 					{% endfor %}
 				</select>
 				<br>
+				<br>
 				<span class="label">4</span>
 				<label>
 					Did your partner contribute fully, fairly, and actively, to the 
@@ -73,6 +74,7 @@
 					{% endfor %}
 				</select>
 				<br>
+				<br>
 				<span class="label">5</span>
 				<label>
 					Was your partner's participation professional and cooperative overall?
@@ -84,13 +86,15 @@
 					{% endfor %}
 				</select>
 				<br>
+				<br>
 				<label class="label">Comments</label>
 				<textarea name="q6"></textarea>
 
-				<hr>
+				<br>
 				<span class="label warning small-centered">Note</span>
 				<h5>The following questions are for statistical analysis, not individual evaluation</h5>
 
+				<br>
 				<span class="label">A</span>
 				<label>
 					How would you describe your comfort and ability with the course material on this week's lab,
@@ -102,6 +106,7 @@
 						<option value="{{ val }}">{{ val }}</option>
 					{% endfor %}
 				</select>
+				<br>
 				<br>
 				<span class="label">B</span>
 				<label>
@@ -115,6 +120,7 @@
 					{% endfor %}
 				</select>
 				<br>
+				<br>
 				<span class="label">C</span>
 				<label>
 					Plus about ___ hours outside of our scheduled lab.
@@ -125,6 +131,7 @@
 						<option value="{{ val }}">{{ val }}</option>
 					{% endfor %}
 				</select>
+				<br>
 				<br>
 				<span class="label">D</span>
 				<label>

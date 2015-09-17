@@ -1,10 +1,18 @@
 {% extends 'templates/common.html' %}
 {% block content %}
+
   <br>
+
+  <div class="row">
+	  <div class="small-12 columns text-center">
+	  	<h4>Usage Instructions</h4>
+	  </div>
+  </div>
+
+  <br>
+
   <div class="row">
 	<div class="small-12 column panel text-center">
-	  <h4>Usage Instructions</h4>
-	  <br>
 	  <div class="row">
 	    <div class="small-10 column small-offset-1 text-justify">
 		  <p>
@@ -23,20 +31,26 @@
 			different notifications:
 			<br>
 			<br>
-			<h5>a) Current Partner Notifications:</h5>
+			<h5 class="alert-box info text-center">Current Partner Notifications</h5>
 			<br>
 			This info box will either tell you that you don't have a partner,
 			the name of your current partner (if you have one), or that you
 			were given permission to work alone for the current assignment.
 			<br>
 			<br>
-			<h5>b) Invitation Notification:</h5>
+			<h5 class="alert-box info text-center">Invitation Notification</h5>
 			<br>
 			This info box will inform you if you've received new partner
 			invitations for the current assignment.
 			<br>
 			<br>
-			<h5>c) Dropped Partner Notification:</h5>
+			<h5 class="alert-box warning text-center">No Partner Notification</h5>
+			<br>
+			This info box will inform you if haven't yet confirmed a partnership for
+			the current assignment.
+			<br>
+			<br>
+			<h5 class="alert-box alert text-center">Dropped Partner Notification:</h5>
 			<br>
 			This info box will inform you if your partner for the current
 			assignment accepted an invitation from another student
@@ -46,17 +60,12 @@
 			for the current assignment.
 			<br>
 			<br>
-			The bottom half of the information panel contains a history of your 
-			confirmed partnerships. If the history is empty, you haven't been
-			involved in any confirmed partnerships.
-			<br>
-			<br>
 			<h4>2) The action panel</h4>
 			<br>
 			The action panel contains three buttons:
 			<br>
 			<br>
-			<h5>a) Send Invitations</h5>
+			<h5>a) Send Partner Invitations</h5>
 			<br>
 			This button brings up a window that allows you to send parntership
 			invitations to students in your lab sections. By default, the app
@@ -67,7 +76,7 @@
 			or repeated partnerships.</strong>
 			<br>
 			<br>
-			<h5>b) Received Invitations</h5>
+			<h5>b) View Invitations from Others</h5>
 			<br>
 			This button allows you to confirm invitations that you've received
 			from other students. <strong>Only after an invitation is confirmed will a
@@ -85,7 +94,7 @@
 			evaluation.
 			<br>
 			<br>
-			The bottom half of the action panel displays that invitations that
+			The bottom half of the action panel displays invitations that
 			you've sent that are currently active.
 		  </p>
 	    </div>
