@@ -1,38 +1,77 @@
-<!DOCTYPE html>
-{% autoescape true %}
-<html>
-  <body>
-	<form action="/admin/student/edit" method="post" enctype="multipart/form-data">
-	  <label>Student ID:</label>
-	  <input type="text" name="studentid" value="{{ student.studentid }}" readonly><br><br>
-	  <label>UCInetID:</label>
-	  <input type="text" name="ucinetid" value="{{ student.ucinetid }}"><br><br>
-	  <label>First Name:</label>
-	  <input type="text" name="first_name" value="{{ student.first_name }}"><br><br>
-	  <label>Last Name:</label>
-	  <input type="text" name="last_name" value="{{ student.last_name }}"><br><br>
-	  <label>Email:</label>
-	  <input type="text" name="email" value="{{ student.email }}"><br><br>
-	  <label>Lab:</label>
-	  <input type="text" name="lab" value="{{ student.lab }}"><br><br>
-	  <label>Active:</label>
-	  <select name="active">
-		<option value="True">True</option>
-		<option value="False">False</option>
-	  </select><br><br>
-	  <label>Quarter:</label>
-	  <input type="text" name="quarter" value="{{ student.quarter }}" readonly><br><br>
-	  <label>Year:</label>
-	  <input type="text" name="year" value="{{ student.year }}" readonly><br><br>
-	  <label>Delete?</label>
-	  <select name="to_delete">
-		<option value="yes">Yes</option>
-		<option value="no" selected="selected">No</option>
-	  </select>
-	  <br>
-	  <br>
-	  <input type="submit" value="Submit">
-	</form>
-  </body>
-</html>
-{% endautoescape %}
+{% extends '/templates/admin_common.html' %}
+{% block content %}
+
+<div class="row">
+
+	<br>
+
+	{% if message %}
+		<div class="small-12 columns">
+		  	<h3 class="text-center">{{ message }}</h3>
+		</div>
+	{% endif %}
+
+	<div class="small-12 columns">
+		<h3 class="text-center">Edit Student: {{ student.ucinetid }} - {{ student.last_name }}, {{ student.first_name }}</h3>
+		<br>
+	</div>
+
+	<div class="small-12 columns panel">
+
+		<form action="/admin/student/edit" method="post" enctype="multipart/form-data">
+
+			<div class="row">
+				<div class="small-6 columns">
+
+					<span class="label">Student ID:</span>
+					<input type="text" name="studentid" value="{{ student.studentid }}" readonly>
+					<span class="label">First Name:</span>
+					<input type="text" name="first_name" value="{{ student.first_name }}">
+					<span class="label">Email:</span>
+					<input type="text" name="email" value="{{ student.email }}">
+					<span class="label">Quarter:</span>
+					<input type="text" name="quarter" value="{{ student.quarter }}" readonly>
+					<span class="label warning">Active:</span>
+					<select name="active">
+						{% if student.active %}
+							<option value="True" selected>True</option>
+							<option value="False">False</option>
+						{% else %}
+							<option value="True">True</option>
+							<option value="False" selected>False</option>
+						{% endif %}
+					</select>
+
+				</div>
+
+				<div class="small-6 columns">
+
+					<span class="label">UCInetID:</span>
+					<input type="text" name="ucinetid" value="{{ student.ucinetid }}">
+					<span class="label">Last Name:</span>
+					<input type="text" name="last_name" value="{{ student.last_name }}">
+					<span class="label">Lab Section:</span>
+					<input type="text" name="lab" value="{{ student.lab }}">
+					<span class="label">Year:</span>
+					<input type="text" name="year" value="{{ student.year }}" readonly>
+					<span class="label alert">Delete?</span>
+					<select name="to_delete">
+						<option value="yes">Yes</option>
+						<option value="no" selected="selected">No</option>
+					</select>
+
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="small-4 columns small-centered">
+					<input class="button expand" type="submit" value="Submit">
+				</div>
+			</div>
+
+		</form>
+
+	</div>
+</div>
+
+{% endblock %}

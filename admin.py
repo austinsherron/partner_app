@@ -168,11 +168,11 @@ class AddPartnership(CustomHandler):
 		else:
 			students = self.students_by_lab(quarter, year, int(view)).fetch()		# ...otherwise, grab students for the lab specified
 
-		current_assign = self.current_assign(quarter, year)
-		current_num = 1 if not current_assign else current_assign.number
+		current_assign = self.current_assign(quarter, year)							# grab current assignment...
+		current_num = 1 if not current_assign else current_assign.number			# ...and get its number, if it exists
 
 		template = JINJA_ENV.get_template('/templates/admin_add_partnership.html')
-		template_values = {
+		template_values = {															# build map of template values...
 			'students': sorted(students, key=lambda x: x.last_name),
 			'view': str(view),
 			'quarter': quarter,
@@ -182,7 +182,7 @@ class AddPartnership(CustomHandler):
 			'current_num': current_num,
 			'num_labs': self.num_labs() if self.num_labs() else 1,
 		}
-		return self.response.write(template.render(template_values))
+		return self.response.write(template.render(template_values))				# ...and render the response
 
 
 class AddStudent(CustomHandler):
@@ -318,30 +318,63 @@ class EditStudent(CustomHandler):
 
 	#@admin_required
 	def get(self):
-		student = Student.query(
-			Student.studentid == int(self.request.get('studentid')),
-			Student.quarter == int(self.request.get('quarter')),
-			Student.year == int(self.request.get('year')),
-		).get()
-		template_values = {'student': student}
+		# pass map of quarter DB representations (ints) to string representation
+		# TODO:
+		#	quarters should not be hardcoded 
+		quarter_map = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
+		quarter = self.request.get('quarter')								# try grabbing quarter/year from URL
+		year = self.request.get('year')
+
+		if not quarter or not year:											# if they don't exist, try grabbing from session
+			temp = get_sess_vals(self.session, 'quarter', 'year')
+			if not temp:													# if they don't exist there, redirect with error
+				return self.redirect('/admin?message=Please set a current quarter and year')
+			quarter,year = temp													
+
+		quarter,year = int(quarter), int(year)
+		studentid = int(self.request.get('studentid'))						# grab studentid from URL (guaranteed to be there, unless URL was tinkered with)
+
+		student = self.student_by_id(quarter, year, studentid)				# grab student by ID (quarter, year, and student ID == PK)
+		# if the student wasn't found, he/she might be inactive
+		student = student if student else self.student_by_id(quarter, year, studentid, active=False)
+
+		template_values = {													# build map of template values...
+			'user': users.get_current_user(),
+			'sign_out': users.create_logout_url('/'),
+			'student': student,
+			'quarter': quarter,
+			'year': year,
+		}
 		template = JINJA_ENV.get_template('/templates/admin_student_edit.html')
-		self.response.write(template.render(template_values))
+		return self.response.write(template.render(template_values))		# ...and render the response
 
 
 	def post(self):
-		student = Student.query(
-			Student.studentid == int(self.request.get('studentid')),
-			Student.quarter == int(self.request.get('quarter')),
-			Student.year == int(self.request.get('year')),
-		).get()
+		# pass map of quarter DB representations (ints) to string representation
+		# TODO:
+		#	quarters should not be hardcoded 
+		quarter_map = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
+		quarter = self.request.get('quarter')								# try grabbing quarter/year from URL
+		year = self.request.get('year')
 
+		if not quarter or not year:											# if they don't exist, try grabbing from session
+			temp = get_sess_vals(self.session, 'quarter', 'year')
+			if not temp:													# if they don't exist there, redirect with error
+				return self.redirect('/admin?message=Please set a current quarter and year')
+			quarter,year = temp													
+
+		quarter,year = int(quarter), int(year)
+		studentid = int(self.request.get('studentid'))						# grab studentid from URL (guaranteed to be there, unless URL was tinkered with)
+
+		student = self.student_by_id(quarter, year, studentid)				# grab student by ID (quarter, year, and student ID == PK)
+		# if the student wasn't found, he/she might be inactive
+		student = student if student else self.student_by_id(quarter, year, studentid, active=False)
 		message = ''
 
 		if student:
 			if self.request.get('to_delete') == 'yes':
 				message += 'Student ' + student.first_name + ', ' + student.last_name
 				message += ' (' + str(student.studentid) + ') successfully deleted'
-
 				student.key.delete()
 			else:
 				student.ucinetid = self.request.get('ucinetid').strip()
@@ -350,14 +383,13 @@ class EditStudent(CustomHandler):
 				student.email = self.request.get('email').strip()
 				student.lab = int(self.request.get('lab').strip())
 				student.active = eval(self.request.get('active'))
-				print(student.active)
 
 				student.put()
 
 				message += 'Student ' + student.first_name + ', ' + student.last_name
 				message += ' (' + str(student.studentid) + ') successfully updated'
 
-		self.redirect('/admin?message=' + message) 
+		self.redirect('/admin/roster/view?message=' + message) 
 
 
 
