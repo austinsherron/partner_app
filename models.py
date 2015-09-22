@@ -109,6 +109,7 @@ class Partnership(ndb.Model):
 	active = ndb.GenericProperty()
 	quarter = ndb.IntegerProperty()
 	year = ndb.IntegerProperty()
+	notes = ndb.TextProperty(default='')
 	
 
 ################################################################################
