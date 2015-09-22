@@ -49,7 +49,7 @@ JINJA_ENV = jinja2.Environment(
 
 class AddAssignment(CustomHandler):
 
-	#@admin_required
+	@admin_required
 	def get(self):
 		template = JINJA_ENV.get_template('/templates/admin_add_assignment.html')
 
@@ -145,6 +145,7 @@ class AddAssignment(CustomHandler):
 
 class AddPartnership(CustomHandler):
 
+	@admin_required
 	def get(self):
 		# pass map of quarter DB representations (ints) to string representation
 		# TODO:
@@ -187,7 +188,7 @@ class AddPartnership(CustomHandler):
 
 class AddStudent(CustomHandler):
 
-	#@admin_required
+	@admin_required
 	def get(self):
 		# pass map of quarter DB representations (ints) to string representation
 		# TODO:
@@ -237,7 +238,7 @@ class AddStudent(CustomHandler):
 
 class ClearDB(CustomHandler):
 
-	#@admin_required
+	@admin_required
 	def get(self):
 		template = JINJA_ENV.get_template('/templates/admin_cleardb.html')
 		self.response.write(template.render())
@@ -274,6 +275,7 @@ class DeactivateStudents(CustomHandler):
 
 class EditAssignment(CustomHandler):
 
+	@admin_required
 	def get(self):
 		quarter = int(self.request.get('quarter'))						# grab quarter, year, and assign num from URL
 		year = int(self.request.get('year'))						
@@ -316,7 +318,7 @@ class EditAssignment(CustomHandler):
 
 class EditStudent(CustomHandler):
 
-	#@admin_required
+	@admin_required
 	def get(self):
 		# pass map of quarter DB representations (ints) to string representation
 		# TODO:
@@ -395,7 +397,7 @@ class EditStudent(CustomHandler):
 
 class ManageAssignments(CustomHandler):
 
-	#@admin_required
+	@admin_required
 	def get(self):
 		quarter_map = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
 
@@ -426,7 +428,7 @@ class ManageAssignments(CustomHandler):
 
 class MainAdmin(CustomHandler):
 
-	#@admin_required
+	@admin_required
 	def get(self):
 		user = users.get_current_user()										# grab current user
 		message = self.request.get('message')								# grab message from URL, if it exists
@@ -452,6 +454,7 @@ class MainAdmin(CustomHandler):
 
 class UpdateSettings(CustomHandler):
 
+	@admin_required
 	def get(self):
 		# pass map of quarter DB representations (ints) to string representation
 		# TODO:
@@ -494,7 +497,7 @@ class UpdateSettings(CustomHandler):
 
 class UploadRoster(CustomHandler):
 
-	#@admin_required
+	@admin_required
 	def get(self):
 		quarter = self.request.get('quarter')									# try grabbing quarter/year from URL
 		year = self.request.get('year')
@@ -608,6 +611,7 @@ class UploadRoster(CustomHandler):
 
 class ViewEvals(CustomHandler):
 
+	@admin_required
 	def get(self):
 		# pass map of quarter DB representations (ints) to string representation
 		# TODO:
@@ -652,7 +656,7 @@ class ViewEvals(CustomHandler):
 
 class ViewPartnerships(CustomHandler):
 
-	#@admin_required
+	@admin_required
 	def get(self):
 		# pass map of quarter DB representations (ints) to string representation
 		# TODO:
@@ -706,7 +710,7 @@ class ViewPartnerships(CustomHandler):
 
 class ViewRoster(CustomHandler):
 
-	#@admin_required
+	@admin_required
 	def get(self):
 		# pass map of quarter DB representations (ints) to string representation
 		# TODO:
@@ -745,6 +749,7 @@ class ViewRoster(CustomHandler):
 
 class ViewStudent(CustomHandler):
 
+	@admin_required
 	def get(self):
 		pass
 		
