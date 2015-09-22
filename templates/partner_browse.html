@@ -5,56 +5,66 @@
 
 <div class="row">
 	<div class="small-12 columns panel">
-			{% for ucinetid,info in selectees %}
+
+		{% for ucinetid,info in selectees %}
+			{% if ucinetid != selector.ucinetid %}
 				{% set status,student = info %}
 
-		<form action="/partner/selection?selected_partner={{ student.studentid }}" enctype="multipart/form-data" method="POST">
+				<form action="/partner/selection?selected_partner={{ student.studentid }}" enctype="multipart/form-data" method="POST">
 
-			<div class="row"> 
-				<div class="small-6 columns">
+					{% if status %}
+						<div class="row" style="display: none;"> 
+					{% else %}
+						<div class="row"> 
+					{% endif %}
 
-					<div class="small-12 columns">
-						{% set name = student.preferred_name if student.preferred_name else student.first_name%}
-						<h3>{{ name }} {{ student.last_name }}</h3> 
-						{% if status %}
-							<span class="alert-box warning">{{ name }} already has a partner for this assignment</span>
-						{% endif %}
-						<span class="label">{{ name }}'s bio</span>
-						<p>{{ student.bio if student.bio else '' }}</p>
-						<span class="label">{{ name }}'s programming experience</span>
-						<p>{{ student.programming_ability + ' (out of 10)' if student.programming_ability else '' }}</p>
-						<span class="label">{{ name }}'s phone number</span>
-						<p>{{ student.phone_number if student.phone_number else '' }}</p>
-						<span class="label">{{ name }}'s email address</span>
-						<p>{{ student.email }}</p>
-						<br>
+						<div class="small-3 columns">
+							<div class="small-12 columns small-centered">
+								<img height="100px" width="100px" src="/images/{{ student.key.urlsafe() }}"/>
+								{% if not selection_closed %}
+									<div class="row">
+										<br>
+										{% if status %}
+											<input class="button expand alert" type="submit" value="Send Invitation">
+										{% else %}
+											<input class="button expand success" type="submit" value="Send Invitation">
+										{% endif %}
+									</div>
+								{% endif %}
+							</div>
+						</div>
+
+						<div class="small-9 columns">
+							<div class="small-6 columns">
+								{% set name = student.preferred_name if student.preferred_name else student.first_name%}
+								<h3>{{ name }} {{ student.last_name }}</h3> 
+								{% if status %}
+									<span class="label warning">{{ name }} already has a partner for this assignment</span>
+								{% endif %}
+								<span class="label">{{ name }}'s bio</span>
+								<p>{{ student.bio if student.bio else '' }}</p>
+								<span class="label">{{ name }}'s programming experience</span>
+								<p>{{ student.programming_ability + ' (out of 5)' if student.programming_ability else '' }}</p>
+							</div>
+							<div class="small-6 columns">
+								<span class="label">Availability</span>
+								<p>{{ student.availability if student.availability else '' }}</p>
+								<span class="label">{{ name }}'s phone number</span>
+								<p>{{ student.phone_number if student.phone_number else '' }}</p>
+								<span class="label">{{ name }}'s email address</span>
+								<p>{{ student.email }}</p>
+								<br>
+							</div>
+						</div>
+
+						<hr>
+
 					</div>
-		
-				</div>
 
-				<div class="small-6 columns">
-					<div class="small-12 columns small-centered">
-						<img src="/images/{{ student.key.urlsafe() }}"/>
-					</div>
-				</div>
+				</form>
 
-				<div class="row">
-					<div class="small-4 columns small-centered">
-						{% if status %}
-							<input class="button expand alert" type="submit" value="Send Invitation">
-						{% else %}
-							<input class="button expand success" type="submit" value="Send Invitation">
-						{% endif %}
-					</div>
-				</div>
-
-			</div>
-				
-			<hr>
-
-		</form>
-
-			{% endfor %}
+			{% endif %}
+		{% endfor %}
 	</div>
 </div>
 

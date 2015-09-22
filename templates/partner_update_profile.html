@@ -11,14 +11,22 @@
 				<div class="row">
 					<div class="small-12 columns">
 						<label class="label">Preferred Name</label>
-						<input type="text" name="preferred_name" value="{{ student.preferred_name }}" />
+						<input type="text" name="preferred_name" 
+						value="{{ student.preferred_name if student.preferred_name else 'What do you like to be called? (firstname/nickname)' }}" />
 					</div>
 				</div>
 
 				<div class="row">
 					<div class="small-12 columns">
 						<label class="label">Tell us a little about yourself...</label>
-						<textarea name="bio">{{ student.bio }}</textarea>
+						<textarea name="bio">{{ student.bio if student.bio else '' }}</textarea>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="small-12 columns">
+						<label class="label">What's your availability?</label>
+						<textarea name="availability">{{ student.availability if student.availability else '' }}</textarea>
 					</div>
 				</div>
 

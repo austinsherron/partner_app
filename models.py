@@ -70,6 +70,7 @@ class Student(ndb.Model):
 	programming_ability = ndb.StringProperty()
 	avatar = ndb.BlobProperty()
 	phone_number = ndb.StringProperty()
+	availability = ndb.TextProperty()
 
 
 ################################################################################
@@ -108,6 +109,8 @@ class Partnership(ndb.Model):
 	active = ndb.GenericProperty()
 	quarter = ndb.IntegerProperty()
 	year = ndb.IntegerProperty()
+	notes = ndb.TextProperty(default='')
+	created = ndb.DateTimeProperty(auto_now_add=True)
 	
 
 ################################################################################
@@ -128,6 +131,7 @@ class Evaluation(ndb.Model):
 	year = ndb.IntegerProperty()
 	quarter = ndb.IntegerProperty()
 	active = ndb.GenericProperty()
+	created = ndb.DateTimeProperty(auto_now_add=True)
 
 
 ################################################################################
