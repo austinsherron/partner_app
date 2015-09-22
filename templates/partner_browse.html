@@ -43,17 +43,16 @@
 								{% endif %}
 								<span class="label">{{ name }}'s bio</span>
 								<p>{{ student.bio if student.bio else '' }}</p>
-								<span class="label">{{ name }}'s programming experience</span>
-								<p>{{ student.programming_ability + ' (out of 5)' if student.programming_ability else '' }}</p>
-							</div>
-							<div class="small-6 columns">
 								<span class="label">Availability</span>
 								<p>{{ student.availability if student.availability else '' }}</p>
-								<span class="label">{{ name }}'s phone number</span>
-								<p>{{ student.phone_number if student.phone_number else '' }}</p>
+							</div>
+							<div class="small-6 columns">
 								<span class="label">{{ name }}'s email address</span>
 								<p>{{ student.email }}</p>
-								<br>
+								<span class="label">{{ name }}'s phone number</span>
+								<p>{{ student.phone_number if student.phone_number else '' }}</p>
+								<span class="label">{{ name }}'s programming experience</span>
+								<p>{{ student.programming_ability + ' (out of 5)' if student.programming_ability else '' }}</p>
 							</div>
 						</div>
 
