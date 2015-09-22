@@ -110,6 +110,7 @@ class Partnership(ndb.Model):
 	quarter = ndb.IntegerProperty()
 	year = ndb.IntegerProperty()
 	notes = ndb.TextProperty(default='')
+	created = ndb.DateTimeProperty(auto_now_add=True)
 	
 
 ################################################################################
@@ -130,6 +131,7 @@ class Evaluation(ndb.Model):
 	year = ndb.IntegerProperty()
 	quarter = ndb.IntegerProperty()
 	active = ndb.GenericProperty()
+	created = ndb.DateTimeProperty(auto_now_add=True)
 
 
 ################################################################################
