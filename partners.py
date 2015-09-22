@@ -136,16 +136,19 @@ class ConfirmPartner(CustomHandler):
 
 		# find current assignment
 		current_assignment = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
+
+		for_assign = int(self.request.get('assign_num')) if admin else current_assignment.number
+
 		# find all open invitation involving both the student being confirmed and the student confirming
 		# invitations = self.all_invitations(confirming, being_confirmed, current_assignment.number)
 		if confirming:
-			invitations = self.all_invites_for_student(confirming, current_assignment.number)
-			invitations += self.all_invites_for_student(being_confirmed, current_assignment.number)
-			open_partnerships = self.students_partners_for_assign(confirming, quarter, year, current_assignment.number).fetch()
-			open_partnerships += self.students_partners_for_assign(being_confirmed, quarter, year, current_assignment.number).fetch()
+			invitations = self.all_invites_for_student(confirming, for_assign)
+			invitations += self.all_invites_for_student(being_confirmed, for_assign)
+			open_partnerships = self.students_partners_for_assign(confirming, quarter, year, for_assign).fetch()
+			open_partnerships += self.students_partners_for_assign(being_confirmed, quarter, year, for_assign).fetch()
 		else:
-			invitations = self.all_invites_for_student(being_confirmed, current_assignment.number)
-			open_partnerships = self.students_partners_for_assign(being_confirmed, quarter, year, current_assignment.number).fetch()
+			invitations = self.all_invites_for_student(being_confirmed, for_assign)
+			open_partnerships = self.students_partners_for_assign(being_confirmed, quarter, year, for_assign).fetch()
 
 		# find any active partnerships for confirming student and the student  being confirmed
 		# open_partnerships = self.open_partnerships(confirming, being_confirmed, current_assignment.number)
@@ -157,7 +160,7 @@ class ConfirmPartner(CustomHandler):
 
 		dropped = self.dropped_partners(open_partnerships, confirming, being_confirmed)
 		msg = "Hello,\n\nThis is an automated message send to inform you that"
-		msg += " your partner for assignment " + str(current_assignment.number)
+		msg += " your partner for assignment " + str(for_assign)
 		msg += " has dissolved your partnership by confirming a partnership with another student."
 		msg += "\n\nIf this is an error, please contact your former partner."
 		msg += "\n\nIf you can't find a partner, please contact your TA."
@@ -172,9 +175,10 @@ class ConfirmPartner(CustomHandler):
 
 			invitation.put()
 
+
 		# create new partnership...
 		partnership = Partnership(initiator = being_confirmed.key, acceptor = confirming.key if confirming else None,
-			assignment_number = current_assignment.number, active = True,
+			assignment_number = for_assign, active = True,
 			year = being_confirmed.year, quarter = being_confirmed.quarter)
 
 		# ...and save it
@@ -188,7 +192,7 @@ class ConfirmPartner(CustomHandler):
 		else:
 			message = 'Partnership between ' + str(being_confirmed.ucinetid) + ' and ' 
 			message += (confirming.ucinetid if confirming else '"No Partner"') + ' successfully created.'
-			return self.redirect('/admin?message=' + message)
+			return self.redirect('/admin/partners/add?message=' + message)
 			
 
 

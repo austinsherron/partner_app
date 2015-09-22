@@ -40,10 +40,12 @@
 
 				<div class="row">
 					<div class="small-4 columns small-centered">
-						{% if status %}
-							<input class="button expand alert" type="submit" value="Send Invitation">
-						{% else %}
-							<input class="button expand success" type="submit" value="Send Invitation">
+						{% if not selection_closed %}
+							{% if status %}
+								<input class="button expand alert" type="submit" value="Send Invitation">
+							{% else %}
+								<input class="button expand success" type="submit" value="Send Invitation">
+							{% endif %}
 						{% endif %}
 					</div>
 				</div>
