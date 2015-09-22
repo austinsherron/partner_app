@@ -210,11 +210,7 @@ class EditProfile(CustomHandler):
 			# redirect to main page if the student doesn't exist in the DB
 			return self.redirect('/partner')
 
-		programming_ability = ['0 - A What Loop?']
-		programming_ability += [str(i) for i in range(1, 5)]
-		programming_ability += ['5 - I know my way around a keyboard']
-		programming_ability += [str(i) for i in range(6, 10)]
-		programming_ability += ['10 - I\'m actually teaching this class']
+		programming_ability = [str(i) for i in range(1,6)]
 
 		template_values = {
 			'user': user,
@@ -238,6 +234,10 @@ class EditProfile(CustomHandler):
 		bio = self.request.get('bio').strip()
 		# ...and save it if the student entered anything
 		student.bio = bio if bio != '' else student.bio
+		# grab form value of availability...
+		availability = self.request.get('availability').strip()
+		# ...and save it if the student entered anything
+		student.availability = availability if availability != '' else student.availability
 		# grab form value of programming ability...
 		programming_ability = self.request.get('programming_ability')
 		# ...and save it

@@ -70,6 +70,7 @@ class Student(ndb.Model):
 	programming_ability = ndb.StringProperty()
 	avatar = ndb.BlobProperty()
 	phone_number = ndb.StringProperty()
+	availability = ndb.TextProperty()
 
 
 ################################################################################
