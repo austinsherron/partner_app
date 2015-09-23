@@ -6,6 +6,9 @@
 <div class="row">
 	<div class="small-12 columns">
 		<h3 class="text-center">Upload Roster</h3>
+		<h6 class="text-center">Roster should be a CSV with the format:</h6>
+		<h6 class="text-center">studentid, lastname, firstname, ucinetid, uci email, lab #</h6>
+
 		<form action="/admin/roster/upload" method="post" enctype="multipart/form-data">
 			<div>
 				<input name="year" value="{{ year }}" type="number" />
