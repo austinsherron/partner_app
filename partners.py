@@ -636,5 +636,5 @@ application = webapp2.WSGIApplication([
 	('/admin/student/add', AddStudent),
 	('/admin/students/deactivate', DeactivateStudents),
 	('/admin/student/edit', EditStudent),
-	('/admin/timing/update', UpdateSettings),
+	('/admin/settings/update', UpdateSettings),
 ], config=config, debug=True)

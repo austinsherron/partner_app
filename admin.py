@@ -438,10 +438,6 @@ class MainAdmin(CustomHandler):
 		if (not quarter or not year) and not message:
 			message = 'Please set a current year and quarter'
 
-		self.session['quarter'] = quarter 									# load current quarter/year into session
-		self.session['year'] = year
-
-		template = JINJA_ENV.get_template('/templates/admin.html')
 		template_values = {													# build template value map...
 			'message': message,
 			'user': user,
@@ -449,6 +445,30 @@ class MainAdmin(CustomHandler):
 			'quarter': self.session.get('quarter'),
 			'year': self.session.get('year'),
 		}
+
+		self.session['quarter'] = quarter 									# load current quarter/year into session
+		self.session['year'] = year
+
+		if quarter and year:
+			# grab number of active/inactive students
+			template_values['active_students'] = len(self.get_active_students(quarter, year).fetch())
+			template_values['inactive_students'] = len(self.get_active_students(quarter, year, active=False).fetch())
+			cur_assign = self.current_assign(quarter, year)					# grab current assignment
+
+			if cur_assign:
+				template_values['cur_assign'] = cur_assign
+				# grab number of active partnerships for the current assignment
+				template_values['assign_partners'] = len(self.all_partners_for_assign(quarter, year, cur_assign.number))
+
+				# grab current eval assignment
+				eval_assign = self.current_eval_assign(quarter, year)			
+
+				if eval_assign:
+					template_values['eval_assign'] = eval_assign
+					# grab number of evals for the current eval assignment
+					template_values['assign_eval'] = len(self.evals_for_assign(quarter, year, cur_assign.number).fetch())
+
+		template = JINJA_ENV.get_template('/templates/admin.html')
 		return self.response.write(template.render(template_values))		# ...and render the response
 
 
