@@ -11,6 +11,7 @@ import os
 import webapp2
 
 from collections import defaultdict
+from datetime import timedelta as td
 from google.appengine.api import users
 from google.appengine.ext import ndb
 from webapp2_extras.appengine.users import admin_required
@@ -60,6 +61,9 @@ class AddAssignment(CustomHandler):
 
 		last_num = self.get_assign_n(quarter, year, -1)
 		last_num = 0 if not last_num else last_num.number
+
+		prev_assign = self.get_assign_n(quarter, year, last_num - 1) if last_num > 0 else None
+		today = datetime.date.today().strftime("%Y-%m-%d")
 		# pass map of quarter DB representations (ints) to string representation
 		# TODO:
 		#	quarters should not be hardcoded 
@@ -69,9 +73,21 @@ class AddAssignment(CustomHandler):
 			'quarter': quarter,
 			'quarters': sorted(quarters.items()),
 			'last_num': last_num,
-			'today': datetime.date.today().strftime("%Y-%m-%d"),
+			'today': today,
 			'user': users.get_current_user(),
 			'sign_out': users.create_logout_url('/'),
+			'fid': (prev_assign.fade_in_date + td(days=7)).strftime('%Y-%m-%d') if prev_assign else today,
+			'fit': prev_assign.fade_in_date.strftime('%H:%M') if prev_assign else '00:00',
+			'dd': (prev_assign.due_date + td(days=7)).strftime('%Y-%m-%d') if prev_assign else today,
+			'dt': prev_assign.due_date.strftime('%H:%M') if prev_assign else '00:00',
+			'cd': (prev_assign.close_date + td(days=7)).strftime('%Y-%m-%d') if prev_assign else today,
+			'ct': prev_assign.close_date.strftime('%H:%M') if prev_assign else '00:00',
+			'eod': (prev_assign.eval_open_date + td(days=7)).strftime('%Y-%m-%d') if prev_assign else today,
+			'eot': prev_assign.eval_open_date.strftime('%H:%M') if prev_assign else '00:00',
+			'ecd': (prev_assign.eval_date + td(days=7)).strftime('%Y-%m-%d') if prev_assign else today,
+			'ect': prev_assign.eval_date.strftime('%H:%M') if prev_assign else '00:00',
+			'fod': (prev_assign.fade_out_date + td(days=7)).strftime('%Y-%m-%d') if prev_assign else today,
+			'fot': prev_assign.fade_out_date.strftime('%H:%M') if prev_assign else '00:00',
 		}
 		return self.response.write(template.render(template_values))			# ...and render the response
 
