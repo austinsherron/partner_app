@@ -59,10 +59,9 @@ class AddAssignment(CustomHandler):
 			return self.redirect('/admin?message=Please set a current quarter and year')
 		quarter,year = temp
 
-		last_num = self.get_assign_n(quarter, year, -1)
-		last_num = 0 if not last_num else last_num.number
+		last_assign = self.get_assign_n(quarter, year, -1)
+		last_num = 0 if not last_assign else last_assign.number
 
-		prev_assign = self.get_assign_n(quarter, year, last_num - 1) if last_num > 0 else None
 		today = datetime.date.today().strftime("%Y-%m-%d")
 		# pass map of quarter DB representations (ints) to string representation
 		# TODO:
@@ -76,18 +75,18 @@ class AddAssignment(CustomHandler):
 			'today': today,
 			'user': users.get_current_user(),
 			'sign_out': users.create_logout_url('/'),
-			'fid': (prev_assign.fade_in_date + td(days=7)).strftime('%Y-%m-%d') if prev_assign else today,
-			'fit': prev_assign.fade_in_date.strftime('%H:%M') if prev_assign else '00:00',
-			'dd': (prev_assign.due_date + td(days=7)).strftime('%Y-%m-%d') if prev_assign else today,
-			'dt': prev_assign.due_date.strftime('%H:%M') if prev_assign else '00:00',
-			'cd': (prev_assign.close_date + td(days=7)).strftime('%Y-%m-%d') if prev_assign else today,
-			'ct': prev_assign.close_date.strftime('%H:%M') if prev_assign else '00:00',
-			'eod': (prev_assign.eval_open_date + td(days=7)).strftime('%Y-%m-%d') if prev_assign else today,
-			'eot': prev_assign.eval_open_date.strftime('%H:%M') if prev_assign else '00:00',
-			'ecd': (prev_assign.eval_date + td(days=7)).strftime('%Y-%m-%d') if prev_assign else today,
-			'ect': prev_assign.eval_date.strftime('%H:%M') if prev_assign else '00:00',
-			'fod': (prev_assign.fade_out_date + td(days=7)).strftime('%Y-%m-%d') if prev_assign else today,
-			'fot': prev_assign.fade_out_date.strftime('%H:%M') if prev_assign else '00:00',
+			'fid': (last_assign.fade_in_date + td(days=7)).strftime('%Y-%m-%d') if last_assign else today,
+			'fit': last_assign.fade_in_date.strftime('%H:%M') if last_assign else '00:00',
+			'dd': (last_assign.due_date + td(days=7)).strftime('%Y-%m-%d') if last_assign else today,
+			'dt': last_assign.due_date.strftime('%H:%M') if last_assign else '00:00',
+			'cd': (last_assign.close_date + td(days=7)).strftime('%Y-%m-%d') if last_assign else today,
+			'ct': last_assign.close_date.strftime('%H:%M') if last_assign else '00:00',
+			'eod': (last_assign.eval_open_date + td(days=7)).strftime('%Y-%m-%d') if last_assign else today,
+			'eot': last_assign.eval_open_date.strftime('%H:%M') if last_assign else '00:00',
+			'ecd': (last_assign.eval_date + td(days=7)).strftime('%Y-%m-%d') if last_assign else today,
+			'ect': last_assign.eval_date.strftime('%H:%M') if last_assign else '00:00',
+			'fod': (last_assign.fade_out_date + td(days=7)).strftime('%Y-%m-%d') if last_assign else today,
+			'fot': last_assign.fade_out_date.strftime('%H:%M') if last_assign else '00:00',
 		}
 		return self.response.write(template.render(template_values))			# ...and render the response
 
