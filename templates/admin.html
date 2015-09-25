@@ -101,7 +101,7 @@
 								{% else %}
 									<span class="label success">% Partnered</span>
 								{% endif %}
-								{{ '%0.4f'|format(perc_partnered) }}
+								{{ '%0.2f'|format(perc_partnered * 200) }}
 							</div>
 						{% endif %}
 					</div>
@@ -126,7 +126,7 @@
 								{% else %}
 									<span class="label success">% Evaluated</span>
 								{% endif %}
-								{{ '%0.4f'|format(perc_evaled) }}
+								{{ '%0.2f'|format(perc_evaled * 100) }}
 							</div>
 						{% endif %}
 					</div>
