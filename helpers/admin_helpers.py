@@ -73,7 +73,7 @@ def keys_to_partners(all_partners):
 	return k_to_p
 
 
-def student_info_to_partner_list(last_num, keys_to_partnerships, keys_to_students, students):
+def student_info_to_partner_list(last_num, first_num, keys_to_partnerships, keys_to_students, students):
 	"""
 	This function creates and returns a tuple--containing student info--to list--containing
 	partnership history info (strings)--mapping.
@@ -102,7 +102,7 @@ def student_info_to_partner_list(last_num, keys_to_partnerships, keys_to_student
 	partnership_dict = defaultdict(list)						# create mapping of students to sequential partner emails
 	for student in students:
 		student_info = (student.studentid,student.ucinetid,student.last_name,student.first_name,student.lab)
-		for i in range(1, last_num + 1):							# need to check for each assignment, as gaps in partner history may exist
+		for i in range(first_num, last_num + 1):					# need to check for each assignment, as gaps in partner history may exist
 			to_append = 'No Selection'								# default status is 'No Selection'
 
 			if i in keys_to_partnerships[student.key]:				# if 'i' isn't there, that student doesn't have a partnership for that assignment 

@@ -719,12 +719,14 @@ class ViewPartnerships(CustomHandler):
 		all_partners = self.all_partners(quarter, year).fetch()						# grab all partnerships 
 		last_assign = self.get_assign_n(quarter, year, -1)							# grab most recent assignment...
 		last_num = 1 if not last_assign else last_assign.number						# ...and its number
+		first_assign = self.get_assign_n(quarter, year, 0)							# grab first assignment...
+		first_num = 0 if not first_assign else first_assign.number						# ...and its number
 
 		keys_to_students = dict(map(lambda x: (x.key,x), students))					# map student objects to keys for easy, fast access from partnership objects
 		keys_to_partnerships = keys_to_partners(all_partners)						# map student keys to partnerships for easy, fast access
 
 		# create mapping of student info to partnership info that the partnership template expects
-		partnership_dict = student_info_to_partner_list(last_num, keys_to_partnerships, keys_to_students, students)
+		partnership_dict = student_info_to_partner_list(last_num, first_num, keys_to_partnerships, keys_to_students, students)
 
 		partnership_dict = sorted(partnership_dict.items(), key=lambda x: (x[0][4], x[0][2]))
 		num_labs = self.num_labs()													
@@ -736,6 +738,7 @@ class ViewPartnerships(CustomHandler):
 			'quarter': quarter,
 			'num_labs': num_labs if num_labs else 0,
 			'last_num': last_num,
+			'first_num': first_num,
 			'user': users.get_current_user(),
 			'sign_out': users.create_logout_url('/'),
 		}
