@@ -667,6 +667,8 @@ class ViewEvals(CustomHandler):
 		assign_num = int(assign_num) if assign_num else 1							# (to avoid errors if there are no assignments in the DB
 		last_num = self.get_assign_n(quarter, year, -1)								# grab last assignment
 		last_num = last_num.number if last_num else assign_num						# (to avoid errors if there are no assignments in the DB)
+		first_assign = self.get_assign_n(quarter, year, 0)							# grab first assignment...
+		first_num = 0 if not first_assign else first_assign.number					# ...and its number
 		evals = self.evals_for_assign(quarter, year, assign_num)					# grab evals for assignment...
 		solo_partners = self.solo_partners(quarter, year, assign_num)				# ...and grab endorsed solos (they're exempt from evals)
 		template_values = {															# build template value map...
@@ -679,6 +681,7 @@ class ViewEvals(CustomHandler):
 			'message': self.request.get('message'),
 			'evals': evals,
 			'solos': solo_partners,
+			'first_num': first_num,
 			'last_num': last_num,
 		}
 		template = JINJA_ENV.get_template('/templates/admin_evals_view.html')
