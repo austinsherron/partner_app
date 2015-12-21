@@ -71,7 +71,6 @@ class Student(ndb.Model):
 	avatar = ndb.BlobProperty()
 	phone_number = ndb.StringProperty()
 	availability = ndb.TextProperty()
-	created = ndb.DateTimeProperty(auto_now_add=True)
 
 
 ################################################################################
@@ -152,6 +151,7 @@ class Setting(ndb.Model):
 	repeat_partners = ndb.BooleanProperty(default=False)
 	cross_section_partners = ndb.BooleanProperty(default=False)
 	
+
 
 ################################################################################
 ################################################################################
