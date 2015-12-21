@@ -117,7 +117,7 @@ class CustomHandler(BaseHandler):
 		assigns_after_now = Assignment.query(
 			Assignment.quarter == quarter,
 			Assignment.year == year,
-			Assignment.fade_in_date < dt.now() - td(hours=7)
+			Assignment.fade_in_date < dt.now() - td(hours=8)
 		).order(Assignment.fade_in_date).fetch()
 
 		try:
@@ -130,13 +130,29 @@ class CustomHandler(BaseHandler):
 		evals_after_now = Assignment.query(
 			Assignment.quarter == quarter,
 			Assignment.year == year,
-			Assignment.eval_date > dt.now() - td(hours=7)
+			Assignment.eval_date > dt.now() - td(hours=8)
 		).order(Assignment.eval_date).fetch()
 
 		if len(evals_after_now) > 0:
 			return evals_after_now[0]
 		else:
 			return None
+
+
+	def active_assigns(self, quarter, year):
+		assigns_before_now = Assignment.query(
+			Assignment.quarter == quarter,
+			Assignment.year == year,
+			Assignment.fade_in_date < dt.now() - td(hours=8)
+		).order(Assignment.fade_in_date).fetch()
+
+		to_return = []
+
+		for i in range(len(assigns_before_now), -1, -1):
+			if assigns_before_now[i].fade_out_date > dt.now() - td(hours=8):
+				to_return.append(assigns_before_now[i])
+
+		return to_return
 
 
 	def get_assign(self, quarter, year, number):
