@@ -33,6 +33,7 @@
 			<table>
 				<tr>
 			  		<th class="num-cell text-center">Select</th>
+			  		<th class="num-cell text-center">Added</th>
 			  		<th class="text-center">StudentID</th>
 			  		<th class="text-center">UCInetID</th>
 			  		<th class="text-center">Last Name</th>
@@ -49,6 +50,11 @@
 							<input type="checkbox" name="student" value="{{ student.studentid }}">
 						</td>
 						<td class="text-center">{{ student.studentid }}</td>
+						{% if student.created %}
+							<td class="text-center">{{ student.created.strftime("%m-%d-%Y") }}</td>
+						{% else %}
+							<td class="text-center">None</td>
+						{% endif %}
 						<td class="text-center overflow">{{ student.ucinetid }}</td>
 						<td class="text-center overflow">{{ student.last_name }}</td>
 						<td class="text-center overflow">{{ student.first_name }}</td>
