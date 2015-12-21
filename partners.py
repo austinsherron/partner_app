@@ -11,7 +11,6 @@ import webapp2
 from datetime import date, datetime, timedelta
 from google.appengine.api import images, users
 from google.appengine.ext import ndb
-from pytz import timezone as tz
 from webapp2_extras.appengine.users import login_required
 
 from admin import AddAssignment, AddStudent, ClearDB, MainAdmin, ManageAssignments, UploadRoster, ViewRoster, DeactivateStudents
@@ -69,7 +68,7 @@ class BrowseForPartners(CustomHandler):
 		# get error message, if any
 		e = self.request.get('error')		
 		# check to see if partner selection period has closed
-		selection_closed = tz('US/Pacific').localize(datetime.now()) > current_assignment.close_date
+		selection_closed = (datetime.now() - timedelta(hours=7) > current_assignment.close_date)
 		# get all current_partnerships for partnership status
 		partnerships = self.all_partners_for_assign(quarter, year, current_assignment.number)
 		partnerships = {p.initiator for p in partnerships} | {p.acceptor for p in partnerships}
