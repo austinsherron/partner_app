@@ -11,11 +11,13 @@ import webapp2
 from datetime import date, datetime, timedelta
 from google.appengine.api import images, users
 from google.appengine.ext import ndb
+from json import dumps
 from webapp2_extras.appengine.users import login_required
 
 from admin import AddAssignment, AddStudent, ClearDB, MainAdmin, ManageAssignments, UploadRoster, ViewRoster, DeactivateStudents
 from admin import AddPartnership, EditAssignment, EditStudent, ViewEvals, ViewPartnerships, UpdateSettings
 from handler import CustomHandler
+from helpers.helpers import query_to_dict
 from models import Assignment, Student, Instructor, Invitation, Partnership, Evaluation, Setting
 
 
@@ -68,7 +70,7 @@ class BrowseForPartners(CustomHandler):
 		# get error message, if any
 		e = self.request.get('error')		
 		# check to see if partner selection period has closed
-		selection_closed = (datetime.now() - timedelta(hours=7) > current_assignment.close_date)
+		selection_closed = (datetime.now() - timedelta(hours=8) > current_assignment.close_date)
 		# get all current_partnerships for partnership status
 		partnerships = self.all_partners_for_assign(quarter, year, current_assignment.number)
 		partnerships = {p.initiator for p in partnerships} | {p.acceptor for p in partnerships}
@@ -92,22 +94,25 @@ class BrowseForPartners(CustomHandler):
 class ConfirmPartner(CustomHandler):
 	@login_required
 	def get(self):
+		quarter = Setting.query().get().quarter
+		year = Setting.query().get().year
+
 		# get current user
 		user = users.get_current_user() 
 		# use user info to find student in DB (the invitee)
-		student = self.get_student(Setting.query().get().quarter, Setting.query().get().year, user.email())
-		# find the current assignment
-		current_assignment = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
+		student = self.get_student(quarter, year, user.email())
+		# find active assignments
+		active_assigns = self.active_assigns(quarter, year)
 		# find open invitations for current assignment
-		invitations = self.received_invites(student, current_assignment.number)
+		invitations = self.received_invites_mult_assign(student, [x.number for x in active_assigns], as_dict=False)
+		#invitations = dict([(num,query_to_dict(*invites)) for num,invites in invitations.items()])
 		# check to see if partner selection is still active
-		selection_closed = (datetime.now() - timedelta(hours=7) > current_assignment.close_date)
+		selection_closed = len(active_assigns) == 0
 		# pass template values...
 		template_values = {
 			'student': student, 			# ...a student object
 			'selection_closed': selection_closed,
-			'current': current_assignment,
-			'invitations': invitations		# ...and a query object of invitation objects
+			'invitations': invitations,
 		}
 		template = JINJA_ENV.get_template('/templates/partner_confirm.html')
 		self.response.write(template.render(template_values))
@@ -124,26 +129,27 @@ class ConfirmPartner(CustomHandler):
 		year = Setting.query().get().year
 
 		if not confirming_key or not being_confirmed_key:
+			# get invitation
+			invitation = ndb.Key(urlsafe=self.request.get('confirmed')).get()
 			# use user info to find student in DB (the invitee)
-			confirming = self.get_student(Setting.query().get().quarter, Setting.query().get().year, user.email())
+			confirming = self.get_student(quarter, year, user.email())
 			# find student being confirmed (the invitor)
-			being_confirmed = self.student_by_id(Setting.query().get().quarter, Setting.query().get().year, self.request.get('confirmed'))
+			being_confirmed = invitation.invitor.get()
+			# get assign
+			for_assign = invitation.assignment_number
 			admin = False
 		else:
+			for_assign = int(self.request.get('assign_num'))
 			being_confirmed = ndb.Key(urlsafe=being_confirmed_key).get()
 			confirming = ndb.Key(urlsafe=confirming_key).get() if confirming_key != 'None' else None
 			admin = True
-
-		# find current assignment
-		current_assignment = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
-
-		for_assign = int(self.request.get('assign_num')) if admin else current_assignment.number
 
 		# find all open invitation involving both the student being confirmed and the student confirming
 		# invitations = self.all_invitations(confirming, being_confirmed, current_assignment.number)
 		if confirming:
 			invitations = self.all_invites_for_student(confirming, for_assign)
 			invitations += self.all_invites_for_student(being_confirmed, for_assign)
+			invitations += self.all_invites_for_pair(confirming, being_confirmed)
 			open_partnerships = self.students_partners_for_assign(confirming, quarter, year, for_assign).fetch()
 			open_partnerships += self.students_partners_for_assign(being_confirmed, quarter, year, for_assign).fetch()
 		else:
@@ -159,7 +165,7 @@ class ConfirmPartner(CustomHandler):
 			partnership.put()
 
 		dropped = self.dropped_partners(open_partnerships, confirming, being_confirmed)
-		msg = "Hello,\n\nThis is an automated message send to inform you that"
+		msg = "Hello,\n\nThis is an automated message sent to inform you that"
 		msg += " your partner for assignment " + str(for_assign)
 		msg += " has dissolved your partnership by confirming a partnership with another student."
 		msg += "\n\nIf this is an error, please contact your former partner."
@@ -266,8 +272,8 @@ class EvaluatePartner(CustomHandler):
 		eval_assign = self.current_eval_assign(Setting.query().get().quarter, Setting.query().get().year)
 		current_partner = self.current_partner(evaluator, partners, eval_assign.number)
 
-		eval_closed = (datetime.now() - timedelta(hours=7) > eval_assign.eval_date or
-			datetime.now() - timedelta(hours=7) < eval_assign.eval_open_date)
+		eval_closed = (datetime.now() - timedelta(hours=8) > eval_assign.eval_date or
+			datetime.now() - timedelta(hours=8) < eval_assign.eval_open_date)
 	
 		rate20scale = ["0 -- Never, completely inadequate", "1", "2", "3", "4"]
 		rate20scale += ["5 -- Seldom, poor quality", "6", "7", "8", "9"]
@@ -366,6 +372,9 @@ class ImageHandler(CustomHandler):
 class MainPage(CustomHandler):
 	@login_required
 	def get(self):
+		quarter = Setting.query().get().quarter
+		year = Setting.query().get().year
+
 		# delcare page template
 		template = JINJA_ENV.get_template('/templates/partners.html')
 		# get current user
@@ -374,13 +383,15 @@ class MainPage(CustomHandler):
 
 		try:
 			# use user info to find student int DB
-			student = self.get_student(Setting.query().get().quarter, Setting.query().get().year, user.email())
+			student = self.get_student(quarter, year, user.email())
+			# get active assignments
+			active_assigns = self.active_assigns(quarter, year)
 			# find current assignment
-			current_assignment = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
+			current_assignment = self.current_assign(quarter, year)
 			# find assignment for which evals will be completed next
-			eval_assign = self.current_eval_assign(Setting.query().get().quarter, Setting.query().get().year)
+			eval_assign = self.current_eval_assign(quarter, year)
 			# find any active invitations for the current assignment that student has sent
-			sent_invitations = self.sent_invites(student, current_assignment.number)
+			sent_invitations = self.sent_invites_mult_assign(student, [x.number for x in active_assigns])
 
 		except (AttributeError, IndexError):
 			template_values = {
@@ -394,7 +405,7 @@ class MainPage(CustomHandler):
 		# find any active invitations for the current assignment that the student has received
 		received_invitations = self.received_invites(student, current_assignment.number)
 		# find any partnerships in which the student has been involved
-		partners = self.partner_history(student, Setting.query().get().quarter, Setting.query().get().year)
+		partners = self.partner_history(student, quarter, year)
 		# find current partner
 		current_partner = self.current_partner(student, partners, current_assignment.number)
 		# find most recently dropped partner, if any
@@ -409,7 +420,7 @@ class MainPage(CustomHandler):
 			'current': current_assignment,	# ...assignment object
 			'eval': eval_assign,			# ...assignment object
 			# ...query object full of invitation objects
-			'sent_invitations': sent_invitations if len(sent_invitations.fetch()) > 0 else None,
+			'sent_invitations': sent_invitations if len(sent_invitations) > 0 else None,
 			# ...query object full of invitation objects
 			'received_invitations': received_invitations if len(received_invitations.fetch()) > 0 else None,
 			'current_partner': current_partner,		# ...student object or string
@@ -444,21 +455,24 @@ class Main(webapp2.RequestHandler):
 class SelectPartner(CustomHandler):
 	@login_required
 	def get(self):
+		quarter = Setting.query().get().quarter
+		year = Setting.query().get().year
+
 		# get current user info
 		user = users.get_current_user()
 		# use user info to find student in DB (the selector)
-		selector = self.get_student(Setting.query().get().quarter, Setting.query().get().year, user.email())
+		selector = self.get_student(quarter, year, user.email())
 		# if cross section partnership aren't allowed, use selector info to find students in same lab section
 		if not self.cross_section_partners():
-			selectees = self.students_by_lab(Setting.query().get().quarter, Setting.query().get().year, selector.lab)
+			selectees = self.students_by_lab(quarter, year, selector.lab)
 		else:
-			selectees = self.get_active_students(Setting.query().get().quarter, Setting.query().get().year)				
-		# get current assignment
-		current_assignment = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
+			selectees = self.get_active_students(quarter, year)				
+		# get active assignments
+		active_assigns = self.active_assigns(quarter, year)
 		# get error message, if any
 		e = self.request.get('error')		
 		# check to see if partner selection period has closed
-		selection_closed = (datetime.now() - timedelta(hours=7) > current_assignment.close_date)
+		selection_closed = len(active_assigns) == 0
 
 		# pass template values...
 		template_values = {
@@ -466,25 +480,28 @@ class SelectPartner(CustomHandler):
 			'selector': selector,  								# ...student object
 			'selectees': selectees.order(Student.last_name),	# ...query of student objects
 			'selection_closed': selection_closed,
-			'current': current_assignment
+			'active': active_assigns,
 		}
 		template = JINJA_ENV.get_template('/templates/partner_selection.html')
 		self.response.write(template.render(template_values))
 
 
 	def post(self):
+		quarter = Setting.query().get().quarter
+		year = Setting.query().get().year
+
 		# get current user info
 		user = users.get_current_user()
 		# use user info to find student in DB (the selector)
-		selector = self.get_student(Setting.query().get().quarter, Setting.query().get().year, user.email())
+		selector = self.get_student(quarter, year, user.email())
 		# use form data to find student that was selected (selected) 
-		selected = self.student_by_id(Setting.query().get().quarter, Setting.query().get().year, self.request.get('selected_partner'))
-		# find current assignment
-		current_assignment = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
+		selected = self.student_by_id(quarter, year, self.request.get('selected_partner'))
+		# use from data to get assignment for which student is choosing partner
+		selected_assign = int(self.request.get('selected_assign'))
 		# check if selector and selected have been partners
 		previous_partners = self.partners_previously(selector, selected)
 		# check if selector has and selected have open inviations for current assignment
-		current_invitations = self.open_invitations(selector, selected, current_assignment.number).fetch()
+		current_invitations = self.open_invitations(selector, selected, selected_assign).fetch()
 
 		# redirect with error...
 		# ...if selected and selector have worked together previously
@@ -502,7 +519,7 @@ class SelectPartner(CustomHandler):
 		else:
 			# create invitation object with selector as invitor...
 			invitation = Invitation(invitor = selector.key, invitee = selected.key,
-				assignment_number = current_assignment.number, active = True)
+				assignment_number = selected_assign, active = True)
 			# ...and save it
 			invitation.put()	
 
@@ -543,7 +560,7 @@ class ViewInvitationHistory(CustomHandler):
 		ordering = {'Assign Num': 0, 'Who': 1, 'To/From': 2, 'Accepted': 3, 'Current Partner': 4}
 		for invite in invites:
 			# organize invite info by time 
-			i = (invite.created - timedelta(hours=7)).strftime('%m-%d-%Y %H:%M:%S')
+			i = (invite.created - timedelta(hours=8)).strftime('%m-%d-%Y %H:%M:%S')
 			invite_info[i] = {}
 			# add assignment number to invite info
 			invite_info[i]['Assign Num'] = invite.assignment_number

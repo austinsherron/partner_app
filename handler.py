@@ -5,6 +5,7 @@
 
 import webapp2
 
+from collections import defaultdict as dd
 from datetime import datetime as dt, timedelta as td
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -148,8 +149,8 @@ class CustomHandler(BaseHandler):
 
 		to_return = []
 
-		for i in range(len(assigns_before_now), -1, -1):
-			if assigns_before_now[i].fade_out_date > dt.now() - td(hours=8):
+		for i in range(len(assigns_before_now) - 1, -1, -1):
+			if assigns_before_now[i].close_date > dt.now() - td(hours=8):
 				to_return.append(assigns_before_now[i])
 
 		return to_return
@@ -193,12 +194,35 @@ class CustomHandler(BaseHandler):
 		)
 
 
+	def received_invites_mult_assign(self, student, assigns, active=True, as_dict=True):
+		invites = []
+		for assign in assigns:
+			invites += self.received_invites(student, assign, active)
+
+		if as_dict:
+			invite_dict = dd(list)
+			for invite in invites:
+				invite_dict[invite.assignment_number].append(invite)
+			invites = invite_dict
+
+		return invites
+
+
 	def sent_invites(self, student, assign_num, active=True):
 		return Invitation.query(
 			Invitation.invitor == student.key, 
 			Invitation.active == active, 
 			Invitation.assignment_number == assign_num 
 		)
+
+
+	def sent_invites_mult_assign(self, student, assigns, active=True):
+			invites = []
+
+			for assign in assigns:
+				invites += self.sent_invites(student, assign, active).fetch()
+
+			return invites
 
 
 	def all_invites_for_student(self, student, assign_num, active=True, combine=True):
@@ -215,6 +239,14 @@ class CustomHandler(BaseHandler):
 			Invitation.assignment_number == assign_num,
 			Invitation.active == True
 		)
+
+
+	def all_invites_for_pair(self, confirming, being_confirmed, active=True):
+		return Invitation.query(
+			ndb.OR(Invitation.invitee == confirming.key, Invitation.invitee == being_confirmed.key),
+			ndb.OR(Invitation.invitor == being_confirmed.key, Invitation.invitor == confirming.key),
+			Invitation.active == active,
+		).fetch()
 
 
 	def all_invitations(self, confirming, being_confirmed, assign_num, active=True):
