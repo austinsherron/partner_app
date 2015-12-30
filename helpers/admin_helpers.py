@@ -99,7 +99,7 @@ def student_info_to_partner_list(last_num, first_num, keys_to_partnerships, keys
 	Generalize
 	Rethink logic
 	"""
-	partnership_dict = defaultdict(list)						# create mapping of students to sequential partner emails
+	partnership_dict = defaultdict(list)							# create mapping of students to sequential partner emails
 	for student in students:
 		student_info = (student.studentid,student.ucinetid,student.last_name,student.first_name,student.lab)
 		for i in range(first_num, last_num + 1):					# need to check for each assignment, as gaps in partner history may exist

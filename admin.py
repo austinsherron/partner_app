@@ -616,7 +616,9 @@ class UploadRoster(CustomHandler):
 
 				student.studentid = studentid
 				student.last_name = row[1].strip().title()
+				student.last_name = row[1].strip('"').title()
 				student.first_name = row[2].strip().title()
+				student.first_name = row[2].strip('"').title()
 				student.ucinetid = row[3].lower().strip()
 				student.email = row[4].lower().strip()
 				student.lab = int(row[5])

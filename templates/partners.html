@@ -124,11 +124,11 @@
 			{% endif %}
 
       		{% if sent_invitations and current %}
-	    		<h5>You've sent partnership invitations (for assignment {{ current.number }}) to the following students:</h5>
+	    		<h5>You've sent partnership invitations to the following students:</h5>
 	      		<ul>
 		    		{% for invitation in sent_invitations %}
 		      			{% set student = invitation.invitee.get() %}
-		      			<li>{{ student.last_name}}, {{ student.first_name }} - {{ student.ucinetid }}</li>	
+		      			<li>{{ student.last_name}}, {{ student.first_name }} - {{ student.ucinetid }} (assignment {{ invitation.assignment_number }})</li>	
 		    		{% endfor %}
 	      		</ul>
       		{% elif current %}

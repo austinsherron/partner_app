@@ -3,19 +3,19 @@
 <a class="close-reveal-modal">&#215;</a>
 <div class="row text-center">
 {% if selection_closed %}
-  <h5>Partner selection for assignment {{ current.number }} has closed</h5>
+  There are currently no assignments that have active partner selection periods.
 {% else %}
-  {% if invitations.get() %}
-    <h3>Which of these students did you agree to work with for assignment {{ current.number }}?</h3>
+  {% if invitations|length > 0 %}
+    <h3>Which of these students did you agree to work with?</h3>
     <form action="/partner/confirm" method="post" enctype="multipart/form-data">
 	  <select name="confirmed">
 	    {% for invitation in invitations %}
 		  {% set student = invitation.invitor.get() %}
-		  <option value="{{ student.studentid }}">
-		    {{ student.last_name }}, {{ student.first_name }} - {{ student.ucinetid }}
-	      </option>
+			<option value="{{ invitation.key.urlsafe() }}">
+			  {{ student.last_name }}, {{ student.first_name }} - {{ student.ucinetid }} (assignment {{ invitation.assignment_number }})
+			</option>
 	    {% endfor %}
-	  </select>
+	  <select>
 	  <input class="button expand" type="submit" value="Confirm">
     </form>
     <br>

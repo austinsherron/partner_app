@@ -74,6 +74,23 @@ def get_sess_vals(session, *args):
 	return tuple(sess_vals)
 
 
+def query_to_dict(*args):
+	"""
+	Converts google NDB query objects to dictionaries.
+
+	Parameters
+	----------
+	*args : mixed
+		Any number of query objects to convert to dictionaries.
+
+	Returns
+	-------
+	mixed
+		Dictionary representations of the arguments in args.
+	"""
+	return [x.to_dict() for x in args]
+
+
 ################################################################################
 ################################################################################
 ################################################################################
