@@ -265,11 +265,14 @@ class EditProfile(CustomHandler):
 class EvaluatePartner(CustomHandler):
 	@login_required
 	def get(self):
+		quarter = Setting.query().get().quarter
+		year = Setting.query().get().year
+
 		user = users.get_current_user()
-		evaluator = self.get_student(Setting.query().get().quarter, Setting.query().get().year, user.email())
-		partners = self.partner_history(evaluator, Setting.query().get().quarter, Setting.query().get().year)
-		current_assignment = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
-		eval_assign = self.current_eval_assign(Setting.query().get().quarter, Setting.query().get().year)
+		evaluator = self.get_student(quarter, year, user.email())
+		partners = self.partner_history(evaluator, quarter, year)
+		current_assignment = self.current_assign(quarter, year)
+		eval_assign = self.current_eval_assign(quarter, year)
 		current_partner = self.current_partner(evaluator, partners, eval_assign.number)
 
 		eval_closed = (datetime.now() - timedelta(hours=8) > eval_assign.eval_date or
@@ -372,8 +375,6 @@ class ImageHandler(CustomHandler):
 class MainPage(CustomHandler):
 	@login_required
 	def get(self):
-		quarter = Setting.query().get().quarter
-		year = Setting.query().get().year
 
 		# delcare page template
 		template = JINJA_ENV.get_template('/templates/partners.html')
@@ -382,6 +383,8 @@ class MainPage(CustomHandler):
 		student = None
 
 		try:
+			quarter = Setting.query().get().quarter
+			year = Setting.query().get().year
 			# use user info to find student int DB
 			student = self.get_student(quarter, year, user.email())
 			# get active assignments
@@ -392,6 +395,8 @@ class MainPage(CustomHandler):
 			eval_assign = self.current_eval_assign(quarter, year)
 			# find any active invitations for the current assignment that student has sent
 			sent_invitations = self.sent_invites_mult_assign(student, [x.number for x in active_assigns])
+			# find any active invitations for the current assignment that the student has received
+			received_invitations = self.received_invites(student, current_assignment.number)
 
 		except (AttributeError, IndexError):
 			template_values = {
@@ -402,8 +407,6 @@ class MainPage(CustomHandler):
 			}
 			return self.response.write(template.render(template_values))
 
-		# find any active invitations for the current assignment that the student has received
-		received_invitations = self.received_invites(student, current_assignment.number)
 		# find any partnerships in which the student has been involved
 		partners = self.partner_history(student, quarter, year)
 		# find current partner
