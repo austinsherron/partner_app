@@ -2,26 +2,33 @@
 {% block content %}
 <a class="close-reveal-modal">&#215;</a>
 <div class="row text-center">
-	{% if eval_closed and eval %}
+	{% if eval_closed %}
 		<h5>
-			Evaluations for assignment {{ eval.number }} open on 
-			<br>
-			{{ eval.eval_open_date.strftime("%A, %m-%d-%Y") }} at {{ eval.eval_open_date.strftime("%I:%M %p") }}
+			There are currently no assignments with open evaluation periods.
 		</h5>
-	{% elif current_partner == None or current_partner == 'No Partner' %}
+	{% elif partners|length == 0 %}
 		<h4>
-			You didn't work with a partner for assignment {{ eval.number }}.
+			You have did not work with a partner on any of the assignments that
+			currently have open evaluation periods.
+			<br>
 			<br>
 			If this is a mistake, please contact your TA.
 		</h4>
 	{% else %}
-		<h4>
-			Evaluation for {{ current_partner.last_name }}, {{ current_partner.first_name }}, Assignment {{ eval.number }}
-			<br>
-		</h4>
-
 		<div class="text-left">
 			<form action="/partner/evaluation" method="post" enctype="multipart/form-data">
+				<h4 class="text-center">
+					Evaluation for:
+					<select name="evaluatee" style="diplay: inline;">
+						{% for num,partner in partners %}
+							<option value="{{ partner.key.urlsafe() }},{{ num }}">
+								{{ partner.last_name }}, {{ partner.first_name }} - {{ partner.ucinetid }}
+								(Assignment {{ num }})
+							</option>
+						{% endfor %}
+					</select>
+				</h4>
+
 				<span class="label">1</span>
 				<label>
 					Did your partner come to the scheduled meetings on time and ready to work?

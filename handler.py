@@ -156,6 +156,22 @@ class CustomHandler(BaseHandler):
 		return to_return
 
 
+	def active_eval_assigns(self, quarter, year):
+		assigns_before_now = Assignment.query(
+			Assignment.quarter == quarter,
+			Assignment.year == year,
+			Assignment.eval_date > dt.now() - td(hours=8)
+		).order(Assignment.eval_date).fetch()
+
+		to_return = []
+
+		for i in range(len(assigns_before_now)):
+			if assigns_before_now[i].eval_open_date < dt.now() - td(hours=8):
+				to_return.append(assigns_before_now[i])
+
+		return to_return
+
+
 	def get_assign(self, quarter, year, number):
 		return Assignment.query(
 			Assignment.quarter == quarter,

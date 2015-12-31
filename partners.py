@@ -17,7 +17,7 @@ from webapp2_extras.appengine.users import login_required
 from admin import AddAssignment, AddStudent, ClearDB, MainAdmin, ManageAssignments, UploadRoster, ViewRoster, DeactivateStudents
 from admin import AddPartnership, EditAssignment, EditStudent, ViewEvals, ViewPartnerships, UpdateSettings
 from handler import CustomHandler
-from helpers.helpers import query_to_dict
+from helpers.helpers import query_to_dict, split_last
 from models import Assignment, Student, Instructor, Invitation, Partnership, Evaluation, Setting
 
 
@@ -268,15 +268,19 @@ class EvaluatePartner(CustomHandler):
 		quarter = Setting.query().get().quarter
 		year = Setting.query().get().year
 
+		# get user
 		user = users.get_current_user()
+		# get student from user info
 		evaluator = self.get_student(quarter, year, user.email())
+		# get student's partner history
 		partners = self.partner_history(evaluator, quarter, year)
-		current_assignment = self.current_assign(quarter, year)
-		eval_assign = self.current_eval_assign(quarter, year)
-		current_partner = self.current_partner(evaluator, partners, eval_assign.number)
-
-		eval_closed = (datetime.now() - timedelta(hours=8) > eval_assign.eval_date or
-			datetime.now() - timedelta(hours=8) < eval_assign.eval_open_date)
+		# grab the active eval assignments
+		eval_assigns = self.active_eval_assigns(quarter, year)
+		# grab partners for eval assignments
+		partners = [(eval_assign.number,self.current_partner(evaluator, partners, eval_assign.number)) for eval_assign in eval_assigns]
+		# filter out No Partner partnerships
+		partners = list(filter(lambda x: x[1] != "No Partner" and x[1] != None, partners))
+		eval_closed = len(eval_assigns) == 0
 	
 		rate20scale = ["0 -- Never, completely inadequate", "1", "2", "3", "4"]
 		rate20scale += ["5 -- Seldom, poor quality", "6", "7", "8", "9"]
@@ -297,23 +301,25 @@ class EvaluatePartner(CustomHandler):
 			'rate_scale': rate20scale,
 			'rate5scale': rate5scale,
 			'rate10scale': rate10scale,
-			'current_partner': current_partner,
-			'eval': eval_assign,
-			'current': current_assignment
+			'partners': partners,
 		}
 		template = JINJA_ENV.get_template('/templates/partner_eval.html')
 		self.response.write(template.render(template_values))
 
 
 	def post(self):
-		user = users.get_current_user()
-		evaluator = self.get_student(Setting.query().get().quarter, Setting.query().get().year, user.email())
-		partners = self.partner_history(evaluator, Setting.query().get().quarter, Setting.query().get().year)
-		current_assignment = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
-		eval_assign = self.current_eval_assign(Setting.query().get().quarter, Setting.query().get().year)
-		current_partner = self.current_partner(evaluator, partners, eval_assign.number)
+		quarter = Setting.query().get().quarter
+		year = Setting.query().get().year
 
-		evaluations = self.existing_eval(evaluator, current_partner, eval_assign.number)
+		user = users.get_current_user()
+		evaluator = self.get_student(quarter, year, user.email())
+		partners = self.partner_history(evaluator, quarter, year)
+		print(self.request.get('evaluatee'))
+		eval_key,num = split_last(self.request.get('evaluatee'))
+		eval_assign = int(num)
+		current_partner = ndb.Key(urlsafe=eval_key).get()
+
+		evaluations = self.existing_eval(evaluator, current_partner, eval_assign)
 
 		for eval in evaluations:
 			eval.active = False
@@ -321,7 +327,7 @@ class EvaluatePartner(CustomHandler):
 
 		evaluation = Evaluation(evaluator = evaluator.key, evaluatee = current_partner.key)
 
-		evaluation.assignment_number = eval_assign.number
+		evaluation.assignment_number = eval_assign
 		evaluation.year = evaluator.year
 		evaluation.quarter = evaluator.quarter
 		evaluation.active = True
