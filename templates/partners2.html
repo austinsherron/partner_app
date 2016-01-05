@@ -181,42 +181,46 @@
 
 	<br>
 
-	<div class="row fullwidth">
-		<span class="label alert">Deactivated Partnerships</span>
-		<div class="small-12 columns">
-			<div class="row panel">
-				<div class="small-12 columns">
-					<table>
-						<tr>
-							<th class="text-center num-cell">Assign Num</th>
-							<th class="text-center">Initiated the Partnership</th>
-							<th class="text-center">Accepted the Invitation to Partner</th>
-						</tr>
-						{% for partner in dropped %}
-							<tr>
-								<td class="text-center num-cell">{{ partner.assignment_number }}</td>
-								{% if partner.initiator %}
-									<td class="text-center">{{ partner.initiator.get().ucinetid }}</td>
-								{% endif %}
+	{% if dropped|length > 0%}
 
-								{% if partner.acceptor %}
-									<td class="text-center">{{ partner.acceptor.get().ucinetid }}</td>
-								{% else %}
-									<td class="text-center">No Partner</td>
-								{% endif %}
+		<div class="row fullwidth">
+			<span class="label alert">Deactivated Partnerships</span>
+			<div class="small-12 columns">
+				<div class="row panel">
+					<div class="small-12 columns">
+						<table>
+							<tr>
+								<th class="text-center num-cell">Assign Num</th>
+								<th class="text-center">Initiated the Partnership</th>
+								<th class="text-center">Accepted the Invitation to Partner</th>
 							</tr>
-						{% endfor %}
-					</table>
+							{% for partner in dropped %}
+								<tr>
+									<td class="text-center num-cell">{{ partner.assignment_number }}</td>
+									{% if partner.initiator %}
+										<td class="text-center">{{ partner.initiator.get().ucinetid }}</td>
+									{% endif %}
+
+									{% if partner.acceptor %}
+										<td class="text-center">{{ partner.acceptor.get().ucinetid }}</td>
+									{% else %}
+										<td class="text-center">No Partner</td>
+									{% endif %}
+								</tr>
+							{% endfor %}
+						</table>
+					</div>
+					<div class="small-6 columns small-centered"> 
+						<h4>
+							Note: if any of these deactivated partnerships are unexpected, <strong>contact your
+							TA and the student with whom the partnership was deactivated. 					
+						</h4>
+					</div> 
 				</div>
-				<div class="small-6 columns small-centered"> 
-					<h4>
-						Note: if any of these deactivated partnerships are unexpected, <strong>contact your
-						TA and the student with whom the partnership was deactivated. 					
-					</h4>
-				</div> 
 			</div>
 		</div>
-	</div>
+
+	{% endif %}
 
 
 {% else %}
