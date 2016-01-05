@@ -229,7 +229,9 @@ class EditProfile(CustomHandler):
 			# redirect to main page if the student doesn't exist in the DB
 			return self.redirect('/partner')
 
-		programming_ability = [str(i) for i in range(1,6)]
+		programming_ability = ['0: Never, or just a few times', '1: Occaisionally, but not regularly']
+		programming_ability += ['2: Regularly, but without much comfort or expertise']
+		programming_ability += ['3: Regularly, with comfortable proficiency', '4: Frequently and with some expertise']
 
 		template_values = {
 			'user': user,
