@@ -160,9 +160,22 @@ class ConfirmPartner(CustomHandler):
 		# open_partnerships = self.open_partnerships(confirming, being_confirmed, current_assignment.number)
 
 		# deactivate those partnerships
+		active_evals = []
 		for partnership in open_partnerships:
+
+			# find any active evals
+			if partnership.initiator:
+				active_evals += self.student_eval_for_assign(partnership.initiator, for_assign)
+			if partnership.acceptor:
+				active_evals += self.student_eval_for_assign(partnership.acceptor, for_assign)
+
 			partnership.active = False
 			partnership.put()
+
+		# decativate active evals
+		for eval in active_evals:
+			eval.active = False
+			eval.put()
 
 		dropped = self.dropped_partners(open_partnerships, confirming, being_confirmed)
 		msg = "Hello,\n\nThis is an automated message sent to inform you that"
@@ -383,7 +396,7 @@ class MainPage(CustomHandler):
 	def get(self):
 
 		# delcare page template
-		template = JINJA_ENV.get_template('/templates/partners.html')
+		template = JINJA_ENV.get_template('/templates/partners2.html')
 		# get current user
 		user = users.get_current_user()
 		student = None
@@ -394,15 +407,13 @@ class MainPage(CustomHandler):
 			# use user info to find student int DB
 			student = self.get_student(quarter, year, user.email())
 			# get active assignments
-			active_assigns = self.active_assigns(quarter, year)
-			# find current assignment
-			current_assignment = self.current_assign(quarter, year)
-			# find assignment for which evals will be completed next
-			eval_assign = self.current_eval_assign(quarter, year)
+			active_assigns = sorted(self.active_assigns(quarter, year), key=lambda x: x.number)
+			# get active eval assigns
+			eval_assigns = sorted(self.active_eval_assigns(quarter, year), key=lambda x: x.number)
 			# find any active invitations for the current assignment that student has sent
 			sent_invitations = self.sent_invites_mult_assign(student, [x.number for x in active_assigns])
 			# find any active invitations for the current assignment that the student has received
-			received_invitations = self.received_invites(student, current_assignment.number)
+			received_invitations = self.received_invites_mult_assign(student, [x.number for x in active_assigns])
 
 		except (AttributeError, IndexError):
 			template_values = {
@@ -415,31 +426,31 @@ class MainPage(CustomHandler):
 
 		# find any partnerships in which the student has been involved
 		partners = self.partner_history(student, quarter, year)
-		# find current partner
-		current_partner = self.current_partner(student, partners, current_assignment.number)
-		# find most recently dropped partner, if any
-		dropped_partners = self.inactive_partners(student, current_assignment.number).fetch()
+		partners = dict([(x.number,self.current_partner(student, partners, x.number)) for x in active_assigns])
+		# find evals the student has submitted
+		evals = self.get_eval_history(student, True, quarter, year)
+		evals = dict([(x.assignment_number,x) for x in evals])
 		# get activity message, if any
 		message = self.request.get('message')
-		
+		dropped = []
+		for x in active_assigns:
+			dropped += self.inactive_partners(student, x.number).fetch()
+		dropped = sorted(dropped, key=lambda x: x.assignment_number)
+
 		# pass template values...
 		template_values = {
 			'user': user,
-			'student': student, 			# ...student object
-			'current': current_assignment,	# ...assignment object
-			'eval': eval_assign,			# ...assignment object
-			# ...query object full of invitation objects
-			'sent_invitations': sent_invitations if len(sent_invitations) > 0 else None,
-			# ...query object full of invitation objects
-			'received_invitations': received_invitations if len(received_invitations.fetch()) > 0 else None,
-			'current_partner': current_partner,		# ...student object or string
-			# ...query object full of partnership objects
-			'partners': partners,
-			# ...sign out url
-			'sign_out': users.create_logout_url('/'),
-			'dropped': dropped_partners,
+			'student': student, 							# ...student object
+			'active': active_assigns,
+			'evals': eval_assigns,
+			'submitted_evals': evals,
+			'sent_invitations': sorted(sent_invitations, key=lambda x: x.assignment_number),	# ...list of invitation objects
+			'received_invitations': sorted(received_invitations.items(), key=lambda x: x[0]),	# ...list of invitation objects
+			'partners': partners,							# ...dict of partnership objects
+			'sign_out': users.create_logout_url('/'),		# sign out url
 			'message': message,
-			'days': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+			'profile': student.bio is None or student.availability is None or student.programming_ability is None,
+			'dropped': dropped,
 		}
 		self.response.write(template.render(template_values))
 
@@ -603,10 +614,10 @@ class ViewHistory(CustomHandler):
 		try:
 			quarter = Setting.query().get().quarter
 			year = Setting.query().get().year
-			student = self.get_student(Setting.query().get().quarter, Setting.query().get().year, user.email())
-			current_assignment = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
-			partners = self.partner_history(student, Setting.query().get().quarter, Setting.query().get().year)
-			evaluations = self.get_eval_history(student, True, Setting.query().get().quarter, Setting.query().get().year,
+			student = self.get_student(quarter, year, user.email())
+			current_assignment = self.current_assign(quarter, year)
+			partners = self.partner_history(student, quarter, year)
+			evaluations = self.get_eval_history(student, True, quarter, year,
 				).order(Evaluation.assignment_number)
 			last_num = self.get_assign_n(quarter, year, -1)
 			last_num = last_num.number if last_num else current_assignment.number

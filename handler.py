@@ -199,6 +199,17 @@ class CustomHandler(BaseHandler):
 			return None
 
 
+	def assign_range(self, quarter, year):
+		zeroth = self.get_assign_n(quarter, year, 0)
+
+		if not zeroth:
+			return range(0,0)
+
+		last = self.get_assign_n(quarter, year, -1)
+		return range(0,last.number + 1)
+		
+
+
 ## INVITATION QUERIES ##########################################################
 
 
@@ -312,9 +323,9 @@ class CustomHandler(BaseHandler):
 			Partnership.year == year
 		).order(Partnership.assignment_number)
 
-		if type(fill_gaps) is int:
+		if type(fill_gaps) is list:
 			partners = []
-			for i in range(1, fill_gaps + 1):
+			for i in fill_gaps:
 				partnership = history.filter(Partnership.assignment_number == i).get()
 
 				if not partnership:
@@ -446,6 +457,14 @@ class CustomHandler(BaseHandler):
 			Evaluation.quarter == quarter,
 			Evaluation.year == year
 		)
+
+
+	def student_eval_for_assign(self, student, assign_num, active=True):
+		return Evaluation.query(
+			Evaluation.evaluator == student,
+			Evaluation.active == active,
+			Evaluation.assignment_number == assign_num,
+		).fetch()
 
 
 	def evals_for_assign(self, quarter, year, assign_num, active=True):
