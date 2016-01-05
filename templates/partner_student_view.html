@@ -1,0 +1,127 @@
+{% extends '/templates/common.html' %}
+{% block content %}
+
+<div class="row fullwidth">
+
+	<br>
+
+	{% if message %}
+		<div class="small-12 columns">
+		  	<h3 class="text-center">{{ message }}</h3>
+		</div>
+	{% endif %}
+
+</div>
+
+<div class="row fullwidth">
+	<span class="label">Abbreviated Partner History</span>
+	<div class="small-12 columns">
+		<div class="row panel">
+			<div class="small-12 columns">
+				<table>
+					<tr>
+						{% for i in assign_range %}
+							<th class="text-center">{{ i }}</th>
+						{% endfor %}
+					</tr>
+					<tr>
+						{% for p in partners %}
+							<td class="text-center">{{ p }}</td>
+						{% endfor %}
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<br>
+
+<div class="row fullwidth">
+	<span class="label">Complete Partner History</span>
+	<div class="small-12 columns">
+		<div class="row panel">
+			<div class="small-12 columns">
+				<table>
+					<tr>
+						<th class="text-center num-cell">Num</th>
+						<th class="text-center">Sent Invite</th>
+						<th class="text-center">Accepted Invite</th>
+						<th class="text-center">Authorized Solo?</th>
+						<th class="text-center">Active</th>
+					</tr>
+					{% for p in all_partners %}
+						<tr>
+							<td class="text-center">{{ p.assignment_number }}</td>
+							{% set i = p.initiator.get() %}
+							<td class="text-center">{{ i.ucinetid }} - {{ i.last_name }}, {{ i.first_name }}</td>
+							{% set a = p.acceptor.get() if p.acceptor else None %}
+
+							{% if a%}
+								<td class="text-center">{{ a.ucinetid }} - {{ a.last_name }}, {{ a.first_name }}</td>
+								<td class="text-center"><span class="label success">False</span></td>
+							{% else %}
+								<td class="text-center">None</td>
+								<td class="text-center"><span class="label warning">True</span></td>
+							{% endif %}
+
+							{% if p.active %}
+								<td class="text-center"><span class="label success">True</span></td>
+							{% else %}
+								<td class="text-center"><span class="label alert">False</span></td>
+							{% endif %}
+						</tr>
+					{% endfor %}
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<br>
+
+<div class="row fullwidth">
+	<span class="label">Eval History</span>
+	<div class="small-12 columns">
+		<div class="row panel">
+			<div class="small-12 columns">
+				<table>
+					<tr>
+						<th class="text-center num-cell">Num</th>
+						<th class="text-center">Being Evaluated</th>
+						{% if evals|length > 0 %}
+							{% for r in evals[0].responses %}
+								<th class="text-center">{{ loop.index }}</th>
+							{% endfor %}
+						{% endif %}
+						<th class="text-center">Active?</th>
+					</tr>
+					{% for e in evals %}
+						<tr>
+							<td class="text-center num-cell">{{ e.assignment_number }}</td>
+							{% set et = e.evaluatee.get() %}
+							<td class="text-center">{{ et.ucinetid }} - {{ et.last_name }}, {{ et.first_name }}</td>
+							{% for r in e.responses %}
+								{% if r[1] == ' ' %}
+									<td class="text-center num-cell">{{ r[:1] }}</td>
+								{% elif r[2] == ' ' %}
+									<td class="text-center num-cell">{{ r[:2] }}</td>
+								{% else %}
+									<td class="text-center">{{ r }}</td>
+								{% endif %}
+							{% endfor %}
+							
+							{% if e.active %}
+								<td class="text-center"><span class="label success">True</span></td>
+							{% else %}
+								<td class="text-center"><span class="label alert">False</span></td>
+							{% endif %}
+						</tr>
+					{% endfor %}
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

@@ -789,7 +789,40 @@ class ViewRoster(CustomHandler):
 class ViewStudent(CustomHandler):
 
 	def get(self):
-		pass
+		# pass map of quarter DB representations (ints) to string representation
+		# TODO:
+		#	quarters should not be hardcoded 
+		quarter_map = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
+		quarter = self.request.get('quarter')								# try grabbing quarter/year from URL
+		year = self.request.get('year')
+
+		if not quarter or not year:											# if they don't exist, try grabbing from session
+			temp = get_sess_vals(self.session, 'quarter', 'year')
+			if not temp:													# if they don't exist there, redirect with error
+				return self.redirect('/admin?message=Please set a current quarter and year')
+			quarter,year = temp													
+
+		quarter,year = int(quarter), int(year)
+		student = ndb.Key(urlsafe=self.request.get('student')).get()
+		assign_range = self.assign_range(quarter, year)
+		partner_history = self.partner_history(student, quarter, year, fill_gaps=assign_range)
+		all_partner_history = self.all_partner_history(student, quarter, year)
+		evals = self.get_eval_history(student, True, quarter, year).fetch()
+		evals += self.get_eval_history(student, False, quarter, year).fetch()
+		evals = sorted(evals, key=lambda x: x.assignment_number)
+
+		template = JINJA_ENV.get_template('/templates/admin_student_view.html')
+		template_values = {
+			'student': student,
+			'partners': partner_history,
+			'all_partners': all_partner_history,
+			'assign_range': assign_range,
+			'evals': evals,
+			'user': users.get_current_user(),
+			'sign_out': users.create_logout_url('/'),
+		}
+		return self.response.write(template.render(template_values))
+		
 		
 
 ################################################################################

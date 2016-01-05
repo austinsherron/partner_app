@@ -60,7 +60,7 @@
 								<span class="label warning">edit</span></a>
 						</td>
 						<td class="num-cell text-center">
-							<a href="/admin/student/view?studentid={{ student.studentid }}&quarter={{ student.quarter }}&year={{ student.year }}">
+							<a href="/admin/student/view?student={{ student.key.urlsafe() }}">
 								<span class="label">View</span></a>
 						</td>
 					</tr>
