@@ -15,7 +15,7 @@ from json import dumps
 from webapp2_extras.appengine.users import login_required
 
 from admin import AddAssignment, AddStudent, ClearDB, MainAdmin, ManageAssignments, UploadRoster, ViewRoster, DeactivateStudents
-from admin import AddPartnership, EditAssignment, EditStudent, ViewEvals, ViewPartnerships, UpdateSettings
+from admin import AddPartnership, EditAssignment, EditStudent, ViewEvals, ViewPartnerships, UpdateSettings, ViewStudent
 from handler import CustomHandler
 from helpers.helpers import query_to_dict, split_last
 from models import Assignment, Student, Instructor, Invitation, Partnership, Evaluation, Setting
@@ -614,28 +614,29 @@ class ViewHistory(CustomHandler):
 		user = users.get_current_user()
 
 		try:
-			quarter = Setting.query().get().quarter
-			year = Setting.query().get().year
+			quarter = self.quarter()
+			year = self.year()
 			student = self.get_student(quarter, year, user.email())
-			current_assignment = self.current_assign(quarter, year)
-			partners = self.partner_history(student, quarter, year)
-			evaluations = self.get_eval_history(student, True, quarter, year,
-				).order(Evaluation.assignment_number)
-			last_num = self.get_assign_n(quarter, year, -1)
-			last_num = last_num.number if last_num else current_assignment.number
+			assign_range = self.assign_range(quarter, year)
+			partner_history = self.partner_history(student, quarter, year, fill_gaps=assign_range)
+			all_partner_history = self.all_partner_history(student, quarter, year)
+			evals = self.get_eval_history(student, True, quarter, year).fetch()
+			evals += self.get_eval_history(student, False, quarter, year).fetch()
+			evals = sorted(evals, key=lambda x: x.assignment_number)
 
 		except AttributeError:
 			self.redirect('/partner')
 			return
 
-		template = JINJA_ENV.get_template('templates/partner_history.html')
+		template = JINJA_ENV.get_template('/templates/partner_student_view.html')
 		template_values = {
-			'user': user,
 			'student': student,
-			'partners': partners,
-			'evals': evaluations,
+			'partners': partner_history,
+			'all_partners': all_partner_history,
+			'assign_range': assign_range,
+			'evals': evals,
+			'user': users.get_current_user(),
 			'sign_out': users.create_logout_url('/'),
-			'last_num': last_num,
 		}
 		return self.response.write(template.render(template_values))
 
@@ -680,6 +681,7 @@ application = webapp2.WSGIApplication([
 	('/admin/student/add', AddStudent),
 	('/admin/students/deactivate', DeactivateStudents),
 	('/admin/student/edit', EditStudent),
+	('/admin/student/view', ViewStudent),
 	('/admin/settings/update', UpdateSettings),
 ], config=config, debug=True)
 
