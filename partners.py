@@ -414,6 +414,18 @@ class MainPage(CustomHandler):
 			sent_invitations = self.sent_invites_mult_assign(student, [x.number for x in active_assigns])
 			# find any active invitations for the current assignment that the student has received
 			received_invitations = self.received_invites_mult_assign(student, [x.number for x in active_assigns])
+			# find any partnerships in which the student has been involved
+			partners = self.partner_history(student, quarter, year)
+			partners = dict([(x.number,self.current_partner(student, partners, x.number)) for x in active_assigns])
+			# find evals the student has submitted
+			evals = self.get_eval_history(student, True, quarter, year)
+			evals = dict([(x.assignment_number,x) for x in evals])
+			# get activity message, if any
+			message = self.request.get('message')
+			dropped = []
+			for x in active_assigns:
+				dropped += self.inactive_partners(student, x.number).fetch()
+			dropped = sorted(dropped, key=lambda x: x.assignment_number)
 
 		except (AttributeError, IndexError):
 			template_values = {
@@ -424,18 +436,6 @@ class MainPage(CustomHandler):
 			}
 			return self.response.write(template.render(template_values))
 
-		# find any partnerships in which the student has been involved
-		partners = self.partner_history(student, quarter, year)
-		partners = dict([(x.number,self.current_partner(student, partners, x.number)) for x in active_assigns])
-		# find evals the student has submitted
-		evals = self.get_eval_history(student, True, quarter, year)
-		evals = dict([(x.assignment_number,x) for x in evals])
-		# get activity message, if any
-		message = self.request.get('message')
-		dropped = []
-		for x in active_assigns:
-			dropped += self.inactive_partners(student, x.number).fetch()
-		dropped = sorted(dropped, key=lambda x: x.assignment_number)
 
 		# pass template values...
 		template_values = {
