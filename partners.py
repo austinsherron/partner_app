@@ -19,6 +19,7 @@ from admin import AddPartnership, EditAssignment, EditStudent, ViewEvals, ViewPa
 from handler import CustomHandler
 from helpers.helpers import query_to_dict, split_last
 from models import Assignment, Student, Instructor, Invitation, Partnership, Evaluation, Setting
+from src.send_mail import SendMail 
 
 
 ################################################################################
@@ -171,6 +172,7 @@ class ConfirmPartner(CustomHandler):
 
 			partnership.active = False
 			partnership.put()
+			SendMail(partnership, 'partner_deactivated')
 
 		# decativate active evals
 		for eval in active_evals:
@@ -178,11 +180,6 @@ class ConfirmPartner(CustomHandler):
 			eval.put()
 
 		dropped = self.dropped_partners(open_partnerships, confirming, being_confirmed)
-		msg = "Hello,\n\nThis is an automated message sent to inform you that"
-		msg += " your partner for assignment " + str(for_assign)
-		msg += " has dissolved your partnership by confirming a partnership with another student."
-		msg += "\n\nIf this is an error, please contact your former partner."
-		msg += "\n\nIf you can't find a partner, please contact your TA."
 
 		# set invitations between invitor and invitee (for current assignment) to inactive
 		for invitation in invitations:
@@ -202,6 +199,7 @@ class ConfirmPartner(CustomHandler):
 
 		# ...and save it
 		partnership.put()
+		SendMail(partnership, 'partner_confirm')
 
 		if not admin:
 			message = 'Partnership with ' + str(being_confirmed.last_name) + ', ' 
@@ -438,7 +436,6 @@ class MainPage(CustomHandler):
 			}
 			return self.response.write(template.render(template_values))
 
-
 		# pass template values...
 		template_values = {
 			'user': user,
@@ -453,6 +450,7 @@ class MainPage(CustomHandler):
 			'message': message,
 			'profile': student.bio is None or student.availability is None or student.programming_ability is None,
 			'dropped': dropped,
+			'show_dropped': len(dropped) > 0 and len(filter(lambda x: x != None, partners.values())) < len(active_assigns),
 		}
 		self.response.write(template.render(template_values))
 
