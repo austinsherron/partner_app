@@ -8,11 +8,11 @@ class SendMail:
 	def __init__(self, recvr=None, type=None, **kargs):
 		self.sender = 'sherronb@uci.edu'
 
-		if recvr and type:
+		if recvr:
 			self.route_message(recvr, type, **kargs)
 
 
-	def route_message(self, recvr, type, subject=None, body=None, **kargs):
+	def route_message(self, recvr, type, **kargs):
 		if type == 'sign_up':
 			pass
 		elif type == 'partner_confirm':
@@ -21,8 +21,8 @@ class SendMail:
 			pass
 		elif type == 'partner_deactivated':
 			self.partner_deactivated(recvr)
-		elif subject and body:
-			pass
+		elif 'subject' in kargs and 'body' in kargs:
+			mail.send_mail(self.sender, recvr, kargs['subject'], kargs['body'])
 		else:
 			raise ValueError('SendMail.route_message: invalid value for \'type\' ( ' + type + ')')
 
