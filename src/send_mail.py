@@ -30,29 +30,30 @@ class SendMail:
 	def partner_deactivated(self, recvr):
 		p1,p2,n1,n2 = SendMail.parse_partnership(recvr)
 
-		self.partner_message_one_student(p1, p2, n1, n2, recvr.assignment_number, 'dissolved')
-		self.partner_message_one_student(p2, p1, n2, n1, recvr.assignment_number, 'dissolved')
+		extra = 'You will need to find another partner.'
+		assign = recvr.assignment_number
+
+		self.partner_message_one_student(p1, p2, n1, n2, assign, 'cancelled', extra)
+		self.partner_message_one_student(p2, p1, n2, n1, assign, 'cancelled', extra)
 
 
 	def partner_confirm(self, recvr):
 		p1,p2,n1,n2 = SendMail.parse_partnership(recvr)
+		assign = recvr.assignment_number
 
-		self.partner_message_one_student(p1, p2, n1, n2, recvr.assignment_number, 'confirmed')
-		self.partner_message_one_student(p2, p1, n2, n1, recvr.assignment_number, 'confirmed')
+		self.partner_message_one_student(p1, p2, n1, n2, assign, 'confirmed')
+		self.partner_message_one_student(p2, p1, n2, n1, assign, 'confirmed')
 
 
-	def partner_message_one_student(self, p1, p2, n1, n2, assign, message):
+	def partner_message_one_student(self, p1, p2, n1, n2, assign, message, extra=''):
 		if not p1:
 			return
 
-		name = p1.preferred_name if p1.preferred_name else p1.first_name
+		subject = 'ICS 31 Lab Asst. ' + str(assign) + ' Partnership ' + message.capitalize()
 
-		subject =  'Partner App: Partnership with ' + n2
-		subject += ' for Assign. ' + str(assign) + ' Has Been ' + message.capitalize()
-
-		body =  'Hello ' + name + ',\n\n\rThis is a message sent to inform you (' + n1 + ') '
-		body += 'that your partnership with ' + n2 + ' for assignment ' + str(assign) 
-		body += ' has been ' + message + '.\n\n\rIf this is a mistake, please contact your TA.'
+		body =  n1 + ':\n\n\rYour partnership with ' + n2 + ' for ICS 31 lab asst '
+		body += str(assign) + ' has been ' + str(message) + '. ' + extra
+		body += '\n\n\rIf this is a mistake, please contact your TA right away.'
 
 		print(body)
 
@@ -76,7 +77,7 @@ class SendMail:
 	@staticmethod
 	def extract_name(student):
 		if student:
-			return str(student.ucinetid) + ' - ' + str(student.last_name) + ', ' + (student.first_name)
+			return (str(student.first_name) + ' ' + str(student.last_name) + ' (' + student.ucinetid + ')').strip()
 
 		return 'No Partner (authorized solo)'
 		
