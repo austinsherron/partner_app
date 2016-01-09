@@ -6,13 +6,13 @@ from google.appengine.api import mail
 class SendMail:
 
 	def __init__(self, recvr=None, type=None, **kargs):
-		self.sender = 'sherronb@uci.edu'
+		self.sender = 'sherronb+PartnerApp@uci.edu'
 
-		if recvr and type:
+		if recvr:
 			self.route_message(recvr, type, **kargs)
 
 
-	def route_message(self, recvr, type, subject=None, body=None, **kargs):
+	def route_message(self, recvr, type, **kargs):
 		if type == 'sign_up':
 			pass
 		elif type == 'partner_confirm':
@@ -21,8 +21,8 @@ class SendMail:
 			pass
 		elif type == 'partner_deactivated':
 			self.partner_deactivated(recvr)
-		elif subject and body:
-			pass
+		elif 'subject' in kargs and 'body' in kargs:
+			mail.send_mail(self.sender, recvr, kargs['subject'], kargs['body'])
 		else:
 			raise ValueError('SendMail.route_message: invalid value for \'type\' ( ' + type + ')')
 
@@ -30,31 +30,32 @@ class SendMail:
 	def partner_deactivated(self, recvr):
 		p1,p2,n1,n2 = SendMail.parse_partnership(recvr)
 
-		self.partner_message_one_student(p1, p2, n1, n2, recvr.assignment_number, 'dissolved')
-		self.partner_message_one_student(p2, p1, n2, n1, recvr.assignment_number, 'dissolved')
+		extra = 'You will need to find another partner.'
+		assign = recvr.assignment_number
+
+		self.partner_message_one_student(p1, p2, n1, n2, assign, 'cancelled', extra)
+		self.partner_message_one_student(p2, p1, n2, n1, assign, 'cancelled', extra)
 
 
 	def partner_confirm(self, recvr):
 		p1,p2,n1,n2 = SendMail.parse_partnership(recvr)
+		assign = recvr.assignment_number
 
-		self.partner_message_one_student(p1, p2, n1, n2, recvr.assignment_number, 'confirmed')
-		self.partner_message_one_student(p2, p1, n2, n1, recvr.assignment_number, 'confirmed')
+		self.partner_message_one_student(p1, p2, n1, n2, assign, 'confirmed')
+		self.partner_message_one_student(p2, p1, n2, n1, assign, 'confirmed')
 
 
-	def partner_message_one_student(self, p1, p2, n1, n2, assign, message):
+	def partner_message_one_student(self, p1, p2, n1, n2, assign, message, extra=''):
 		if not p1:
 			return
 
-		name = p1.preferred_name if p1.preferred_name else p1.first_name
+		subject = 'ICS 31 Lab Asst. ' + str(assign) + ' Partnership ' + message.capitalize()
 
-		subject =  'Partner App: Partnership with ' + n2
-		subject += ' for Assign. ' + str(assign) + ' Has Been ' + message.capitalize()
-
-		body =  'Hello ' + name + ',\n\n\rThis is a message sent to inform you (' + n1 + ') '
-		body += 'that your partnership with ' + n2 + ' for assignment ' + str(assign) 
-		body += ' has been ' + message + '.\n\n\rIf this is a mistake, please contact your TA.'
-
-		print(body)
+		body  = 'This is an automated message from the partner app.\n\n\r'
+		body += n1 + ':\n\n\rYour partnership with ' + n2 + ' for ICS 31 lab asst '
+		body += str(assign) + ' has been ' + str(message) + '. ' + extra
+		body += '\n\n\rIf this is a mistake, please contact your TA right away.'
+		body += '\n\rNOTE: Please DO NOT reply to this message.'
 
 		mail.send_mail(self.sender, p1.email, subject, body)
 
@@ -76,7 +77,7 @@ class SendMail:
 	@staticmethod
 	def extract_name(student):
 		if student:
-			return str(student.ucinetid) + ' - ' + str(student.last_name) + ', ' + (student.first_name)
+			return (str(student.first_name) + ' ' + str(student.last_name) + ' (' + student.ucinetid + ')').strip()
 
 		return 'No Partner (authorized solo)'
 		
