@@ -6,7 +6,7 @@ from google.appengine.api import mail
 class SendMail:
 
 	def __init__(self, recvr=None, type=None, **kargs):
-		self.sender = 'sherronb@uci.edu'
+		self.sender = 'sherronb+PartnerApp@uci.edu'
 
 		if recvr:
 			self.route_message(recvr, type, **kargs)
@@ -51,11 +51,11 @@ class SendMail:
 
 		subject = 'ICS 31 Lab Asst. ' + str(assign) + ' Partnership ' + message.capitalize()
 
-		body =  n1 + ':\n\n\rYour partnership with ' + n2 + ' for ICS 31 lab asst '
+		body  = 'This is an automated message from the partner app.\n\n\r'
+		body += n1 + ':\n\n\rYour partnership with ' + n2 + ' for ICS 31 lab asst '
 		body += str(assign) + ' has been ' + str(message) + '. ' + extra
 		body += '\n\n\rIf this is a mistake, please contact your TA right away.'
-
-		print(body)
+		body += '\n\rNOTE: Please DO NOT reply to this message.'
 
 		mail.send_mail(self.sender, p1.email, subject, body)
 
