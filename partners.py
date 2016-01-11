@@ -517,7 +517,10 @@ class SelectPartner(CustomHandler):
 		# use form data to find student that was selected (selected) 
 		selected = self.student_by_id(quarter, year, self.request.get('selected_partner'))
 		# use from data to get assignment for which student is choosing partner
-		selected_assign = int(self.request.get('selected_assign'))
+		try:
+			selected_assign = int(self.request.get('selected_assign'))
+		except ValueError:
+			return self.redirect('/partner/selection?error=You must choose an assignment number')
 		# check if selector and selected have been partners
 		previous_partners = self.partners_previously(selector, selected)
 		# check if selector has and selected have open inviations for current assignment
