@@ -85,7 +85,7 @@
 <br>
 
 <div class="row fullwidth">
-	<span class="label">Eval History</span>
+	<span class="label">Evals Student Has Submitted</span>
 	<div class="small-12 columns">
 		<div class="row panel">
 			<div class="small-12 columns">
@@ -104,6 +104,52 @@
 						<tr>
 							<td class="text-center num-cell">{{ e.assignment_number }}</td>
 							{% set et = e.evaluatee.get() %}
+							<td class="text-center">{{ et.ucinetid }} - {{ et.last_name }}, {{ et.first_name }}</td>
+							{% for r in e.responses %}
+								{% if r[1] == ' ' %}
+									<td class="text-center num-cell">{{ r[:1] }}</td>
+								{% elif r[2] == ' ' %}
+									<td class="text-center num-cell">{{ r[:2] }}</td>
+								{% else %}
+									<td class="text-center">{{ r }}</td>
+								{% endif %}
+							{% endfor %}
+							
+							{% if e.active %}
+								<td class="text-center"><span class="label success">True</span></td>
+							{% else %}
+								<td class="text-center"><span class="label alert">False</span></td>
+							{% endif %}
+						</tr>
+					{% endfor %}
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<br>
+
+<div class="row fullwidth">
+	<span class="label">Evals Submitted About Student</span>
+	<div class="small-12 columns">
+		<div class="row panel">
+			<div class="small-12 columns">
+				<table>
+					<tr>
+						<th class="text-center num-cell">Num</th>
+						<th class="text-center">Evaluator</th>
+						{% if evals_for|length > 0 %}
+							{% for r in evals_for[0].responses %}
+								<th class="text-center">{{ loop.index }}</th>
+							{% endfor %}
+						{% endif %}
+						<th class="text-center">Active?</th>
+					</tr>
+					{% for e in evals_for %}
+						<tr>
+							<td class="text-center num-cell">{{ e.assignment_number }}</td>
+							{% set et = e.evaluator.get() %}
 							<td class="text-center">{{ et.ucinetid }} - {{ et.last_name }}, {{ et.first_name }}</td>
 							{% for r in e.responses %}
 								{% if r[1] == ' ' %}

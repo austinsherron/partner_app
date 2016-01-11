@@ -459,6 +459,15 @@ class CustomHandler(BaseHandler):
 		)
 
 
+	def get_eval_for_history(self, student, active, quarter, year):
+		return Evaluation.query(
+			Evaluation.evaluatee == student.key,
+			Evaluation.active == active,
+			Evaluation.quarter == quarter,
+			Evaluation.year == year
+		)
+
+
 	def student_eval_for_assign(self, student, assign_num, active=True):
 		return Evaluation.query(
 			Evaluation.evaluator == student,

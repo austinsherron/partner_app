@@ -810,6 +810,9 @@ class ViewStudent(CustomHandler):
 		evals = self.get_eval_history(student, True, quarter, year).fetch()
 		evals += self.get_eval_history(student, False, quarter, year).fetch()
 		evals = sorted(evals, key=lambda x: x.assignment_number)
+		evals_for = self.get_eval_for_history(student, True, quarter, year).fetch()
+		evals_for += self.get_eval_for_history(student, False, quarter, year).fetch()
+		evals_for = sorted(evals_for, key=lambda x: x.assignment_number)
 
 		template = JINJA_ENV.get_template('/templates/admin_student_view.html')
 		template_values = {
@@ -818,6 +821,7 @@ class ViewStudent(CustomHandler):
 			'all_partners': all_partner_history,
 			'assign_range': assign_range,
 			'evals': evals,
+			'evals_for': evals_for,
 			'user': users.get_current_user(),
 			'sign_out': users.create_logout_url('/'),
 		}
