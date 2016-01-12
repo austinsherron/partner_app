@@ -18,7 +18,8 @@
 			{% if ucinetid != selector.ucinetid %}
 				{% set status,student = info %}
 
-				<form action="/partner/selection?selected_partner={{ student.studentid }}" enctype="multipart/form-data" method="POST">
+				<form action="/partner/selection?selected_partner={{ student.studentid }}&selected_assign={{ current.number }}" 
+					enctype="multipart/form-data" method="POST">
 
 					{% if status %}
 						<div class="row" style="display: none;"> 
