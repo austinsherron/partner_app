@@ -49,10 +49,10 @@ class SendMail:
 		if not p1:
 			return
 
-		subject = 'ICS 31 Lab Asst. ' + str(assign) + ' Partnership ' + message.capitalize()
+		subject = 'ICS 10 Lab Asst. ' + str(assign) + ' Partnership ' + message.capitalize()
 
 		body  = 'This is an automated message from the partner app.\n\n\r'
-		body += n1 + ':\n\n\rYour partnership with ' + n2 + ' for ICS 31 lab asst '
+		body += n1 + ':\n\n\rYour partnership with ' + n2 + ' for ICS 10 lab asst '
 		body += str(assign) + ' has been ' + str(message) + '. ' + extra
 		body += '\n\n\rIf this is a mistake, please contact your TA right away.'
 		body += '\n\rNOTE: Please DO NOT reply to this message.'
