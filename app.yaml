@@ -1,4 +1,4 @@
-application: ics-10-partner-app
+application: ics31-partner-app
 version: 1
 runtime: python27
 api_version: 1
