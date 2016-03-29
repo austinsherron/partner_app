@@ -346,7 +346,7 @@ class EvaluatePartner(CustomHandler):
 		evaluation.active = True
 		evaluation.responses.append(self.request.get('q1'))
 		evaluation.responses.append(self.request.get('q2'))
-		evaluation.responses.append(self.request.get('q3'))
+		#evaluation.responses.append(self.request.get('q3'))
 		evaluation.responses.append(self.request.get('q4'))
 		evaluation.responses.append(self.request.get('q5'))
 		evaluation.responses.append(self.request.get('q6'))
