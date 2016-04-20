@@ -172,7 +172,7 @@ class ConfirmPartner(CustomHandler):
 
             partnership.active = False
             partnership.put()
-            SendMail(partnership, 'partner_deactivated')
+            #SendMail(partnership, 'partner_deactivated')
 
         # decativate active evals
         for eval in active_evals:
@@ -199,7 +199,7 @@ class ConfirmPartner(CustomHandler):
 
         # ...and save it
         partnership.put()
-        SendMail(partnership, 'partner_confirm')
+        #SendMail(partnership, 'partner_confirm')
 
         if not admin:
             message = 'Partnership with ' + str(being_confirmed.last_name) + ', ' 
