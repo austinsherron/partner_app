@@ -150,7 +150,6 @@ class ConfirmPartner(CustomHandler):
         if confirming:
             invitations = self.all_invites_for_student(confirming, for_assign)
             invitations += self.all_invites_for_student(being_confirmed, for_assign)
-            invitations += self.all_invites_for_pair(confirming, being_confirmed)
             open_partnerships = self.students_partners_for_assign(confirming, quarter, year, for_assign).fetch()
             open_partnerships += self.students_partners_for_assign(being_confirmed, quarter, year, for_assign).fetch()
         else:
@@ -190,7 +189,6 @@ class ConfirmPartner(CustomHandler):
                 invitation.accepted = True
 
             invitation.put()
-
 
         # create new partnership...
         partnership = Partnership(initiator = being_confirmed.key, acceptor = confirming.key if confirming else None,
