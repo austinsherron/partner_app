@@ -394,7 +394,7 @@ class MainPage(CustomHandler):
     def get(self):
 
         # delcare page template
-        template = JINJA_ENV.get_template('/templates/partners2.html')
+        template = JINJA_ENV.get_template('/templates/partners_main.html')
         # get current user
         user = users.get_current_user()
         student = None
