@@ -16,10 +16,10 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 from webapp2_extras.appengine.users import admin_required
 
-from helpers.admin_helpers import keys_to_partners, make_date, student_info_to_partner_list
-from helpers.helpers import get_sess_val, get_sess_vals
 from handler import CustomHandler
-from models import Assignment, Student, Instructor, Invitation, Partnership, Evaluation, Setting
+from models import Assignment, Student, Setting
+from src.helpers.admin_helpers import keys_to_partners, make_date, student_info_to_partner_list
+from src.helpers.helpers import get_sess_val, get_sess_vals
 
 
 ################################################################################
@@ -33,7 +33,7 @@ from models import Assignment, Student, Instructor, Invitation, Partnership, Eva
 
 
 JINJA_ENV = jinja2.Environment(
-    loader = jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    loader = jinja2.FileSystemLoader(os.path.dirname('app.yaml')),
     extensions = ['jinja2.ext.autoescape'],
     autoescape=True)
 

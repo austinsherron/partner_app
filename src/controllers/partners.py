@@ -14,13 +14,10 @@ from google.appengine.ext import ndb
 from json import dumps
 from webapp2_extras.appengine.users import login_required
 
-from admin import AddAssignment, AddStudent, ClearDB, MainAdmin, ManageAssignments, UploadRoster, ViewRoster, DeactivateStudents
-from admin import AddPartnership, EditAssignment, EditStudent, ViewEvals, ViewPartnerships, UpdateSettings, ViewStudent
 from handler import CustomHandler
-from helpers.helpers import query_to_dict, split_last
-from models import Assignment, Student, Instructor, Invitation, Partnership, Evaluation, Setting
+from models import Student, Invitation, Partnership, Evaluation, Setting
+from src.helpers.helpers import query_to_dict, split_last
 from src.send_mail import SendMail 
-from src.assignment import AssignmentModel
 
 
 ################################################################################
@@ -34,7 +31,7 @@ from src.assignment import AssignmentModel
 
 
 JINJA_ENV = jinja2.Environment(
-    loader = jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    loader = jinja2.FileSystemLoader(os.path.dirname('app.yaml')),
     extensions = ['jinja2.ext.autoescape'],
     autoescape=True)
 
@@ -641,51 +638,6 @@ class ViewHistory(CustomHandler):
             'sign_out': users.create_logout_url('/'),
         }
         return self.response.write(template.render(template_values))
-
-
-################################################################################
-################################################################################
-################################################################################
-
-
-################################################################################
-## CONFIGURE AND START APP #####################################################
-################################################################################
-
-
-config = {}
-config['webapp2_extras.sessions'] = {
-    'secret_key': 'some-secret-key',
-}
-
-application = webapp2.WSGIApplication([
-    ('/', Main),
-    ('/partner', MainPage),
-    ('/partner/edit/profile', EditProfile),
-    ('/partner/evaluation', EvaluatePartner),
-    ('/partner/selection', SelectPartner),
-    ('/partner/browse', BrowseForPartners),
-    ('/partner/confirm', ConfirmPartner),
-    ('/partner/history', ViewHistory),
-    ('/partner/history/invitations', ViewInvitationHistory),
-    ('/partner/instructions', HelpPage),
-    ('/images/(.*)', ImageHandler),
-    ('/admin', MainAdmin),
-    ('/admin/assignment/add', AddAssignment),
-    ('/admin/assignment/edit', EditAssignment),
-    ('/admin/assignment/view', ManageAssignments),
-    ('/admin/cleardb', ClearDB),
-    ('/admin/evaluations/view', ViewEvals),
-    ('/admin/partners/add', AddPartnership),
-    ('/admin/partners/view', ViewPartnerships),
-    ('/admin/roster/upload', UploadRoster),
-    ('/admin/roster/view', ViewRoster),
-    ('/admin/student/add', AddStudent),
-    ('/admin/students/deactivate', DeactivateStudents),
-    ('/admin/student/edit', EditStudent),
-    ('/admin/student/view', ViewStudent),
-    ('/admin/settings/update', UpdateSettings),
-], config=config, debug=True)
 
 
 ################################################################################

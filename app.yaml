@@ -6,18 +6,18 @@ threadsafe: true
 
 handlers:
 - url: /foundation
-  static_dir: foundation
+  static_dir: static/foundation
 
 - url: /.*
-  script: partners.application
+  script: main.application
 
 - url: /partner.*
   login: required
-  script: partners.application
+  script: main.application
 
 - url: /admin.*
   login: admin
-  script: partners.application
+  script: main.application
 
 libraries:
 - name: webapp2
