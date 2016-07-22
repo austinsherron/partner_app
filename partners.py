@@ -20,6 +20,7 @@ from handler import CustomHandler
 from helpers.helpers import query_to_dict, split_last
 from models import Assignment, Student, Instructor, Invitation, Partnership, Evaluation, Setting
 from src.send_mail import SendMail 
+from src.assignment import AssignmentModel
 
 
 ################################################################################
@@ -177,8 +178,6 @@ class ConfirmPartner(CustomHandler):
         for eval in active_evals:
             eval.active = False
             eval.put()
-
-        dropped = self.dropped_partners(open_partnerships, confirming, being_confirmed)
 
         # set invitations between invitor and invitee (for current assignment) to inactive
         for invitation in invitations:
