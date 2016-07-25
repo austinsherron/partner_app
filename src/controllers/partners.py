@@ -561,26 +561,28 @@ class ViewInvitationHistory(CustomHandler):
     @login_required
     def get(self):
         template = JINJA_ENV.get_template('/templates/partner_invitation_history.html')
+        quarter  = SettingModel.quarter()
+        year     = SettingModel.year()
         # grab current user 
         user = users.get_current_user()
         # use user info to find student in DB 
-        student = self.get_student(Setting.query().get().quarter, Setting.query().get().year, user.email())
+        student = StudentModel.get_student_by_email(quarter, year, user.email())
     
         # redirect to main page if student doesn't exist
         if not student:
             return self.redirect('/partner')
 
         # grab all invites (including inactive ones)
-        invites = self.invitation_history(student).order(Invitation.assignment_number).fetch()
-        current_assignment = self.current_assign(Setting.query().get().quarter, Setting.query().get().year)
+        invites = InvitationModel.get_all_invitations_involving_student(student).order(Invitation.assignment_number).fetch()
+        current_assignment = AssignmentModel.get_active_assign_with_latest_fade_in_date(quarter, year)
 
         # if there are no assignments for this quarter, render early to avoid errors
         if not current_assignment:
             return self.response.write(template.render({'user': user, 'sign_out': users.create_logout_url('/')}))
 
-        partners = self.partner_history(student, Setting.query().get().quarter, Setting.query().get().year)
+        partners = PartnershipModel.get_active_partner_history_for_student(student, quarter, year)
         # grab current partner for reporting 
-        current_partner = self.current_partner(student, partners, current_assignment.number)
+        current_partner = PartnershipModel.get_partner_from_partner_history_by_assign(student, partners, current_assignment.number)
 
         invite_info = {}
         # dict for custom ordering of invite info fields
@@ -619,15 +621,17 @@ class ViewHistory(CustomHandler):
         user = users.get_current_user()
 
         try:
-            quarter = self.quarter()
-            year = self.year()
-            student = self.get_student(quarter, year, user.email())
-            assign_range = self.assign_range(quarter, year)
-            partner_history = self.partner_history(student, quarter, year, fill_gaps=assign_range)
-            all_partner_history = self.all_partner_history(student, quarter, year)
-            evals = self.get_eval_history(student, True, quarter, year).fetch()
-            evals += self.get_eval_history(student, False, quarter, year).fetch()
-            evals = sorted(evals, key=lambda x: x.assignment_number)
+            quarter = SettingModel.quarter()
+            year    = SettingModel.year()
+            student = StudentModel.get_student_by_email(quarter, year, user.email())
+
+            assign_range        = AssignmentModel.get_assign_range(quarter, year)
+            partner_history     = PartnershipModel.get_active_partner_history_for_student(student, quarter, year, fill_gaps=assign_range)
+            all_partner_history = PartnershipModel.get_all_partner_history_for_student(student, quarter, year)
+
+            evals  = EvalModel.get_eval_history_by_evaluator(student, True, quarter, year).fetch()
+            evals += EvalModel.get_eval_history_by_evaluator(student, False, quarter, year).fetch()
+            evals  = sorted(evals, key=lambda x: x.assignment_number)
 
         except AttributeError:
             self.redirect('/partner')
@@ -635,13 +639,13 @@ class ViewHistory(CustomHandler):
 
         template = JINJA_ENV.get_template('/templates/partner_student_view.html')
         template_values = {
-            'student': student,
-            'partners': partner_history,
+            'student':      student,
+            'partners':     partner_history,
             'all_partners': all_partner_history,
             'assign_range': assign_range,
-            'evals': evals,
-            'user': users.get_current_user(),
-            'sign_out': users.create_logout_url('/'),
+            'evals':        evals,
+            'user':         users.get_current_user(),
+            'sign_out':     users.create_logout_url('/'),
         }
         return self.response.write(template.render(template_values))
 
