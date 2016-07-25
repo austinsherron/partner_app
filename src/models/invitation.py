@@ -51,8 +51,8 @@ class InvitationModel:
     @staticmethod
     def get_all_invites_by_student_and_assign(student, assign_num, active=True, combine=True):
         if combine:
-            invites  = InvitationModel.get_recvd_invites_by_student_and_assign(student, assign_num, active)
-            invites += InvitationModel.get_sent_invites_by_student_and_assign(student, assign_num, active)
+            invites  = InvitationModel.get_recvd_invites_by_student_and_assign(student, assign_num, active).fetch()
+            invites += InvitationModel.get_sent_invites_by_student_and_assign(student, assign_num, active).fetch()
             return invites
         else:
             recvd = InvitationModel.get_recvd_invites_by_student_and_assign(student, assign_num, active)

@@ -2,6 +2,7 @@ import webapp2
 
 from src.controllers import admin
 from src.controllers import partners
+from src.controllers import view_history
 
 
 config = {}
@@ -17,8 +18,8 @@ application = webapp2.WSGIApplication([
     ('/partner/selection', partners.SelectPartner),
     ('/partner/browse', partners.BrowseForPartners),
     ('/partner/confirm', partners.ConfirmPartner),
-    ('/partner/history', partners.ViewHistory),
-    ('/partner/history/invitations', partners.ViewInvitationHistory),
+    ('/partner/history', view_history.ViewHistory),
+    ('/partner/history/invitations', view_history.ViewInvitationHistory),
     ('/partner/instructions', partners.HelpPage),
     ('/images/(.*)', partners.ImageHandler),
     ('/admin', admin.MainAdmin),
