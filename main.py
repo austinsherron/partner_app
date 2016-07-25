@@ -1,7 +1,12 @@
 import webapp2
 
 from src.controllers import admin
+from src.controllers import evaluations
 from src.controllers import partners
+from src.controllers import browse_partners
+from src.controllers import landing
+from src.controllers import misc
+from src.controllers import profile
 from src.controllers import view_history
 
 
@@ -11,17 +16,17 @@ config['webapp2_extras.sessions'] = {
 }
 
 application = webapp2.WSGIApplication([
-    ('/', partners.Main),
-    ('/partner', partners.MainPage),
-    ('/partner/edit/profile', partners.EditProfile),
-    ('/partner/evaluation', partners.EvaluatePartner),
+    ('/', landing.Main),
+    ('/partner', landing.MainPage),
+    ('/partner/edit/profile', profile.EditProfile),
+    ('/partner/evaluation', evaluations.EvaluatePartner),
     ('/partner/selection', partners.SelectPartner),
-    ('/partner/browse', partners.BrowseForPartners),
+    ('/partner/browse', browse_partners.BrowseForPartners),
     ('/partner/confirm', partners.ConfirmPartner),
     ('/partner/history', view_history.ViewHistory),
     ('/partner/history/invitations', view_history.ViewInvitationHistory),
-    ('/partner/instructions', partners.HelpPage),
-    ('/images/(.*)', partners.ImageHandler),
+    ('/partner/instructions', misc.HelpPage),
+    ('/images/(.*)', misc.ImageHandler),
     ('/admin', admin.MainAdmin),
     ('/admin/assignment/add', admin.AddAssignment),
     ('/admin/assignment/edit', admin.EditAssignment),
