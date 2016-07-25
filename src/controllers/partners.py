@@ -218,59 +218,52 @@ class EditProfile(CustomHandler):
     @login_required
     def get(self):
         template = JINJA_ENV.get_template('/templates/partner_update_profile.html')
-        # get current user...
-        user = users.get_current_user()
-        # ...and try to find him/her in the DB
-        student = self.get_student(Setting.query().get().quarter, Setting.query().get().year, user.email())
+
+        quarter = SettingModel.quarter()
+        year    = SettingModel.year()
+        user    = users.get_current_user()
+        student = StudentModel.get_student_by_email(quarter, year, user.email())
 
         if not student:
             # redirect to main page if the student doesn't exist in the DB
             return self.redirect('/partner')
 
-        programming_ability = ['0: Never, or just a few times', '1: Occaisionally, but not regularly']
+        programming_ability  = ['0: Never, or just a few times', '1: Occaisionally, but not regularly']
         programming_ability += ['2: Regularly, but without much comfort or expertise']
         programming_ability += ['3: Regularly, with comfortable proficiency', '4: Frequently and with some expertise']
 
         template_values = {
-            'user': user,
-            'sign_out': users.create_logout_url('/'),
-            'student': student,
+            'user':                user,
+            'sign_out':            users.create_logout_url('/'),
+            'student':             student,
             'programming_ability': programming_ability,
-            'key': student.key.urlsafe(),
+            'key':                 student.key.urlsafe(),
         }
         return self.response.write(template.render(template_values))
 
 
     def post(self):
-        # get current user...
-        user = users.get_current_user()
-        # ...and try to find him/her in the DB
-        student = self.get_student(Setting.query().get().quarter, Setting.query().get().year, user.email())
+        quarter = SettingModel.quarter()
+        year    = SettingModel.year()
+        user    = users.get_current_user()
+        student = StudentModel.get_student_by_email(quarter, year, user.email())
 
-        # grab form value of preferred name (will be the same if student didn't enter anything)
-        student.preferred_name = self.request.get('preferred_name').strip()
-        # grab form value of bio...
-        bio = self.request.get('bio').strip()
-        # ...and save it if the student entered anything
-        student.bio = bio if bio != '' else student.bio
-        # grab form value of availability...
-        availability = self.request.get('availability').strip()
-        # ...and save it if the student entered anything
-        student.availability = availability if availability != '' else student.availability
-        # grab form value of programming ability...
-        programming_ability = self.request.get('programming_ability')
-        # ...and save it
+        student.preferred_name      = self.request.get('preferred_name').strip()
+        bio                         = self.request.get('bio').strip()
+        student.bio                 = bio if bio != '' else student.bio         
+        availability                = self.request.get('availability').strip()
+        student.availability        = availability if availability != '' else student.availability 
+        programming_ability         = self.request.get('programming_ability')
         student.programming_ability = programming_ability
-        # grab form value of avatar pic...
-        avatar = str(self.request.get('avatar'))
-        # ...and resize/save it if it exists
+
+        # grab image and resize if necessary
+        avatar         = str(self.request.get('avatar'))
         student.avatar = images.resize(avatar, 320, 320) if avatar != '' else student.avatar
-        # get phone number from for...
-        phone_number = self.request.get('phone_number')
-        # ...and save it if it isn't the default (000-000-0000)
+
+        phone_number         = self.request.get('phone_number')
         student.phone_number = phone_number if phone_number != '000-000-0000' else student.phone_number
-        # save updated student object
         student.put()
+
         # redirect to main page
         return self.redirect('/partner/edit/profile')
 
@@ -278,30 +271,30 @@ class EditProfile(CustomHandler):
 class EvaluatePartner(CustomHandler):
     @login_required
     def get(self):
-        quarter = Setting.query().get().quarter
-        year = Setting.query().get().year
+        quarter = SettingModel.quarter()
+        year    = SettingModel.year()
 
         # get user
         user = users.get_current_user()
         # get student from user info
-        evaluator = self.get_student(quarter, year, user.email())
+        evaluator = StudentModel.get_student_by_email(quarter, year, user.email())
         # get student's partner history
-        partners = self.partner_history(evaluator, quarter, year)
+        partners = PartnershipModel.get_active_partner_history_for_student(evaluator, quarter, year)
         # grab the active eval assignments
-        eval_assigns = self.active_eval_assigns(quarter, year)
+        eval_assigns = AssignmentModel.get_active_eval_assigns(quarter, year)
         # grab partners for eval assignments
-        partners = [(eval_assign.number,self.current_partner(evaluator, partners, eval_assign.number)) for eval_assign in eval_assigns]
+        partners = [(eval_assign.number,PartnershipModel.get_partner_from_partner_history_by_assign(evaluator, partners, eval_assign.number)) for eval_assign in eval_assigns]
         # filter out No Partner partnerships
         partners = list(filter(lambda x: x[1] != "No Partner" and x[1] != None, partners))
         eval_closed = len(eval_assigns) == 0
     
-        rate20scale = ["0 -- Never, completely inadequate", "1", "2", "3", "4"]
+        rate20scale  = ["0 -- Never, completely inadequate", "1", "2", "3", "4"]
         rate20scale += ["5 -- Seldom, poor quality", "6", "7", "8", "9"]
         rate20scale += ["10 -- About half the time, average", "11", "12", "13", "14"]
         rate20scale += ["15 -- Most of the time, good quality", "16", "17", "18", "19"]
         rate20scale += ["20 -- Always, excellent"]
 
-        rate5scale = ['1 - My partner was much more capable than I was']
+        rate5scale  = ['1 - My partner was much more capable than I was']
         rate5scale += ['2 - My partner was a little more capable than I was']
         rate5scale += ['3 - We were about evenly matched, on average']
         rate5scale += ['4 - I was a little more capable than my partner']
@@ -321,43 +314,31 @@ class EvaluatePartner(CustomHandler):
 
 
     def post(self):
-        quarter = Setting.query().get().quarter
-        year = Setting.query().get().year
+        quarter = SettingModel.quarter()
+        year    = SettingModel.year()
+        user    = users.get_current_user()
 
-        user = users.get_current_user()
-        evaluator = self.get_student(quarter, year, user.email())
-        partners = self.partner_history(evaluator, quarter, year)
-        print(self.request.get('evaluatee'))
-        eval_key,num = split_last(self.request.get('evaluatee'))
-        eval_assign = int(num)
+        evaluator       = StudentModel.get_student_by_email(quarter, year, user.email())
+        partners        = PartnershipModel.get_active_partner_history_for_student(evaluator, quarter, year)
+        eval_key,num    = split_last(self.request.get('evaluatee'))
+        eval_assign     = int(num)
         current_partner = ndb.Key(urlsafe=eval_key).get()
 
-        evaluations = self.existing_eval(evaluator, current_partner, eval_assign)
-
+        evaluations = EvalModel.get_existing_eval_by_assign(evaluator, current_partner, eval_assign)
         for eval in evaluations:
             eval.active = False
             eval.put()
 
-        evaluation = Evaluation(evaluator = evaluator.key, evaluatee = current_partner.key)
-
+        evaluation                   = Evaluation(evaluator = evaluator.key, evaluatee = current_partner.key)
         evaluation.assignment_number = eval_assign
-        evaluation.year = evaluator.year
-        evaluation.quarter = evaluator.quarter
-        evaluation.active = True
-        evaluation.responses.append(self.request.get('q1'))
-        evaluation.responses.append(self.request.get('q2'))
-        evaluation.responses.append(self.request.get('q3'))
-        evaluation.responses.append(self.request.get('q4'))
-        evaluation.responses.append(self.request.get('q5'))
-        evaluation.responses.append(self.request.get('q6'))
-        evaluation.responses.append(self.request.get('q7'))
-        evaluation.responses.append(self.request.get('q8'))
-        evaluation.responses.append(self.request.get('q9'))
-        evaluation.responses.append(self.request.get('q10'))
-
+        evaluation.year              = evaluator.year
+        evaluation.quarter           = evaluator.quarter
+        evaluation.active            = True
+        for i in range(1, 11):
+            evaluation.responses.append(self.request.get('q' + str(i)))
         evaluation.put()
 
-        message = 'Evaluation for ' + str(current_partner.last_name) + ', '
+        message  = 'Evaluation for ' + str(current_partner.last_name) + ', '
         message += str(current_partner.first_name) + ' successfully submitted'
 
         self.redirect('/partner?message=' + message)
@@ -406,6 +387,11 @@ class MainPage(CustomHandler):
             year    = SettingModel.year()
             # use user info to find student int DB
             student = StudentModel.get_student_by_email(quarter, year, user.email())
+
+            self.session['quarter'] = quarter
+            self.session['year']    = year
+            self.session['student'] = student.key.urlsafe()
+
             # get active assignments
             active_assigns = sorted(AssignmentModel.get_active_assigns(quarter, year), key=lambda x: x.number)
             # get active eval assigns
@@ -634,8 +620,7 @@ class ViewHistory(CustomHandler):
             evals  = sorted(evals, key=lambda x: x.assignment_number)
 
         except AttributeError:
-            self.redirect('/partner')
-            return
+            return self.redirect('/partner')
 
         template = JINJA_ENV.get_template('/templates/partner_student_view.html')
         template_values = {
