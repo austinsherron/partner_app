@@ -1,3 +1,4 @@
+from google.appengine.ext import ndb
 from models import Partnership
 
 

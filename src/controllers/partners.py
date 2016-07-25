@@ -17,6 +17,12 @@ from webapp2_extras.appengine.users import login_required
 from handler import CustomHandler
 from models import Student, Invitation, Partnership, Evaluation, Setting
 from src.helpers.helpers import query_to_dict, split_last
+from src.models.assignment import AssignmentModel
+from src.models.eval import EvalModel
+from src.models.invitation import InvitationModel
+from src.models.partnership import PartnershipModel
+from src.models.settings import SettingModel
+from src.models.student import StudentModel
 from src.send_mail import SendMail 
 
 
@@ -396,29 +402,29 @@ class MainPage(CustomHandler):
         student = None
 
         try:
-            quarter = Setting.query().get().quarter
-            year = Setting.query().get().year
+            quarter = SettingModel.quarter()
+            year    = SettingModel.year()
             # use user info to find student int DB
-            student = self.get_student(quarter, year, user.email())
+            student = StudentModel.get_student_by_email(quarter, year, user.email())
             # get active assignments
-            active_assigns = sorted(self.active_assigns(quarter, year), key=lambda x: x.number)
+            active_assigns = sorted(AssignmentModel.get_active_assigns(quarter, year), key=lambda x: x.number)
             # get active eval assigns
-            eval_assigns = sorted(self.active_eval_assigns(quarter, year), key=lambda x: x.number)
+            eval_assigns = sorted(AssignmentModel.get_active_eval_assigns(quarter, year), key=lambda x: x.number)
             # find any active invitations for the current assignment that student has sent
-            sent_invitations = self.sent_invites_mult_assign(student, [x.number for x in active_assigns])
+            sent_invitations = InvitationModel.get_sent_invites_by_student_and_mult_assigns(student, [x.number for x in active_assigns])
             # find any active invitations for the current assignment that the student has received
-            received_invitations = self.received_invites_mult_assign(student, [x.number for x in active_assigns])
+            received_invitations = InvitationModel.get_recvd_invites_by_student_and_mult_assigns(student, [x.number for x in active_assigns])
             # find any partnerships in which the student has been involved
-            partners = self.partner_history(student, quarter, year)
+            partners = PartnershipModel.get_active_partner_history_for_student(student, quarter, year)
             partners = dict([(x.number,self.current_partner(student, partners, x.number)) for x in active_assigns])
             # find evals the student has submitted
-            evals = self.get_eval_history(student, True, quarter, year)
+            evals = EvalModel.get_eval_history_by_evaluator(student, True, quarter, year)
             evals = dict([(x.assignment_number,x) for x in evals])
             # get activity message, if any
             message = self.request.get('message')
             dropped = []
             for x in active_assigns:
-                dropped += self.inactive_partners(student, x.number).fetch()
+                dropped += PartnershipModel.get_inactive_partnerships_by_student_and_assign(student, x.number).fetch()
             dropped = sorted(dropped, key=lambda x: x.assignment_number)
 
         except (AttributeError, IndexError):
@@ -469,20 +475,20 @@ class Main(webapp2.RequestHandler):
 class SelectPartner(CustomHandler):
     @login_required
     def get(self):
-        quarter = Setting.query().get().quarter
-        year = Setting.query().get().year
+        quarter = SettingModel.quarter()
+        year    = SettingModel.year()
 
         # get current user info
         user = users.get_current_user()
         # use user info to find student in DB (the selector)
-        selector = self.get_student(quarter, year, user.email())
+        selector = StudentModel.get_student_by_email(quarter, year, user.email())
         # if cross section partnership aren't allowed, use selector info to find students in same lab section
-        if not self.cross_section_partners():
-            selectees = self.students_by_lab(quarter, year, selector.lab)
+        if not SettingModel.cross_section_partners():
+            selectees = StudentModel.get_students_by_lab(quarter, year, selector.lab)
         else:
-            selectees = self.get_active_students(quarter, year)                
+            selectees = StudentModel.get_students_by_active_status(quarter, year)                
         # get active assignments
-        active_assigns = self.active_assigns(quarter, year)
+        active_assigns = AssignmentModel.get_active_assigns(quarter, year)
         # get error message, if any
         e = self.request.get('error')        
         # check to see if partner selection period has closed
@@ -501,36 +507,36 @@ class SelectPartner(CustomHandler):
 
 
     def post(self):
-        quarter = Setting.query().get().quarter
-        year = Setting.query().get().year
+        quarter = SettingModel.quarter()
+        year    = SettingModel.year()
 
         # get current user info
         user = users.get_current_user()
         # use user info to find student in DB (the selector)
-        selector = self.get_student(quarter, year, user.email())
+        selector = StudentModel.get_student_by_email(quarter, year, user.email())
         # use form data to find student that was selected (selected) 
-        selected = self.student_by_id(quarter, year, self.request.get('selected_partner'))
+        selected = StudentModel.get_student_by_student_id(quarter, year, self.request.get('selected_partner'))
         # use from data to get assignment for which student is choosing partner
         try:
             selected_assign = int(self.request.get('selected_assign'))
         except ValueError:
             return self.redirect('/partner/selection?error=You must choose an assignment number')
         # check if selector and selected have been partners
-        previous_partners = self.partners_previously(selector, selected)
+        previous_partners = PartnershipModel.get_partnerships_for_pair(selector, selected)
         # check if selector has and selected have open inviations for current assignment
-        current_invitations = self.open_invitations(selector, selected, selected_assign).fetch()
+        current_invitations = InvitationModel.get_open_invitations_for_pair_for_assign(selector, selected, selected_assign).fetch()
 
         # redirect with error...
         # ...if selected and selector have worked together previously
-        if previous_partners and not self.repeat_partners():
+        if previous_partners and not SettingModel.repeat_partners():
             e = 'Sorry, you\'ve already worked with, or are currently working with '
             e += str(selected.last_name) + ', ' + str(selected.first_name)
             e += '. If you think you have a legitimate reason to repeat a partnership'
             e += ', please contact your TA'
             return self.redirect('/partner/selection?error=' + e)
         # ... or if selected and selector have open invitations for the current assignment
-        if len(self.partners_for_assign(selector, selected, selected_assign)) > 0:
-            e = 'Sorry, are currently working with '
+        if len(PartnershipModel.get_partnerships_for_pair_by_assign(selector, selected, selected_assign)) > 0:
+            e = 'Sorry, you are currently working with '
             e += str(selected.last_name) + ', ' + str(selected.first_name)
             return self.redirect('/partner/selection?error=' + e)
         if current_invitations:

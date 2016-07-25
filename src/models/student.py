@@ -33,7 +33,7 @@ class StudentModel:
 
 
     @staticmethod
-    def get_students_by_lab_number(quarter, year, lab, active=True):
+    def get_students_by_lab(quarter, year, lab, active=True):
         return Student.query(
             Student.quarter == quarter,
             Student.year == year, 
