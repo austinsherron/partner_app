@@ -20,6 +20,7 @@ from handler import CustomHandler
 from models import Assignment, Student, Setting
 from src.helpers.admin_helpers import keys_to_partners, make_date, student_info_to_partner_list
 from src.helpers.helpers import get_sess_val, get_sess_vals
+from src.models.assignment import AssignmentModel
 
 
 ################################################################################
@@ -200,56 +201,6 @@ class AddPartnership(CustomHandler):
         return self.response.write(template.render(template_values))                # ...and render the response
 
 
-class AddStudent(CustomHandler):
-
-    #@admin_required
-    def get(self):
-        # pass map of quarter DB representations (ints) to string representation
-        # TODO:
-        #    quarters should not be hardcoded 
-        quarters = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
-
-        temp = get_sess_vals(self.session, 'quarter', 'year')                    # try grabbing quarter/year from session
-        if not temp:                                                            # redirect with error if it doesn't exist
-            return self.redirect('/admin?message=Please set a current quarter and year')
-        quarter,year = temp
-
-        template_values = {                                                        # build map of template values...
-            'message': self.request.get('message'),                                # grab message if it exists
-            'user': users.get_current_user(),
-            'sign_out': users.create_logout_url('/'),
-            'quarter': quarter,
-            'quarters': sorted(quarters.items()),
-            'year': year,
-        }
-        template = JINJA_ENV.get_template('/templates/admin_add_student.html')
-        return self.response.write(template.render(template_values))            # ...and render the request
-
-
-    def post(self):
-        try:                                                                    # try to create student from form values
-            student = Student()
-            student.studentid = int(self.request.get('studentid').strip())
-            student.first_name = self.request.get('first_name').strip().title()    
-            student.last_name = self.request.get('last_name').strip().title()
-            student.ucinetid = self.request.get('ucinetid').strip().lower()
-            student.email = self.request.get('email').strip().lower()
-            student.lab = int(self.request.get('lab').strip())
-            student.quarter = int(self.request.get('quarter').strip())
-            student.year = int(self.request.get('year').strip())
-            student.active = True
-
-        except Exception, e:                                                    # on error, redirect with message
-            return self.redirect('/admin?message=' + 'There was a problem adding that student: ' + str(e))            
-        
-        student.put()                                                            # save student
-
-        message = 'Student ' + student.ucinetid + ' has been added'                # create success message
-
-        return self.redirect('/admin/student/add?message=' + message)            # render response
-
-
-
 class ClearDB(CustomHandler):
 
     #@admin_required
@@ -329,85 +280,6 @@ class EditAssignment(CustomHandler):
         return self.response.write(template.render(template_values))    # ...and render the response
 
 
-class EditStudent(CustomHandler):
-
-    #@admin_required
-    def get(self):
-        # pass map of quarter DB representations (ints) to string representation
-        # TODO:
-        #    quarters should not be hardcoded 
-        quarter_map = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
-        quarter = self.request.get('quarter')                                # try grabbing quarter/year from URL
-        year = self.request.get('year')
-
-        if not quarter or not year:                                            # if they don't exist, try grabbing from session
-            temp = get_sess_vals(self.session, 'quarter', 'year')
-            if not temp:                                                    # if they don't exist there, redirect with error
-                return self.redirect('/admin?message=Please set a current quarter and year')
-            quarter,year = temp                                                    
-
-        quarter,year = int(quarter), int(year)
-        studentid = int(self.request.get('studentid'))                        # grab studentid from URL (guaranteed to be there, unless URL was tinkered with)
-
-        student = self.student_by_id(quarter, year, studentid)                # grab student by ID (quarter, year, and student ID == PK)
-        # if the student wasn't found, he/she might be inactive
-        student = student if student else self.student_by_id(quarter, year, studentid, active=False)
-
-        template_values = {                                                    # build map of template values...
-            'user': users.get_current_user(),
-            'sign_out': users.create_logout_url('/'),
-            'student': student,
-            'quarter': quarter,
-            'year': year,
-        }
-        template = JINJA_ENV.get_template('/templates/admin_student_edit.html')
-        return self.response.write(template.render(template_values))        # ...and render the response
-
-
-    def post(self):
-        # pass map of quarter DB representations (ints) to string representation
-        # TODO:
-        #    quarters should not be hardcoded 
-        quarter_map = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
-        quarter = self.request.get('quarter')                                # try grabbing quarter/year from URL
-        year = self.request.get('year')
-
-        if not quarter or not year:                                            # if they don't exist, try grabbing from session
-            temp = get_sess_vals(self.session, 'quarter', 'year')
-            if not temp:                                                    # if they don't exist there, redirect with error
-                return self.redirect('/admin?message=Please set a current quarter and year')
-            quarter,year = temp                                                    
-
-        quarter,year = int(quarter), int(year)
-        studentid = int(self.request.get('studentid'))                        # grab studentid from URL (guaranteed to be there, unless URL was tinkered with)
-
-        student = self.student_by_id(quarter, year, studentid)                # grab student by ID (quarter, year, and student ID == PK)
-        # if the student wasn't found, he/she might be inactive
-        student = student if student else self.student_by_id(quarter, year, studentid, active=False)
-        message = ''
-
-        if student:
-            if self.request.get('to_delete') == 'yes':
-                message += 'Student ' + student.first_name + ', ' + student.last_name
-                message += ' (' + str(student.studentid) + ') successfully deleted'
-                student.key.delete()
-            else:
-                student.ucinetid = self.request.get('ucinetid').strip()
-                student.first_name = self.request.get('first_name').strip()
-                student.last_name = self.request.get('last_name').strip()
-                student.email = self.request.get('email').strip()
-                student.lab = int(self.request.get('lab').strip())
-                student.active = eval(self.request.get('active'))
-
-                student.put()
-
-                message += 'Student ' + student.first_name + ', ' + student.last_name
-                message += ' (' + str(student.studentid) + ') successfully updated'
-
-        self.redirect('/admin/roster/view?message=' + message) 
-
-
-
 class ManageAssignments(CustomHandler):
 
     #@admin_required
@@ -436,52 +308,6 @@ class ManageAssignments(CustomHandler):
             'user': users.get_current_user(),
             'sign_out': users.create_logout_url('/'),
         }
-        return self.response.write(template.render(template_values))        # ...and render the response
-
-
-class MainAdmin(CustomHandler):
-
-    #@admin_required
-    def get(self):
-        user = users.get_current_user()                                        # grab current user
-        message = self.request.get('message')                                # grab message from URL, if it exists
-
-        quarter,year = self.quarter(),self.year()
-
-        if (not quarter or not year) and not message:
-            message = 'Please set a current year and quarter'
-
-        template_values = {                                                    # build template value map...
-            'message': message,
-            'user': user,
-            'sign_out': users.create_logout_url('/'),
-            'quarter': self.session.get('quarter'),
-            'year': self.session.get('year'),
-        }
-
-        self.session['quarter'] = quarter                                     # load current quarter/year into session
-        self.session['year'] = year
-
-        if quarter and year:
-            # grab number of active/inactive students
-            template_values['active_students'] = len(self.get_active_students(quarter, year).fetch())
-            template_values['inactive_students'] = len(self.get_active_students(quarter, year, active=False).fetch())
-            cur_assign = self.current_assign(quarter, year)                    # grab current assignment
-
-            if cur_assign:
-                template_values['cur_assign'] = cur_assign
-                # grab number of active partnerships for the current assignment
-                template_values['assign_partners'] = len(self.all_partners_for_assign(quarter, year, cur_assign.number))
-
-                # grab current eval assignment
-                eval_assign = self.current_eval_assign(quarter, year)            
-
-                if eval_assign:
-                    template_values['eval_assign'] = eval_assign
-                    # grab number of evals for the current eval assignment
-                    template_values['assign_eval'] = len(self.evals_for_assign(quarter, year, cur_assign.number).fetch())
-
-        template = JINJA_ENV.get_template('/templates/admin.html')
         return self.response.write(template.render(template_values))        # ...and render the response
 
 
@@ -791,49 +617,3 @@ class ViewRoster(CustomHandler):
         return self.response.write(template.render(template_values))        # ...and render the response
 
 
-class ViewStudent(CustomHandler):
-
-    def get(self):
-        # pass map of quarter DB representations (ints) to string representation
-        # TODO:
-        #    quarters should not be hardcoded 
-        quarter_map = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
-        quarter = self.request.get('quarter')                        # try grabbing quarter/year from URL
-        year = self.request.get('year')
-
-        if not quarter or not year:                                # if they don't exist, try grabbing from session
-            temp = get_sess_vals(self.session, 'quarter', 'year')
-            if not temp:                                # if they don't exist there, redirect with error
-                return self.redirect('/admin?message=Please set a current quarter and year')
-            quarter,year = temp                                                    
-
-        quarter,year = int(quarter), int(year)
-        student = ndb.Key(urlsafe=self.request.get('student')).get()
-        assign_range = self.assign_range(quarter, year)
-        partner_history = self.partner_history(student, quarter, year, fill_gaps=assign_range)
-        all_partner_history = self.all_partner_history(student, quarter, year)
-        evals = self.get_eval_history(student, True, quarter, year).fetch()
-        evals += self.get_eval_history(student, False, quarter, year).fetch()
-        evals = sorted(evals, key=lambda x: x.assignment_number)
-        evals_for = self.get_eval_for_history(student, True, quarter, year).fetch()
-        evals_for += self.get_eval_for_history(student, False, quarter, year).fetch()
-        evals_for = sorted(evals_for, key=lambda x: x.assignment_number)
-
-        template = JINJA_ENV.get_template('/templates/admin_student_view.html')
-        template_values = {
-            'student': student,
-            'partners': partner_history,
-            'all_partners': all_partner_history,
-            'assign_range': assign_range,
-            'evals': evals,
-            'evals_for': evals_for,
-            'user': users.get_current_user(),
-            'sign_out': users.create_logout_url('/'),
-        }
-        return self.response.write(template.render(template_values))
-        
-        
-
-################################################################################
-################################################################################
-################################################################################
