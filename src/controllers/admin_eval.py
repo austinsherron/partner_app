@@ -8,6 +8,7 @@ from handler import CustomHandler
 from src.helpers.helpers import get_sess_val, get_sess_vals
 from src.models.assignment import AssignmentModel
 from src.models.eval import EvalModel
+from src.models.partnership import PartnershipModel
 
 
 JINJA_ENV = jinja2.Environment(
@@ -44,8 +45,8 @@ class ViewEvals(CustomHandler):
         last_num      = last_num.number if last_num else assign_num                   # (to avoid errors if there are no assignments in the DB)
         first_assign  = AssignmentModel.get_assign_n(quarter, year, 0)                            
         first_num     = 0 if not first_assign else first_assign.number                   
-        evals         = EvalModel.get_all_evals_for_assign(quarter, year, assign_num) # grab evals for assignment...
-        solo_partners = self.solo_partners(quarter, year, assign_num)                 # ...and grab endorsed solos (they're exempt from evals)
+        evals         = EvalModel.get_all_evals_for_assign(quarter, year, assign_num)                # grab evals for assignment...
+        solo_partners = PartnershipModel.get_solo_partnerships_by_assign(quarter, year, assign_num)  # ...and grab endorsed solos (they're exempt from evals)
 
         template_values = {                                                         
             'user':         users.get_current_user(),
