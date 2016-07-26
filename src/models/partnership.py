@@ -124,7 +124,7 @@ class PartnershipModel:
 
 
     @staticmethod
-    def get_solo_partnerships_by_assign(self, quarter, year, assign_num, active=True):
+    def get_solo_partnerships_by_assign(quarter, year, assign_num, active=True):
         return Partnership.query(
             Partnership.quarter == quarter,
             Partnership.year == year,
@@ -135,7 +135,7 @@ class PartnershipModel:
 
 
     @staticmethod
-    def get_all_partnerships(self, quarter, year, active=True):
+    def get_all_partnerships(quarter, year, active=True):
         return Partnership.query(
             Partnership.quarter == quarter,
             Partnership.year == year,
@@ -144,7 +144,7 @@ class PartnershipModel:
 
 
     @staticmethod
-    def get_all_partnerships_by_lab(self, quarter, year, lab, active=True):
+    def get_all_partnerships_by_lab(quarter, year, lab, active=True):
         return Partnership.query(
             Partnership.quarter == quarter,
             Partnership.year == year,

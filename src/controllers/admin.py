@@ -49,48 +49,6 @@ JINJA_ENV = jinja2.Environment(
 ################################################################################
 
 
-class AddPartnership(CustomHandler):
-
-    def get(self):
-        # pass map of quarter DB representations (ints) to string representation
-        # TODO:
-        #    quarters should not be hardcoded 
-        quarter_map = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
-        quarter = self.request.get('quarter')                                        # try grabbing quarter/year from URL
-        year = self.request.get('year')
-
-        if not quarter or not year:                                                    # if they don't exist, try grabbing from session
-            temp = get_sess_vals(self.session, 'quarter', 'year')
-            if not temp:                                                            # if they don't exist there, redirect with error
-                return self.redirect('/admin?message=Please set a current quarter and year')
-            quarter,year = temp                                                    
-
-        quarter,year = int(quarter), int(year)
-        view = self.request.get('view')                                                # check URL for 'view by' options (lab vs class)
-        view = view if view else 'class'
-
-        if view == 'class':                                                            # if user wants to veiw by class, or the view by option wasn't specified...
-            students = self.get_active_students(quarter, year).fetch()                # ...grab all active students
-        else:
-            students = self.students_by_lab(quarter, year, int(view)).fetch()        # ...otherwise, grab students for the lab specified
-
-        current_assign = self.current_assign(quarter, year)                            # grab current assignment...
-        current_num = 1 if not current_assign else current_assign.number            # ...and get its number, if it exists
-
-        template = JINJA_ENV.get_template('/templates/admin_add_partnership.html')
-        template_values = {                                                            # build map of template values...
-            'students': sorted(students, key=lambda x: x.last_name),
-            'view': str(view),
-            'quarter': quarter,
-            'year': year,
-            'user': users.get_current_user(),
-            'sign_out': users.create_logout_url('/'),
-            'current_num': current_num,
-            'num_labs': self.num_labs() if self.num_labs() else 1,
-        }
-        return self.response.write(template.render(template_values))                # ...and render the response
-
-
 class ClearDB(CustomHandler):
 
     #@admin_required
@@ -336,63 +294,6 @@ class ViewEvals(CustomHandler):
         }
         template = JINJA_ENV.get_template('/templates/admin_evals_view.html')
         return self.response.write(template.render(template_values))            # ...and render the response
-
-
-class ViewPartnerships(CustomHandler):
-
-    #@admin_required
-    def get(self):
-        # pass map of quarter DB representations (ints) to string representation
-        # TODO:
-        #    quarters should not be hardcoded 
-        #    rethink logic
-        quarter_map = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
-        quarter = self.request.get('quarter')                                        # try grabbing quarter/year from URL
-        year = self.request.get('year')
-
-        if not quarter or not year:                                                    # if they don't exist, try grabbing from session
-            temp = get_sess_vals(self.session, 'quarter', 'year')
-            if not temp:                                                            # if they don't exist there, redirect with error
-                return self.redirect('/admin?message=Please set a current quarter and year')
-            quarter,year = temp                                                    
-
-        quarter,year = int(quarter), int(year)
-        view_by = self.request.get('view_by')                                        # check URL for 'view by' options (lab vs class)
-        view_by = view_by if view_by else 1
-
-        if view_by == 'class':                                                        # if user wants to veiw by class, or the view by option wasn't specified...
-            students = self.get_active_students(quarter, year).fetch()                # ...grab all active students
-        else:
-            students = self.students_by_lab(quarter, year, int(view_by)).fetch()    # ...otherwise, grab students for the lab specified
-
-        all_partners = self.all_partners(quarter, year).fetch()                        # grab all partnerships 
-        last_assign = self.get_assign_n(quarter, year, -1)                            # grab most recent assignment...
-        last_num = 1 if not last_assign else last_assign.number                        # ...and its number
-        first_assign = self.get_assign_n(quarter, year, 0)                            # grab first assignment...
-        first_num = 0 if not first_assign else first_assign.number                        # ...and its number
-
-        keys_to_students = dict(map(lambda x: (x.key,x), students))                    # map student objects to keys for easy, fast access from partnership objects
-        keys_to_partnerships = keys_to_partners(all_partners)                        # map student keys to partnerships for easy, fast access
-
-        # create mapping of student info to partnership info that the partnership template expects
-        partnership_dict = student_info_to_partner_list(last_num, first_num, keys_to_partnerships, keys_to_students, students)
-
-        partnership_dict = sorted(partnership_dict.items(), key=lambda x: (x[0][4], x[0][2]))
-        num_labs = self.num_labs()                                                    
-
-        template_values = {                                                            # build map of template values...
-            'partnerships': partnership_dict,
-            'view_by': str(view_by),
-            'year': year,
-            'quarter': quarter,
-            'num_labs': num_labs if num_labs else 0,
-            'last_num': last_num,
-            'first_num': first_num,
-            'user': users.get_current_user(),
-            'sign_out': users.create_logout_url('/'),
-        }
-        template = JINJA_ENV.get_template('/templates/admin_partnerships.html')
-        return self.response.write(template.render(template_values))                # ...and render the response
 
 
 class ViewRoster(CustomHandler):
