@@ -5,8 +5,8 @@ from google.appengine.api import users
 from webapp2_extras.appengine.users import login_required
 
 from datetime import date, datetime, timedelta
-from handler import CustomHandler
 from models import Invitation
+from src.handler.base_handler import BaseHandler
 from src.models.assignment import AssignmentModel
 from src.models.eval import EvalModel
 from src.models.partnership import PartnershipModel
@@ -21,7 +21,7 @@ JINJA_ENV = jinja2.Environment(
     autoescape=True)
 
 
-class ViewHistory(CustomHandler):
+class ViewHistory(BaseHandler):
     @login_required
     def get(self):
         user = users.get_current_user()
@@ -55,7 +55,7 @@ class ViewHistory(CustomHandler):
         return self.response.write(template.render(template_values))
 
 
-class ViewInvitationHistory(CustomHandler):
+class ViewInvitationHistory(BaseHandler):
 
     @login_required
     def get(self):

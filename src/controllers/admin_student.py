@@ -5,8 +5,8 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 from webapp2_extras.appengine.users import admin_required
 
-from handler import CustomHandler
 from models import Student
+from src.handler.base_handler import BaseHandler
 from src.helpers.helpers import get_sess_val, get_sess_vals
 from src.models.assignment import AssignmentModel
 from src.models.eval import EvalModel
@@ -20,7 +20,7 @@ JINJA_ENV = jinja2.Environment(
     autoescape=True)
 
 
-class AddStudent(CustomHandler):
+class AddStudent(BaseHandler):
 
     #@admin_required
     def get(self):
@@ -66,7 +66,7 @@ class AddStudent(CustomHandler):
         return self.redirect('/admin/student/add?message=' + message)            
 
 
-class DeactivateStudents(CustomHandler):
+class DeactivateStudents(BaseHandler):
 
     def post(self):
         quarter = int(self.request.get('quarter'))                                    
@@ -86,7 +86,7 @@ class DeactivateStudents(CustomHandler):
         return self.redirect('/admin/roster/view?message=' + message)                
 
 
-class EditStudent(CustomHandler):
+class EditStudent(BaseHandler):
 
     #@admin_required
     def get(self):
@@ -164,7 +164,7 @@ class EditStudent(CustomHandler):
         self.redirect('/admin/roster/view?message=' + message) 
 
 
-class ViewStudent(CustomHandler):
+class ViewStudent(BaseHandler):
 
     def get(self):
         # pass map of quarter DB representations (ints) to string representation

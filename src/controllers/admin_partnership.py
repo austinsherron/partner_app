@@ -5,7 +5,7 @@ import webapp2
 from google.appengine.api import users
 from webapp2_extras.appengine.users import admin_required
 
-from handler import CustomHandler
+from src.handler.base_handler import BaseHandler
 from src.helpers.admin_helpers import keys_to_partners, student_info_to_partner_list
 from src.helpers.helpers import get_sess_val, get_sess_vals
 from src.models.assignment import AssignmentModel
@@ -20,7 +20,7 @@ JINJA_ENV = jinja2.Environment(
     autoescape=True)
 
 
-class AddPartnership(CustomHandler):
+class AddPartnership(BaseHandler):
 
     def get(self):
         # pass map of quarter DB representations (ints) to string representation
@@ -62,7 +62,7 @@ class AddPartnership(CustomHandler):
         return self.response.write(template.render(template_values))                
 
 
-class ViewPartnerships(CustomHandler):
+class ViewPartnerships(BaseHandler):
 
     #@admin_required
     def get(self):

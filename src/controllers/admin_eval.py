@@ -4,7 +4,7 @@ import os
 from google.appengine.api import users
 from webapp2_extras.appengine.users import admin_required
 
-from handler import CustomHandler
+from src.handler.base_handler import BaseHandler
 from src.helpers.helpers import get_sess_val, get_sess_vals
 from src.models.assignment import AssignmentModel
 from src.models.eval import EvalModel
@@ -17,7 +17,7 @@ JINJA_ENV = jinja2.Environment(
     autoescape=True)
 
 
-class ViewEvals(CustomHandler):
+class ViewEvals(BaseHandler):
 
     def get(self):
         # pass map of quarter DB representations (ints) to string representation

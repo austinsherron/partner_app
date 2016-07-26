@@ -5,7 +5,7 @@ from datetime import date, datetime, timedelta
 from google.appengine.api import images, users
 from webapp2_extras.appengine.users import login_required
 
-from handler import CustomHandler
+from src.handler.base_handler import BaseHandler
 from src.models.assignment import AssignmentModel
 from src.models.partnership import PartnershipModel
 from src.models.settings import SettingModel
@@ -18,7 +18,7 @@ JINJA_ENV = jinja2.Environment(
     autoescape=True)
 
 
-class BrowseForPartners(CustomHandler):
+class BrowseForPartners(BaseHandler):
 
     @login_required
     def get(self):

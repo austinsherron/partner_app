@@ -5,8 +5,8 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 from webapp2_extras.appengine.users import login_required
 
-from handler import CustomHandler
 from models import Evaluation 
+from src.handler.base_handler import BaseHandler
 from src.helpers.helpers import split_last
 from src.models.assignment import AssignmentModel
 from src.models.eval import EvalModel
@@ -21,7 +21,7 @@ JINJA_ENV = jinja2.Environment(
     autoescape=True)
 
 
-class EvaluatePartner(CustomHandler):
+class EvaluatePartner(BaseHandler):
     @login_required
     def get(self):
         quarter = SettingModel.quarter()

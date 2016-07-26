@@ -5,8 +5,8 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 from webapp2_extras.appengine.users import login_required
 
-from handler import CustomHandler
 from models import Student, Invitation, Partnership, Evaluation, Setting
+from src.handler.base_handler import BaseHandler
 from src.models.assignment import AssignmentModel
 from src.models.eval import EvalModel
 from src.models.invitation import InvitationModel
@@ -22,7 +22,7 @@ JINJA_ENV = jinja2.Environment(
     autoescape=True)
 
 
-class ConfirmPartner(CustomHandler):
+class ConfirmPartner(BaseHandler):
     @login_required
     def get(self):
         quarter = SettingModel.quarter()
@@ -126,7 +126,7 @@ class ConfirmPartner(CustomHandler):
             return self.redirect('/admin/partners/add?message=' + message)
             
 
-class SelectPartner(CustomHandler):
+class SelectPartner(BaseHandler):
     @login_required
     def get(self):
         quarter = SettingModel.quarter()

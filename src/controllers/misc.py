@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 from google.appengine.api import users
 from webapp2_extras.appengine.users import login_required
 
-from handler import CustomHandler
+from src.handler.base_handler import BaseHandler
 
 
 JINJA_ENV = jinja2.Environment(
@@ -14,7 +14,7 @@ JINJA_ENV = jinja2.Environment(
     autoescape=True)
 
 
-class HelpPage(CustomHandler):
+class HelpPage(BaseHandler):
     def get(self):
         user = users.get_current_user()
         template_values = {}
@@ -29,7 +29,7 @@ class HelpPage(CustomHandler):
         self.response.write(template.render(template_values))
 
 
-class ImageHandler(CustomHandler):
+class ImageHandler(BaseHandler):
 
     def get(self, key):
         # cast key from url from str to ndb.Key

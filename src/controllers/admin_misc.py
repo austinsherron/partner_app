@@ -5,8 +5,8 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 from webapp2_extras.appengine.users import admin_required
 
-from handler import CustomHandler
 from models import Assignment, Student, Setting
+from src.handler.base_handler import BaseHandler
 from src.models.assignment import AssignmentModel
 from src.models.settings import SettingModel
 
@@ -17,7 +17,7 @@ JINJA_ENV = jinja2.Environment(
     autoescape=True)
 
 
-class ClearDB(CustomHandler):
+class ClearDB(BaseHandler):
 
     #@admin_required
     def get(self):
@@ -34,7 +34,7 @@ class ClearDB(CustomHandler):
         self.redirect('/admin')
 
 
-class UpdateSettings(CustomHandler):
+class UpdateSettings(BaseHandler):
 
     def get(self):
         # pass map of quarter DB representations (ints) to string representation

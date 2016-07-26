@@ -6,8 +6,8 @@ from datetime import timedelta as td
 from google.appengine.api import users
 from webapp2_extras.appengine.users import admin_required
 
-from handler import CustomHandler
 from models import Assignment
+from src.handler.base_handler import BaseHandler
 from src.helpers.admin_helpers import make_date
 from src.helpers.helpers import get_sess_val, get_sess_vals
 from src.models.assignment import AssignmentModel
@@ -19,7 +19,7 @@ JINJA_ENV = jinja2.Environment(
     autoescape=True)
 
 
-class AddAssignment(CustomHandler):
+class AddAssignment(BaseHandler):
 
     #@admin_required
     def get(self):
@@ -125,7 +125,7 @@ class AddAssignment(CustomHandler):
             return self.redirect(redirect_link + '?message=' + message)
 
 
-class EditAssignment(CustomHandler):
+class EditAssignment(BaseHandler):
 
     def get(self):
         quarter    = int(self.request.get('quarter'))                   # grab quarter, year, and assign num from URL
@@ -166,7 +166,7 @@ class EditAssignment(CustomHandler):
         return self.response.write(template.render(template_values))    
 
 
-class ManageAssignments(CustomHandler):
+class ManageAssignments(BaseHandler):
 
     #@admin_required
     def get(self):

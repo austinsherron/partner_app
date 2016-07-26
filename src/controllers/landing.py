@@ -5,7 +5,7 @@ import webapp2
 from google.appengine.api import users
 from webapp2_extras.appengine.users import login_required
 
-from handler import CustomHandler
+from src.handler.base_handler import BaseHandler
 from src.models.assignment import AssignmentModel
 from src.models.eval import EvalModel
 from src.models.invitation import InvitationModel
@@ -20,7 +20,7 @@ JINJA_ENV = jinja2.Environment(
     autoescape=True)
 
 
-class MainPage(CustomHandler):
+class MainPage(BaseHandler):
     @login_required
     def get(self):
 

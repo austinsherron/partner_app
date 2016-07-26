@@ -5,7 +5,7 @@ from google.appengine.api import images, users
 from google.appengine.ext import ndb
 from webapp2_extras.appengine.users import login_required
 
-from handler import CustomHandler
+from src.handler.base_handler import BaseHandler
 from src.models.settings import SettingModel
 from src.models.student import StudentModel
 
@@ -16,7 +16,7 @@ JINJA_ENV = jinja2.Environment(
     autoescape=True)
 
 
-class EditProfile(CustomHandler):
+class EditProfile(BaseHandler):
 
     @login_required
     def get(self):

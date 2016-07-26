@@ -5,8 +5,8 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 from webapp2_extras.appengine.users import admin_required
 
-from handler import CustomHandler
 from models import Student, Setting
+from src.handler.base_handler import BaseHandler
 from src.helpers.helpers import get_sess_val, get_sess_vals
 from src.models.assignment import AssignmentModel
 from src.models.student import StudentModel
@@ -18,7 +18,7 @@ JINJA_ENV = jinja2.Environment(
     autoescape=True)
 
 
-class UploadRoster(CustomHandler):
+class UploadRoster(BaseHandler):
 
     #@admin_required
     def get(self):
@@ -138,7 +138,7 @@ class UploadRoster(CustomHandler):
             return self.redirect('/admin?message=' + 'There was a problem uploading the roster: ' + str(e))            
 
 
-class ViewRoster(CustomHandler):
+class ViewRoster(BaseHandler):
 
     #@admin_required
     def get(self):

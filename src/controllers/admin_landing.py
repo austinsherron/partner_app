@@ -4,7 +4,7 @@ import os
 from google.appengine.api import users
 from webapp2_extras.appengine.users import admin_required
 
-from handler import CustomHandler
+from src.handler.base_handler import BaseHandler
 from src.models.assignment import AssignmentModel
 from src.models.eval import EvalModel
 from src.models.partnership import PartnershipModel
@@ -18,7 +18,7 @@ JINJA_ENV = jinja2.Environment(
     autoescape=True)
 
 
-class MainAdmin(CustomHandler):
+class MainAdmin(BaseHandler):
 
     #@admin_required
     def get(self):
