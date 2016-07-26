@@ -1,10 +1,12 @@
 import webapp2
 
 from src.controllers import admin_assignment
+from src.controllers import admin_eval
 from src.controllers import admin_landing
+from src.controllers import admin_misc
 from src.controllers import admin_partnership
+from src.controllers import admin_roster
 from src.controllers import admin_student
-from src.controllers import admin
 from src.controllers import evaluations
 from src.controllers import partners
 from src.controllers import browse_partners
@@ -35,15 +37,15 @@ application = webapp2.WSGIApplication([
     ('/admin/assignment/add', admin_assignment.AddAssignment),
     ('/admin/assignment/edit', admin_assignment.EditAssignment),
     ('/admin/assignment/view', admin_assignment.ManageAssignments),
-    ('/admin/cleardb', admin.ClearDB),
-    ('/admin/evaluations/view', admin.ViewEvals),
+    ('/admin/cleardb', admin_misc.ClearDB),
+    ('/admin/evaluations/view', admin_eval.ViewEvals),
     ('/admin/partners/add', admin_partnership.AddPartnership),
     ('/admin/partners/view', admin_partnership.ViewPartnerships),
-    ('/admin/roster/upload', admin.UploadRoster),
-    ('/admin/roster/view', admin.ViewRoster),
+    ('/admin/roster/upload', admin_roster.UploadRoster),
+    ('/admin/roster/view', admin_roster.ViewRoster),
     ('/admin/student/add', admin_student.AddStudent),
     ('/admin/students/deactivate', admin_student.DeactivateStudents),
     ('/admin/student/edit', admin_student.EditStudent),
     ('/admin/student/view', admin_student.ViewStudent),
-    ('/admin/settings/update', admin.UpdateSettings),
+    ('/admin/settings/update', admin_misc.UpdateSettings),
 ], config=config, debug=True)
