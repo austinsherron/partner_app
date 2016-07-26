@@ -66,6 +66,26 @@ class AddStudent(CustomHandler):
         return self.redirect('/admin/student/add?message=' + message)            
 
 
+class DeactivateStudents(CustomHandler):
+
+    def post(self):
+        quarter = int(self.request.get('quarter'))                                    
+        year    = int(self.request.get('year'))                                      
+
+        student_ids   = [int(sid) for sid in self.request.POST.getall('student')]     
+        students      = []                                                                   # init container for students to deactivate
+        to_deactivate = StudentModel.get_students_by_student_ids(quarter, year, student_ids) # query students to deactivate
+
+        for student in to_deactivate:                                               
+            student.active = False
+            students.append(student)
+
+        ndb.put_multi(students)                                                     # save student objects to DB
+        
+        message = 'Students successfully deactivated'                                
+        return self.redirect('/admin/roster/view?message=' + message)                
+
+
 class EditStudent(CustomHandler):
 
     #@admin_required

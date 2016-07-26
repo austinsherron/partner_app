@@ -66,26 +66,6 @@ class ClearDB(CustomHandler):
         self.redirect('/admin')
 
 
-class DeactivateStudents(CustomHandler):
-
-    def post(self):
-        quarter = int(self.request.get('quarter'))                                    # grab quarter from URL
-        year = int(self.request.get('year'))                                        # grab year from URL
-
-        student_ids = [int(sid) for sid in self.request.POST.getall('student')]        # get selected student IDs
-        students = []                                                                # init container for students to deactivate
-        to_deactivate = self.students_by_ids(quarter, year, student_ids)            # query students to deactivate
-
-        for student in to_deactivate:                                                # deactivate each student...
-            student.active = False
-            students.append(student)
-
-        ndb.put_multi(students)                                                        # ...and then save student objects to DB
-        
-        message = 'Students successfully deactivated'                                # create success message
-        return self.redirect('/admin/roster/view?message=' + message)                # render the response
-
-
 class UpdateSettings(CustomHandler):
 
     def get(self):
