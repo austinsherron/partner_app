@@ -1,5 +1,6 @@
 from datetime import datetime as dt, timedelta as td
 from models import Assignment
+from src.helpers.admin_helpers import make_date
 
 
 class AssignmentModel:
@@ -107,3 +108,28 @@ class AssignmentModel:
         return range(0,last.number + 1)
 
 
+    @staticmethod
+    def save_assignment_with_dates(**kwargs):
+        assignment = kwargs['assignment']
+
+        assignment.fade_in_date   = make_date(kwargs['fade_in_date'], kwargs['fade_in_time'])
+        assignment.due_date       = make_date(kwargs[ 'due_date' ], kwargs[ 'due_time' ])
+        assignment.close_date     = make_date(kwargs['close_date'], kwargs['close_time'])
+        assignment.eval_date      = make_date(kwargs['eval_date'], kwargs['eval_time'])
+        assignment.eval_open_date = make_date(kwargs['eval_open_date'], kwargs['eval_open_time'])
+        assignment.fade_out_date  = make_date(kwargs['fade_out_date'], kwargs['fade_out_time'])
+
+        # set 'current' value (always false due to query updates)
+        assignment.current = False
+        assignment.put()
+        return assignment
+
+
+    @staticmethod
+    def make_assignment_with_pk_vals(quarter, year, assign):
+        assignment         = Assignment()
+        assignment.year    = year
+        assignment.quarter = quarter
+        assignment.number  = assign
+
+        return assignment

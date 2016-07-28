@@ -8,9 +8,9 @@ from webapp2_extras.appengine.users import admin_required
 
 from models import Assignment
 from src.handler.base_handler import BaseHandler
-from src.helpers.admin_helpers import make_date
 from src.helpers.helpers import get_sess_val, get_sess_vals
 from src.models.assignment import AssignmentModel
+from src.models.message import MessageModel
 
 
 JINJA_ENV = jinja2.Environment(
@@ -72,10 +72,7 @@ class AddAssignment(BaseHandler):
         # if this request didn't come from the edit form...
         if not edit:
             # ...create new assignment and set PK values
-            assignment         = Assignment()
-            assignment.year    = int(self.request.get('year'))
-            assignment.quarter = int(self.request.get('quarter'))
-            assignment.number  = int(self.request.get('assign_num'))
+            assignment = AssignmentModel.make_assignment_with_pk_vals(quarter, year, number)
         else:
             # ...else get assignment
             assignment = AssignmentModel.get_assign_by_number(quarter, year, number)
@@ -86,42 +83,25 @@ class AddAssignment(BaseHandler):
             return self.redirect('/admin/assignment/add?message=' + message)
         else:
             # set dates/times
-            fade_in_date            = str(self.request.get('fade_in_date')).split('-')
-            fade_in_time            = str(self.request.get('fade_in_time')).split(':')
-            assignment.fade_in_date = make_date(fade_in_date, fade_in_time)
-
-            due_date            = str(self.request.get('due_date')).split('-')
-            due_time            = str(self.request.get('due_time')).split(':')
-            assignment.due_date = make_date(due_date, due_time)
-
-            close_date            = str(self.request.get('close_date')).split('-')
-            close_time            = str(self.request.get('close_time')).split(':')
-            assignment.close_date = make_date(close_date, close_time)
-
-            eval_date            = str(self.request.get('eval_date')).split('-')
-            eval_time            = str(self.request.get('eval_time')).split(':')
-            assignment.eval_date = make_date(eval_date, eval_time)
-
-            eval_open_date            = str(self.request.get('eval_open_date')).split('-')
-            eval_open_time            = str(self.request.get('eval_open_time')).split(':')
-            assignment.eval_open_date = make_date(eval_open_date, eval_open_time)
-
-            fade_out_date            = str(self.request.get('fade_out_date')).split('-')
-            fade_out_time            = str(self.request.get('fade_out_time')).split(':')
-            assignment.fade_out_date = make_date(fade_out_date, fade_out_time)
-
-            # set 'current' value (always false due to query updates)
-            assignment.current = False
-            assignment.put()
-    
-            message  = 'Assignment ' + str(assignment.number) + ' for quarter '
-            message += str(assignment.quarter) + ' ' + str(assignment.year) 
-            # changed success message depending on whether an assignment was just create/updated
-            message += ' successfully ' + ('updated' if edit else 'added')        
-
+            kwargs = {
+                'assignment'  :   assignment,
+                'fade_in_date':   str(self.request.get('fade_in_date')).split('-'),
+                'fade_in_time':   str(self.request.get('fade_in_time')).split(':'),
+                'due_date':       str(self.request.get('due_date')).split('-'),
+                'due_time':       str(self.request.get('due_time')).split(':'),
+                'close_date':     str(self.request.get('close_date')).split('-'),
+                'close_time':     str(self.request.get('close_time')).split(':'),
+                'eval_date':      str(self.request.get('eval_date')).split('-'),
+                'eval_time':      str(self.request.get('eval_time')).split(':'),
+                'eval_open_date': str(self.request.get('eval_open_date')).split('-'),
+                'eval_open_time': str(self.request.get('eval_open_time')).split(':'),
+                'fade_out_date':  str(self.request.get('fade_out_date')).split('-'),
+                'fade_out_time':  str(self.request.get('fade_out_time')).split(':'),
+            }
+            AssignmentModel.save_assignment_with_dates(**kwargs)
             # redirct according to action (add vs edit)
             redirect_link = '/admin/assignment/' + ('view' if edit else 'add') 
-
+            message       = MessageModel.assignment_edited_or_added(quarter, year, number, edit)
             return self.redirect(redirect_link + '?message=' + message)
 
 

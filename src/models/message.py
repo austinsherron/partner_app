@@ -67,3 +67,12 @@ class MessageModel:
         message  = 'You have requested to opt-in to this partnership.'
         message += ' This partnership can\'t be dissolved without your consent.'
         return message
+
+
+    @staticmethod
+    def assignment_edited_or_added(quarter, year, assign, edit):
+        message  = 'Assignment ' + str(assign) + ' for quarter '
+        message += str(quarter) + ' ' + str(year) 
+        # changed success message depending on whether an assignment was just create/updated
+        message += ' successfully ' + ('updated' if edit else 'added')        
+        return message
