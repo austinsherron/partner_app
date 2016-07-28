@@ -42,3 +42,11 @@ class SettingModel:
         if setting:
             return setting.cross_section_partners
 
+
+    @staticmethod
+    def group_max():
+        setting = Setting.query().get()
+
+        if setting:
+            return setting.group_max
+

@@ -103,3 +103,21 @@ class InvitationModel:
                 Invitation.invitor == confirming.key, 
                 Invitation.invitee == confirming.key),
             )
+
+
+    @staticmethod
+    def deactivate_invitations_for_students_and_assign(confirming, being_confirmed, assign):
+        invitations = []
+        if being_confirmed:
+            invitations += InvitationModel.get_all_invites_by_student_and_assign(being_confirmed, for_assign)
+        if confirming:
+            invitations += InvitationModel.get_all_invites_by_student_and_assign(confirming, for_assign)
+
+        for invitation in invitations:
+            invitation.active = False
+
+            if confirming and (invitation.invitor == being_confirmed.key and invitation.invitee == confirming.key):
+                invitation.accepted = True
+
+        ndb.put_multi(invitations)
+        return True

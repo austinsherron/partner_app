@@ -104,14 +104,14 @@ class Invitation(ndb.Model):
 
 
 class Partnership(ndb.Model):
-	initiator = ndb.KeyProperty(kind=Student)
-	acceptor = ndb.KeyProperty(kind=Student)
+        members = ndb.KeyProperty(repeated=True)
 	assignment_number = ndb.IntegerProperty()
 	active = ndb.GenericProperty()
 	quarter = ndb.IntegerProperty()
 	year = ndb.IntegerProperty()
 	notes = ndb.TextProperty(default='')
 	created = ndb.DateTimeProperty(auto_now_add=True)
+        to_cancel = ndb.KeyProperty(repeated=True)
 	
 
 ################################################################################
@@ -151,6 +151,7 @@ class Setting(ndb.Model):
 	num_labs = ndb.IntegerProperty()
 	repeat_partners = ndb.BooleanProperty(default=False)
 	cross_section_partners = ndb.BooleanProperty(default=False)
+        group_max = ndb.IntegerProperty()
 	
 
 ################################################################################

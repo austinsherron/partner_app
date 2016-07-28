@@ -10,6 +10,7 @@ from src.handler.base_handler import BaseHandler
 from src.models.assignment import AssignmentModel
 from src.models.eval import EvalModel
 from src.models.invitation import InvitationModel
+from src.models.settings import MessageModel
 from src.models.partnership import PartnershipModel
 from src.models.settings import SettingModel
 from src.models.student import StudentModel
@@ -68,61 +69,27 @@ class ConfirmPartner(BaseHandler):
             confirming      = ndb.Key(urlsafe=confirming_key).get() if confirming_key != 'None' else None
             admin           = True
 
-        # find all active partnership and invitation involving students
-        if confirming:
-            invitations        = InvitationModel.get_all_invites_by_student_and_assign(confirming, for_assign)
-            invitations       += InvitationModel.get_all_invites_by_student_and_assign(being_confirmed, for_assign)
-            open_partnerships  = PartnershipModel.get_partnerships_by_student_and_assign(confirming, quarter, year, for_assign).fetch()
-            open_partnerships += PartnershipModel.get_partnerships_by_student_and_assign(being_confirmed, quarter, year, for_assign).fetch()
+        partnership = None
+        if not confirming and PartnershipModel.student_has_partner_for_assign(being_confirmed, for_assign):
+            message = MessageModel.already_has_partner(admin)
+        elif not confirming:
+            message     = MessageModel.confirm_solo_partnership(being_confirmed)
+            partnership = PartnershipModel.create_partnership([being_confirmed], for_assign)
+        elif PartnershipModel.student_has_partner_for_assign(being_confirmed, for_assign):
+            message = MessageModel.already_has_partner(admin)
+        elif PartnershipModel.student_has_partner_for_assign(confirming, for_assign):
+            message = MessageModel.already_has_partner(admin)
         else:
-            invitations       = InvitationModel.get_all_invites_by_student_and_assign(being_confirmed, for_assign)
-            open_partnerships = PartnershipModel.get_partnerships_by_student_and_assign(being_confirmed, quarter, year, for_assign).fetch()
-
-        # deactivate partnerships, keep track of active evals so they can be deactivated
-        active_evals = []
-        for partnership in open_partnerships:
-
-            if partnership.initiator:
-                active_evals += EvalModel.get_eval_by_evaluator_and_assign(partnership.initiator, for_assign)
-            if partnership.acceptor:
-                active_evals += EvalModel.get_eval_by_evaluator_and_assign(partnership.acceptor, for_assign)
-
-            partnership.active = False
-            partnership.put()
-            SendMail(partnership, 'partner_deactivated')
-
-        # decativate active evals
-        for eval in active_evals:
-            eval.active = False
-            eval.put()
+            message     = MessageModel.confirm_partnership([being_confirmed, confirming], admin, being_confirmed)
+            partnership = PartnershipModel.create_partnership([being_confirmed, confirming], for_assign)
 
         # set invitations between invitor and invitee (for current assignment) to inactive
-        for invitation in invitations:
-            invitation.active = False
-
-            # set the accepted invitation to accepted == True
-            if confirming and (invitation.invitor == being_confirmed.key and invitation.invitee == confirming.key):
-                invitation.accepted = True
-
-            invitation.put()
-
-        # create new partnership...
-        partnership = Partnership(initiator = being_confirmed.key, acceptor = confirming.key if confirming else None,
-            assignment_number = for_assign, active = True,
-            year = being_confirmed.year, quarter = being_confirmed.quarter)
-
-        # ...and save it
-        partnership.put()
-        SendMail(partnership, 'partner_confirm')
+        InvitationModel.deactivate_invitations_for_students_and_assign(confirming, being_confirmed, for_assign)
+        # SendMail(partnership, 'partner_confirm')
 
         if not admin:
-            message = 'Partnership with ' + str(being_confirmed.last_name) + ', ' 
-            message += str(being_confirmed.first_name) + ' confirmed.'
-            message += ' Please refresh the page.'
             return self.redirect('/partner?message=' + message)
         else:
-            message = 'Partnership between ' + str(being_confirmed.ucinetid) + ' and ' 
-            message += (confirming.ucinetid if confirming else '"No Partner"') + ' successfully created.'
             return self.redirect('/admin/partners/add?message=' + message)
             
 
@@ -132,27 +99,24 @@ class SelectPartner(BaseHandler):
         quarter = SettingModel.quarter()
         year    = SettingModel.year()
 
-        # get current user info
-        user = users.get_current_user()
-        # use user info to find student in DB (the selector)
+        user     = users.get_current_user()
         selector = StudentModel.get_student_by_email(quarter, year, user.email())
         # if cross section partnership aren't allowed, use selector info to find students in same lab section
         if not SettingModel.cross_section_partners():
             selectees = StudentModel.get_students_by_lab(quarter, year, selector.lab)
         else:
             selectees = StudentModel.get_students_by_active_status(quarter, year)                
-        # get active assignments
+
         active_assigns = AssignmentModel.get_active_assigns(quarter, year)
         # get error message, if any
         e = self.request.get('error')        
         # check to see if partner selection period has closed
         selection_closed = len(active_assigns) == 0
 
-        # pass template values...
         template_values = {
             'error': e,
-            'selector': selector,                                  # ...student object
-            'selectees': selectees.order(Student.last_name),    # ...query of student objects
+            'selector': selector,                                  
+            'selectees': selectees.order(Student.last_name),    
             'selection_closed': selection_closed,
             'active': active_assigns,
         }
@@ -164,13 +128,9 @@ class SelectPartner(BaseHandler):
         quarter = SettingModel.quarter()
         year    = SettingModel.year()
 
-        # get current user info
-        user = users.get_current_user()
-        # use user info to find student in DB (the selector)
+        user     = users.get_current_user()
         selector = StudentModel.get_student_by_email(quarter, year, user.email())
-        # use form data to find student that was selected (selected) 
         selected = StudentModel.get_student_by_student_id(quarter, year, self.request.get('selected_partner'))
-        # use from data to get assignment for which student is choosing partner
         try:
             selected_assign = int(self.request.get('selected_assign'))
         except ValueError:
@@ -198,7 +158,6 @@ class SelectPartner(BaseHandler):
             e += str(selected.last_name) + ', ' + str(selected.first_name)
             return self.redirect('/partner/selection?error=' + e)
         else:
-            # create invitation object with selector as invitor...
             invitation = Invitation(invitor = selector.key, invitee = selected.key,
                 assignment_number = selected_assign, active = True)
             # ...and save it

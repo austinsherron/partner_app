@@ -6,16 +6,10 @@ from models import Partnership
 class PartnershipModel:
 
     @staticmethod
-    def get_active_partnerships_involving_pair_by_assign(confirming, being_confirmed, assign_num):
+    def get_active_partnerships_involving_students_by_assign(students, assign_num):
         # this method returns all partnerships that involve AT LEAST ONE student in the pair
         return Partnership.query(
-            ndb.OR(
-                    ndb.OR(
-                        Partnership.initiator == confirming.key, 
-                        Partnership.initiator == being_confirmed.key),
-                    ndb.OR(
-                        Partnership.acceptor == confirming.key,
-                        Partnership.acceptor == being_confirmed.key)),
+            Partnership.members.IN(students),
             Partnership.assignment_number == assign_num,
             Partnership.active == True
         )
@@ -151,3 +145,25 @@ class PartnershipModel:
             Partnership.year == year,
             Partnership.active == active,
         )
+
+
+    @staticmethod
+    def student_has_partner_for_assign(student, assign):
+        quarter  = student.quarter
+        year     = student.year
+        partners = PartnershipModel.get_partnerships_by_student_and_assign(student, quarter, year, assign).fetch()
+        return bool(partners)
+
+
+    @staticmethod
+    def create_partnership(students, assign):
+        partnership = Partnership(
+            members           = students,
+            assignment_number = for_assign, 
+            active            = True,
+            year              = students[0].year, 
+            quarter           = students[0].quarter
+        )
+
+        partnership.put()
+        return partnership
