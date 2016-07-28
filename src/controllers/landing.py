@@ -5,6 +5,7 @@ import webapp2
 from google.appengine.api import users
 from webapp2_extras.appengine.users import login_required
 
+from models import Student
 from src.handler.base_handler import BaseHandler
 from src.models.assignment import AssignmentModel
 from src.models.eval import EvalModel
@@ -70,17 +71,16 @@ class MainPage(BaseHandler):
             }
             return self.response.write(template.render(template_values))
 
-        # pass template values...
         template_values = {
             'user': user,
-            'student': student,                             # ...student object
+            'student': student,                             
             'active': active_assigns,
             'evals': eval_assigns,
             'submitted_evals': evals,
-            'sent_invitations': sorted(sent_invitations, key=lambda x: x.assignment_number),    # ...list of invitation objects
-            'received_invitations': sorted(received_invitations.items(), key=lambda x: x[0]),    # ...list of invitation objects
-            'partners': partners,                            # ...dict of partnership objects
-            'sign_out': users.create_logout_url('/'),        # sign out url
+            'sent_invitations': sorted(sent_invitations, key=lambda x: x.assignment_number),    
+            'received_invitations': sorted(received_invitations.items(), key=lambda x: x[0]),  
+            'partners': partners,                            
+            'sign_out': users.create_logout_url('/'),       
             'message': message,
             'profile': student.bio is None or student.availability is None or student.programming_ability is None,
             'dropped': dropped,

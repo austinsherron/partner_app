@@ -111,7 +111,8 @@ class Partnership(ndb.Model):
 	year = ndb.IntegerProperty()
 	notes = ndb.TextProperty(default='')
 	created = ndb.DateTimeProperty(auto_now_add=True)
-        to_cancel = ndb.KeyProperty(repeated=True)
+        cancelled = ndb.KeyProperty(repeated=True)
+        solo = ndb.ComputedProperty(lambda p: len(p.members) == 1)
 	
 
 ################################################################################

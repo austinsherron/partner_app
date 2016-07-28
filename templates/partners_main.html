@@ -197,15 +197,9 @@
 							{% for partner in dropped %}
 								<tr>
 									<td class="text-center num-cell">{{ partner.assignment_number }}</td>
-									{% if partner.initiator %}
-										<td class="text-center">{{ partner.initiator.get().ucinetid }}</td>
-									{% endif %}
-
-									{% if partner.acceptor %}
-										<td class="text-center">{{ partner.acceptor.get().ucinetid }}</td>
-									{% else %}
-										<td class="text-center">No Partner</td>
-									{% endif %}
+                                                                        {% for member in partner.members %}
+                                                                            <td class="text-center">{{ member.get().ucinetid }}</td>
+                                                                        {% endfor %}
 								</tr>
 							{% endfor %}
 						</table>

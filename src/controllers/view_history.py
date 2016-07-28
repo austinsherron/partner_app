@@ -31,6 +31,7 @@ class ViewHistory(BaseHandler):
             year    = SettingModel.year()
             student = StudentModel.get_student_by_email(quarter, year, user.email())
 
+            active_assigns      = map(lambda x: x.number, AssignmentModel.get_active_assigns(quarter, year))
             assign_range        = AssignmentModel.get_assign_range(quarter, year)
             partner_history     = PartnershipModel.get_active_partner_history_for_student(student, quarter, year, fill_gaps=assign_range)
             all_partner_history = PartnershipModel.get_all_partner_history_for_student(student, quarter, year)
@@ -48,6 +49,7 @@ class ViewHistory(BaseHandler):
             'partners':     partner_history,
             'all_partners': all_partner_history,
             'assign_range': assign_range,
+            'active':       active_assigns,
             'evals':        evals,
             'user':         users.get_current_user(),
             'sign_out':     users.create_logout_url('/'),
@@ -101,7 +103,7 @@ class ViewInvitationHistory(BaseHandler):
 
             # add info regarding partner in relation to this invite (was this invite from your current partner?)
             # NOTE: this field will be set to 'True' for any invitations from this partner that were previously accepted
-            invite_info[i]['Current Partner'] = str(who == current_partner and invite.accepted)
+            invite_info[i]['Current Partner'] = str(who in  current_partner and invite.accepted)
 
             invite_info[i] = sorted(invite_info[i].items(), key=lambda x: ordering[x[0]])
 

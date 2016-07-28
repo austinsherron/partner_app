@@ -36,9 +36,12 @@ class EvaluatePartner(BaseHandler):
         # grab the active eval assignments
         eval_assigns = AssignmentModel.get_active_eval_assigns(quarter, year)
         # grab partners for eval assignments
-        partners = [(eval_assign.number,PartnershipModel.get_partner_from_partner_history_by_assign(evaluator, partners, eval_assign.number)) for eval_assign in eval_assigns]
+        evaluatees = []
+        for eval_assign in eval_assigns:
+            for partner in PartnershipModel.get_partner_from_partner_history_by_assign(evaluator, partners, eval_assign.number):
+                evaluatees.append((eval_assign.number,partner))
         # filter out No Partner partnerships
-        partners = list(filter(lambda x: x[1] != "No Partner" and x[1] != None, partners))
+        partners = list(filter(lambda x: x[1] != "No Partner" and x[1] != None, evaluatees))
         eval_closed = len(eval_assigns) == 0
     
         rate20scale  = ["0 -- Never, completely inadequate", "1", "2", "3", "4"]

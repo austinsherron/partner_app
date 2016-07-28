@@ -28,6 +28,7 @@ application = webapp2.WSGIApplication([
     ('/partner/evaluation', evaluations.EvaluatePartner),
     ('/partner/selection', partners.SelectPartner),
     ('/partner/browse', browse_partners.BrowseForPartners),
+    ('/partner/cancel', partners.CancelPartner),
     ('/partner/confirm', partners.ConfirmPartner),
     ('/partner/history', view_history.ViewHistory),
     ('/partner/history/invitations', view_history.ViewInvitationHistory),

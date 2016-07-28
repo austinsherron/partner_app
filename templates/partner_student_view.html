@@ -45,31 +45,48 @@
 				<table>
 					<tr>
 						<th class="text-center num-cell">Num</th>
-						<th class="text-center">Sent Invite</th>
-						<th class="text-center">Accepted Invite</th>
-						<th class="text-center">Authorized Solo?</th>
+						<th class="text-center">Other Members</th>
+						<th class="text-center">Authorized Solo</th>
 						<th class="text-center">Active</th>
+						<th class="text-center">Cancel?</th>
 					</tr>
 					{% for p in all_partners %}
 						<tr>
 							<td class="text-center">{{ p.assignment_number }}</td>
-							{% set i = p.initiator.get() %}
-							<td class="text-center">{{ i.ucinetid }} - {{ i.last_name }}, {{ i.first_name }}</td>
-							{% set a = p.acceptor.get() if p.acceptor else None %}
-
-							{% if a%}
-								<td class="text-center">{{ a.ucinetid }} - {{ a.last_name }}, {{ a.first_name }}</td>
-								<td class="text-center"><span class="label success">False</span></td>
-							{% else %}
-								<td class="text-center">None</td>
-								<td class="text-center"><span class="label warning">True</span></td>
-							{% endif %}
+                                                        {% if p.members|length == 1 %}
+							    <td class="text-center">None</td>
+							    <td class="text-center"><span class="label warning">True</span></td>
+                                                        {% else %}
+                                                            <td class="text-center">
+                                                                {% for member in p.members %}
+                                                                    {% if member != student.key %}
+                                                                        {{ member.get().ucinetid }} - {{ member.get().last_name }},
+                                                                        {{ member.get().first_name }}
+                                                                        <br>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </td>
+                                                            <td class="text-center"><span class="label success">False</span></td>
+                                                        {% endif %}
 
 							{% if p.active %}
 								<td class="text-center"><span class="label success">True</span></td>
 							{% else %}
 								<td class="text-center"><span class="label alert">False</span></td>
 							{% endif %}
+                                                        <td class="text-center">
+                                                            {% if student.key in p.cancelled and p.assignment_number in active and p.active %}
+                                                                <span class="label alert">
+                                                                    <a href="/partner/cancel?p={{ p.key.urlsafe() }}&cancel=0" class="white-link">Uncancel</a>
+                                                                </span>
+                                                            {% elif p.assignment_number in active and p.active %}
+                                                                <span class="label alert">
+                                                                    <a href="/partner/cancel?p={{ p.key.urlsafe() }}&cancel=1" class="white-link">Cancel</a>
+                                                                </span>
+                                                            {% else %}
+                                                                <span class="label secondary">Cancel</span>
+                                                            {% endif %}
+                                                        </td>
 						</tr>
 					{% endfor %}
 				</table>
