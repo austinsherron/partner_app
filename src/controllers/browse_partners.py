@@ -46,8 +46,10 @@ class BrowseForPartners(BaseHandler):
 
         # get all current_partnerships for partnership status
         partnerships = PartnershipModel.get_all_partnerships_for_assign(quarter, year, current_assignment.number)
-        partnerships = {p.initiator for p in partnerships} | {p.acceptor for p in partnerships}
-
+        members      = []
+        for p in partnerships:
+            members += p.members
+        partnership = members
         # build dict to store information about partnership status
         selectees = sorted({s.ucinetid: (s.key in partnerships,s) for s in selectees}.items(), key=lambda x: x[1][1].last_name)
 
