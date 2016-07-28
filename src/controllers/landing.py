@@ -5,11 +5,14 @@ import webapp2
 from google.appengine.api import users
 from webapp2_extras.appengine.users import login_required
 
-from models import Student
+from models import Course,Student
 from src.handler.base_handler import BaseHandler
+from src.helpers.helpers import get_active_course,get_sess_val
 from src.models.assignment import AssignmentModel
+from src.models.course import CourseModel
 from src.models.eval import EvalModel
 from src.models.invitation import InvitationModel
+from src.models.message import MessageModel
 from src.models.partnership import PartnershipModel
 from src.models.settings import SettingModel
 from src.models.student import StudentModel
@@ -25,17 +28,20 @@ class MainPage(BaseHandler):
     @login_required
     def get(self):
 
-        # delcare page template
-        template = JINJA_ENV.get_template('/templates/partners_main.html')
-        # get current user
-        user = users.get_current_user()
-        student = None
+        template               = JINJA_ENV.get_template('/templates/partners_main.html')
+        user                   = users.get_current_user()
+        student                = None
+        message                = ''
 
         try:
-            quarter = SettingModel.quarter()
-            year    = SettingModel.year()
-            # use user info to find student int DB
-            student = StudentModel.get_student_by_email(quarter, year, user.email())
+            quarter       = SettingModel.quarter()
+            year          = SettingModel.year()
+            student       = StudentModel.get_student_by_email(quarter, year, user.email())
+            active_course = get_active_course(self.session, self.request, student)
+            courses       = CourseModel.get_courses_by_student(student)
+            
+            if active_course:
+                self.session['course'] = active_course.urlsafe()
 
             self.session['quarter'] = quarter
             self.session['year']    = year
@@ -67,7 +73,8 @@ class MainPage(BaseHandler):
                 'user': user,
                 'student': student,
                 'sign_out': users.create_logout_url('/'),
-                'email': user.email()
+                'email': user.email(),
+                'message': message
             }
             return self.response.write(template.render(template_values))
 
@@ -85,6 +92,8 @@ class MainPage(BaseHandler):
             'profile': student.bio is None or student.availability is None or student.programming_ability is None,
             'dropped': dropped,
             'show_dropped': len(dropped) > 0 and len(filter(lambda x: x != None, partners.values())) < len(active_assigns),
+            'courses': courses,
+            'active_course': active_course,
         }
         self.response.write(template.render(template_values))
 
