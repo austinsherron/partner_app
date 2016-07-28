@@ -35,7 +35,9 @@ class CancelPartner(BaseHandler):
         partnership = ndb.Key(urlsafe=self.request.get('p')).get()
 
         if cancel:
-            PartnershipModel.cancel_partnership(student, partnership)
+            partnership = PartnershipModel.cancel_partnership(student, partnership)
+            if not partnership.active:
+                EvalModel.cancel_evals_for_partnership(partnership)
             return self.redirect('/partner/history?message=' + MessageModel.partnership_cancelled())
         else:
             PartnershipModel.uncancel_partnership(student, partnership)
@@ -96,6 +98,9 @@ class ConfirmPartner(BaseHandler):
             partnership = PartnershipModel.create_partnership([being_confirmed], for_assign)
         elif PartnershipModel.student_has_partner_for_assign(being_confirmed, for_assign):
             message = MessageModel.already_has_partner(admin)
+#            message = ''
+#            partnership = PartnershipModel.get_partnerships_for_students_by_assign([being_confirmed], for_assign)
+#            partnership = PartnershipModel.add_members_to_partnership([confirming], partnership[0])
         elif PartnershipModel.student_has_partner_for_assign(confirming, for_assign):
             message = MessageModel.already_has_partner(admin)
         else:

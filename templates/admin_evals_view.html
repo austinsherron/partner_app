@@ -57,7 +57,7 @@
 
 			{% for solo in solos %}
 				<tr>
-					{% set student = solo.initiator.get() %}
+					{% set student = solo.members[0].get() %}
 					<td class="overflow">{{ student.email }}</td>
 					<td class="overflow">No Partner</td>
 				</tr>

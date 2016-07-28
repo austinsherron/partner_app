@@ -46,7 +46,7 @@ def make_date(date, time):
 def keys_to_partners(all_partners):
 	"""
 	This is a function that maps student keys to the partnership objects in which
-	a key exists as either an acceptor or an initiator.
+	a key exists as a member of a partnership.
 	
 	Parameters
 	----------
@@ -64,11 +64,8 @@ def keys_to_partners(all_partners):
 	"""
 	k_to_p = defaultdict(dict)
 	for partnership in all_partners:
-		if partnership.initiator:
-			k_to_p[partnership.initiator][partnership.assignment_number] = partnership
-
-		if partnership.acceptor:
-			k_to_p[partnership.acceptor][partnership.assignment_number] = partnership
+            for member in partnership.members:
+                k_to_p[member][partnership.assignment_number] = partnership
 
 	return k_to_p
 
@@ -106,18 +103,16 @@ def student_info_to_partner_list(last_num, first_num, keys_to_partnerships, keys
 			to_append = 'No Selection'								# default status is 'No Selection'
 
 			if i in keys_to_partnerships[student.key]:				# if 'i' isn't there, that student doesn't have a partnership for that assignment 
-				partnership = keys_to_partnerships[student.key][i]	
+			    partnership = keys_to_partnerships[student.key][i]	
 
-				if partnership.acceptor and partnership.initiator:	
-					if partnership.initiator != student.key:
-						initiator = partnership.initiator.get() if partnership.initiator not in keys_to_students else keys_to_students[partnership.initiator]
-						to_append = initiator.email
-					else:
-						acceptor = partnership.acceptor.get() if partnership.acceptor not in keys_to_students else keys_to_students[partnership.acceptor]
-						to_append = acceptor.email
-
-				elif not partnership.acceptor and partnership.initiator:
-					to_append = 'No Partner'
+                            if len(partnership.members) == 1:
+                                to_append = 'No Partner'
+                            else:
+                                to_append = ''
+                                for member in partnership.members:
+                                    if member != student.key:
+                                        member_object = member.get() if member not in keys_to_students else keys_to_students[member]
+                                        to_append    += member_object.email + ' '
 
 			partnership_dict[student_info].append(to_append)
 

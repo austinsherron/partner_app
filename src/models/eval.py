@@ -1,3 +1,4 @@
+from google.appengine.ext import ndb
 from models import Evaluation
 
 
@@ -51,3 +52,31 @@ class EvalModel:
         )
 
 
+    @staticmethod
+    def get_eval_for_pair_by_assign(evaluator, evaluatee, assign, active=True):
+        return Evaluation.query(
+            Evaluation.evaluatee == evaluatee.key,
+            Evaluation.evaluator == evaluator.key,
+            Evaluation.assignment_number == assign,
+            Evaluation.active == active,
+            Evaluation.year == evaluator.year,
+            Evaluation.quarter == evaluator.quarter,
+        )
+
+
+    @staticmethod
+    def cancel_evals_for_partnership(partnership):
+        members = partnership.members
+        to_save = []
+
+        for member1 in members:
+            for member2 in members:
+                if member1 != member2:
+                    evals = EvalModel.get_eval_for_pair_by_assign(member1.get(), member2.get(), partnership.assignment_number)
+
+                    for eval in evals:
+                        eval.active = False
+                        to_save.append(eval)
+
+        ndb.put_multi(to_save)
+        return True

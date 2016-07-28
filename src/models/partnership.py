@@ -188,3 +188,10 @@ class PartnershipModel:
         del partnership.cancelled[partnership.cancelled.index(student.key)]
         partnership.put()
         return partnership
+
+
+    @staticmethod
+    def add_members_to_partnership(students, partnership):
+        partnership.members += [student.key for student in students]
+        partnership.put()
+        return partnership
