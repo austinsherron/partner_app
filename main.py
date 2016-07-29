@@ -33,6 +33,8 @@ application = webapp2.WSGIApplication([
     ('/partner/history', view_history.ViewHistory),
     ('/partner/history/invitations', view_history.ViewInvitationHistory),
     ('/partner/instructions', misc.HelpPage),
+    ('/partner/invitation/confirm', partners.ConfirmInvitation),
+    ('/partner/invitation/decline', partners.DeclineInvitation),
     ('/images/(.*)', misc.ImageHandler),
     ('/admin', admin_landing.MainAdmin),
     ('/admin/assignment/add', admin_assignment.AddAssignment),

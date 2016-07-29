@@ -81,10 +81,11 @@ class ViewInvitationHistory(BaseHandler):
 
         partners        = PartnershipModel.get_active_partner_history_for_student(student, quarter, year)
         current_partner = PartnershipModel.get_partner_from_partner_history_by_assign(student, partners, current_assignment.number)
+        active_range    = set([a.number for a in AssignmentModel.get_active_assigns(quarter, year)])
 
         invite_info = {}
         # dict for custom ordering of invite info fields
-        ordering = {'Assign Num': 0, 'Who': 1, 'To/From': 2, 'Accepted': 3, 'Current Partner': 4}
+        ordering = {'Assign Num': 0, 'Who': 1, 'To/From': 2, 'Accepted': 3, 'Active': 4}
         for invite in invites:
             # organize invite info by time 
             i = (invite.created - timedelta(hours=8)).strftime('%m-%d-%Y %H:%M:%S')
@@ -100,18 +101,15 @@ class ViewInvitationHistory(BaseHandler):
             # add invitor/invitee (depending on 'Sent'/'Received') to invite info
             invite_info[i]['Who']      = str(who.last_name) + ', ' + str(who.first_name) + ' - ' + str(who.ucinetid)
             invite_info[i]['Accepted'] = str(invite.accepted)
-
-            # add info regarding partner in relation to this invite (was this invite from your current partner?)
-            # NOTE: this field will be set to 'True' for any invitations from this partner that were previously accepted
-            invite_info[i]['Current Partner'] = str(who in  current_partner and invite.accepted)
-
-            invite_info[i] = sorted(invite_info[i].items(), key=lambda x: ordering[x[0]])
+            invite_info[i]['Active']   = str(invite.active)
+            invite_info[i]['key']      = invite.key.urlsafe()
 
         template_values = {
-            'invites':  sorted(invite_info.items(), reverse=True),
-            'fields':   sorted(ordering.items(), key=lambda x: x[1]),
-            'user':     user,
-            'sign_out': users.create_logout_url('/'),
+            'invites':      sorted(invite_info.items(), reverse=True),
+            'fields':       sorted(ordering.items(), key=lambda x: x[1]),
+            'user':         user,
+            'sign_out':     users.create_logout_url('/'),
+            'active_range': active_range,
         }
         return self.response.write(template.render(template_values))
 

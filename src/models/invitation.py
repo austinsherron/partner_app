@@ -138,3 +138,11 @@ class InvitationModel:
         )
         invitation.put()    
         return invitation
+
+
+    @staticmethod
+    def update_invitation_status(invitation, active=True):
+        invite = invitation.get()
+        invite.active=active
+        invite.put()
+        return invite

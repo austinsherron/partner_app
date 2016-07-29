@@ -76,3 +76,8 @@ class MessageModel:
         # changed success message depending on whether an assignment was just create/updated
         message += ' successfully ' + ('updated' if edit else 'added')        
         return message
+
+
+    @staticmethod
+    def invitation_declined():
+        return 'Invitation declined.'

@@ -7,24 +7,60 @@
 	<div class="small-12 columns panel">
 		<table>
 			<th>
-				{% for cat,num in fields %}
-					<td class="text-center"><h6>{{ cat }}</h6></td>
-				{% endfor %}
+                            <th class="text-center">Assign Num</th>
+                            <th class="text-center">Who</th>
+                            <th class="text-center">To/From</th>
+                            <th class="text-center">Accepted</th>
+                            <th class="text-center">Active</th>
+                            <th class="text-center">Accept?</th>
+                            <th class="text-center">Decline</th>
 			</th>
 			{% for dt,invite in invites %}
 				<tr>
-					<td>{{ dt }}</td>
-					{% for k,v in invite %}
-						{% if v is number %}
-							<td class="text-center"><span class="label">{{ v }}</span></td>
-						{% elif v == 'True' %}
-							<td class='text-center'><span class="label success">{{ v }}</span></td>
-						{% elif v == 'False' %}
-							<td class="text-center"><span class="label alert">{{ v }}</span></td>
-						{% else %}
-							<td class="text-center">{{ v }}</td>
-						{% endif %}
-					{% endfor %}
+					<td class="text-center">{{ dt }}</td>
+                                        <td class="text-center num-cell"><span class="label">{{ invite['Assign Num'] }}</span></td>
+                                        <td class="text-center">{{ invite['Who'] }}</td>
+                                        <td class="text-center">{{ invite['To/From'] }}</td>
+
+                                        {% if invite['Accepted'] == 'True' %}
+                                            <td class='text-center'><span class="label success">{{ invite['Accepted'] }}</span></td>
+					{% else %}
+                                            <td class="text-center"><span class="label alert">{{ invite['Accepted'] }}</span></td>
+                                        {% endif %}
+
+                                        {% if invite['Active'] == 'True' %}
+                                            <td class='text-center'><span class="label success">{{ invite['Active'] }}</span></td>
+					{% else  %}
+                                            <td class="text-center"><span class="label alert">{{ invite['Active'] }}</span></td>
+                                        {% endif %}
+
+                                        <td class="text-center">
+                                            {% if invite['Assign Num'] in active_range and invite['Active'] == 'True' and invite['To/From'] != 'Sent' %}
+                                                <span class="label success">
+                                                    <a href="/partner/invitation/confirm?confirmed={{ invite['key'] }}" class="white-link">Accept</a>
+                                                </span>
+                                            {% else %}
+                                                <span class="label secondary">
+                                                    <a href="#" class="white-link">Accept</a>
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td class="text-center">
+                                            {% if invite['Assign Num'] in active_range and invite['Active'] == 'True' %}
+                                                <span class="label alert">
+                                                    {% if invite['To/From'] == 'Sent' %}
+                                                        <a href="/partner/invitation/decline?confirmed={{ invite['key'] }}" class="white-link">Cancel</a>
+                                                    {% else %}
+                                                        <a href="/partner/invitation/decline?confirmed={{ invite['key'] }}" class="white-link">Decline</a>
+                                                    {% endif %}
+                                                </span>
+                                            {% else %}
+                                                <span class="label secondary">
+                                                    <a href="#" class="white-link">Decline</a>
+                                                </span>
+                                            {% endif %}
+                                        </td>
 				</tr>
 			{% endfor %}
 		</table>

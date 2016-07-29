@@ -44,6 +44,38 @@ class CancelPartner(BaseHandler):
             return self.redirect('/partner/history?message=' + MessageModel.partnership_uncancelled())
 
 
+class ConfirmInvitation(BaseHandler):
+
+    @login_required
+    def get(self):
+        quarter = SettingModel.quarter()
+        year    = SettingModel.year()
+        user    = users.get_current_user()
+
+        invitation      = ndb.Key(urlsafe=self.request.get('confirmed')).get()
+        confirming      = StudentModel.get_student_by_email(quarter, year, user.email())
+        being_confirmed = invitation.invitor.get()
+        for_assign      = invitation.assignment_number
+
+        partnership = None
+        if not confirming and PartnershipModel.student_has_partner_for_assign(being_confirmed, for_assign):
+            message = MessageModel.already_has_partner(False)
+        elif PartnershipModel.student_has_partner_for_assign(being_confirmed, for_assign):
+            message = MessageModel.already_has_partner(False)
+        elif PartnershipModel.student_has_partner_for_assign(confirming, for_assign):
+            message = MessageModel.already_has_partner(False)
+        else:
+            message     = MessageModel.confirm_partnership([being_confirmed, confirming], False, being_confirmed)
+            partnership = PartnershipModel.create_partnership([being_confirmed, confirming], for_assign)
+
+        # set invitations between invitor and invitee (for current assignment) to inactive
+        if partnership:
+            InvitationModel.deactivate_invitations_for_students_and_assign(confirming, being_confirmed, for_assign)
+            # SendMail(partnership, 'partner_confirm')
+
+        return self.redirect('/partner?message=' + message)
+
+
 class ConfirmPartner(BaseHandler):
     @login_required
     def get(self):
@@ -116,6 +148,16 @@ class ConfirmPartner(BaseHandler):
             return self.redirect('/partner?message=' + message)
         else:
             return self.redirect('/admin/partners/add?message=' + message)
+
+
+class DeclineInvitation(BaseHandler):
+
+    @login_required
+    def get(self):
+        invitation = ndb.Key(urlsafe=self.request.get('confirmed')).get()
+        InvitationModel.update_invitation_status(invitation.key, active=False)
+        message = MessageModel.invitation_declined()
+        return self.redirect('/partner?message=' + message)
             
 
 class SelectPartner(BaseHandler):

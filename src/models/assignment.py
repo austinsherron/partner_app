@@ -105,7 +105,7 @@ class AssignmentModel:
             return range(0,0)
 
         last = AssignmentModel.get_assign_n(quarter, year, -1)
-        return range(0,last.number + 1)
+        return range(zeroth.number,last.number + 1)
 
 
     @staticmethod
