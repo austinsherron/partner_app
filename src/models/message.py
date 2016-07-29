@@ -76,23 +76,3 @@ class MessageModel:
         # changed success message depending on whether an assignment was just create/updated
         message += ' successfully ' + ('updated' if edit else 'added')        
         return message
-
-
-    @staticmethod
-    def choose_a_course():
-        return 'Please choose a course'
-
-
-    @staticmethod
-    def course_added(name):
-        return 'You have successfully added a course (' + name + ')'
-
-
-    @staticmethod
-    def deactivated_course(name):
-        return 'You have deactivated course ' + name
-
-
-    @staticmethod
-    def activated_course(name):
-        return 'You have activated course ' + name

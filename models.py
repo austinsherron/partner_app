@@ -40,11 +40,9 @@ class Assignment(ndb.Model):
 
 
 class Instructor(ndb.Model):
-	ucinetid    = ndb.StringProperty()
-	first_name  = ndb.StringProperty()
-	last_name   = ndb.StringProperty()
-	email       = ndb.StringProperty()
-        permissions = ndb.StringProperty(repeated=True)
+	ucinetid = ndb.StringProperty()
+	name     = ndb.StringProperty()
+	email    = ndb.StringProperty()
 
 
 ################################################################################
@@ -156,27 +154,6 @@ class Setting(ndb.Model):
 	cross_section_partners = ndb.BooleanProperty(default=False)
         group_max              = ndb.IntegerProperty()
 	
-
-################################################################################
-################################################################################
-################################################################################
-
-
-################################################################################
-## COURSE MODEL ################################################################
-################################################################################
-
-
-class Course(ndb.Model):
-    year        = ndb.IntegerProperty()
-    quarter     = ndb.IntegerProperty()
-    name        = ndb.StringProperty()
-    abbr_name   = ndb.StringProperty()
-    setting     = ndb.KeyProperty()
-    students    = ndb.KeyProperty(repeated=True)
-    instructors = ndb.KeyProperty(repeated=True)
-    active      = ndb.BooleanProperty(default=True)
-
 
 ################################################################################
 ################################################################################

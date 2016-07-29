@@ -4,13 +4,9 @@ import os
 from google.appengine.api import users
 from webapp2_extras.appengine.users import admin_required
 
-from models import Course,Instructor
 from src.handler.base_handler import BaseHandler
-from src.helpers.helpers import get_active_course
 from src.models.assignment import AssignmentModel
-from src.models.course import CourseModel
 from src.models.eval import EvalModel
-from src.models.instructor import InstructorModel
 from src.models.partnership import PartnershipModel
 from src.models.settings import SettingModel
 from src.models.student import StudentModel
@@ -26,16 +22,9 @@ class MainAdmin(BaseHandler):
 
     #@admin_required
     def get(self):
-        user       = users.get_current_user()                                        
-        quarter    = SettingModel.quarter()
-        year       = SettingModel.year()
-        instructor = InstructorModel.get_instructor_by_email(user.email())
-
-        active_course = get_active_course(self.session, self.request, instructor)
-        courses       = CourseModel.get_courses_by_instructor(instructor)
-        
-        if active_course:
-            self.session['course'] = active_course.urlsafe()
+        user    = users.get_current_user()                                        
+        quarter = SettingModel.quarter()
+        year    = SettingModel.year()
 
         # grab message from URL, if it exists
         message = self.request.get('message')                                
@@ -44,13 +33,11 @@ class MainAdmin(BaseHandler):
             message = 'Please set a current year and quarter'
 
         template_values = {                                                    
-            'message':       message,
-            'user':          user,
-            'sign_out':      users.create_logout_url('/'),
-            'quarter':       quarter,
-            'year':          year,
-            'courses':       courses,
-            'active_course': active_course,
+            'message':  message,
+            'user':     user,
+            'sign_out': users.create_logout_url('/'),
+            'quarter':  quarter,
+            'year':     year,
         }
 
         self.session['quarter'] = quarter                                     
