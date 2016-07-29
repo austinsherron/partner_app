@@ -86,3 +86,13 @@ class MessageModel:
     @staticmethod
     def course_added(name):
         return 'You have successfully added a course (' + name + ')'
+
+
+    @staticmethod
+    def deactivated_course(name):
+        return 'You have deactivated course ' + name
+
+
+    @staticmethod
+    def activated_course(name):
+        return 'You have activated course ' + name

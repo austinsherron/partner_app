@@ -40,6 +40,8 @@ application = webapp2.WSGIApplication([
     ('/admin/assignment/edit', admin_assignment.EditAssignment),
     ('/admin/assignment/view', admin_assignment.ManageAssignments),
     ('/admin/courses/add', admin_course.AddCourse),
+    ('/admin/courses/activate', admin_course.ActivateCourse),
+    ('/admin/courses/deactivate', admin_course.DeactivateCourse),
     ('/admin/courses/view', admin_course.ViewCourses),
     ('/admin/cleardb', admin_misc.ClearDB),
     ('/admin/cleardb', admin_misc.ClearDB),

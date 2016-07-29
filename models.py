@@ -175,6 +175,7 @@ class Course(ndb.Model):
     setting     = ndb.KeyProperty()
     students    = ndb.KeyProperty(repeated=True)
     instructors = ndb.KeyProperty(repeated=True)
+    active      = ndb.BooleanProperty(default=True)
 
 
 ################################################################################
