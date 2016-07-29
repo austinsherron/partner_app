@@ -1,0 +1,49 @@
+{% extends 'templates/admin_common.html' %}
+{% block content %}
+
+<div class="row">
+
+	{% if message %}
+		<div class="small-12 columns">
+			<h3 class="text-center">{{ message }}</h3>
+		</div>
+	{% endif %}
+
+	<br>
+
+	<div class="small-12 columns">
+		<h3 class="text-center">Add A Course</h3>
+		<br>
+	</div>
+
+	<form action="/admin/courses/add" method="post" enctype="multipart/form-data">
+  		<div class="small-12 column panel">
+    		<div class="row">
+	  			<div class="small-6 column">
+		  			<span class="label">Quarter</span>
+		  			<select name="quarter">
+						{% for n,q in quarters.items() %}
+							{% if q == quarter %}
+								<option value="{{ n }}" selected>{{ q }}</option>
+							{% else %}
+								<option value="{{ n }}">{{ q }}</option>
+							{% endif %}
+						{% endfor %}
+		  			</select>
+		  			<span class="label">Year</span>
+		  			<input type="number" value="{{ year }}" name="year">
+      			</div>
+      			<div class="small-6 column">
+		  			<span class="label">Name</span>
+		  			<input type="text" name="name">
+		  			<span class="label">Abbreviated Name</span>
+		  			<input type="text" name="abbr_name">
+      			</div>
+    		</div>
+			<div class="small-4 columns small-centered">
+			  <input type="submit" value="Add" class="button expand">
+			</div>
+ 		</div>
+ 	</form>
+</div>
+{% endblock %}

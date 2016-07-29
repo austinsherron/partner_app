@@ -22,7 +22,7 @@
 			<section class="top-bar-section">
 				{% if user %}
 					<ul class="left">
-						<li class="has-dropdown active">
+						<li class="has-dropdown">
 							<a href="#">History</a>
 							<ul class="dropdown">
 								<li>
@@ -42,8 +42,8 @@
 					</ul>
 				{% endif %}
 				<ul class="right">
-                                            {% if student %}
-						<li class="has-dropdown active">
+                                            {% if courses %}
+						<li class="has-dropdown">
 							<a href="#">Courses</a>
 							<ul class="dropdown">
                                                             {% for course in courses %}

@@ -81,3 +81,8 @@ class MessageModel:
     @staticmethod
     def choose_a_course():
         return 'Please choose a course'
+
+
+    @staticmethod
+    def course_added(name):
+        return 'You have successfully added a course (' + name + ')'

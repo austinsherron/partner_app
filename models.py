@@ -41,7 +41,8 @@ class Assignment(ndb.Model):
 
 class Instructor(ndb.Model):
 	ucinetid    = ndb.StringProperty()
-	name        = ndb.StringProperty()
+	first_name  = ndb.StringProperty()
+	last_name   = ndb.StringProperty()
 	email       = ndb.StringProperty()
         permissions = ndb.StringProperty(repeated=True)
 

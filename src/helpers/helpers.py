@@ -102,12 +102,15 @@ def split_last(s, char=','):
 	return list(filter(lambda x: x != '', splt))
 
 
-def get_active_course(session, request, student):
+def get_active_course(session, request, key, student=True):
     active_course = request.get('course')
     if not active_course:
         active_course = get_sess_val(session, 'course')
     if not active_course:
-        active_course = CourseModel.get_courses_by_student(student).get()
+        if student:
+            active_course = CourseModel.get_courses_by_student(key).get()
+        else:
+            active_course = CourseModel.get_courses_by_instructor(key).get()
     if not active_course:
         return False
 
