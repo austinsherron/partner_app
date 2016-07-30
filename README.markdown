@@ -25,6 +25,10 @@ Considerations include:
 
 and lots of other stuff.
 
+There is one thing that needs to be done before this goes live: SendMail 
+(src/send_mail.py)needs to be updated reflect the changes to the partnership
+model. This doesn't *need* to be done before going live, but it should be done.
+
 I haven't merged this branch into working/production, but I'm pretty sure it 
 can be. Let me know if you need help merging and deploying the new version of
 the app.
