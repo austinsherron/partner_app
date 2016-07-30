@@ -101,4 +101,3 @@ class MessageModel:
     @staticmethod
     def activated_course(name):
         return 'You have activated course ' + name
->>>>>>> parent of 8e5b2c4... Revert "Update Models and Controllers to Prepare for Architecture Change"
