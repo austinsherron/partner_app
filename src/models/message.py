@@ -81,3 +81,24 @@ class MessageModel:
     @staticmethod
     def invitation_declined():
         return 'Invitation declined.'
+
+
+    @staticmethod
+    def choose_a_course():
+        return 'Please choose a course'
+
+
+    @staticmethod
+    def course_added(name):
+        return 'You have successfully added a course (' + name + ')'
+
+
+    @staticmethod
+    def deactivated_course(name):
+        return 'You have deactivated course ' + name
+
+
+    @staticmethod
+    def activated_course(name):
+        return 'You have activated course ' + name
+>>>>>>> parent of 8e5b2c4... Revert "Update Models and Controllers to Prepare for Architecture Change"

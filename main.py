@@ -1,7 +1,9 @@
 import webapp2
 
 from src.controllers import admin_assignment
+from src.controllers import admin_course
 from src.controllers import admin_eval
+from src.controllers import admin_instructor
 from src.controllers import admin_landing
 from src.controllers import admin_misc
 from src.controllers import admin_partnership
@@ -40,8 +42,15 @@ application = webapp2.WSGIApplication([
     ('/admin/assignment/add', admin_assignment.AddAssignment),
     ('/admin/assignment/edit', admin_assignment.EditAssignment),
     ('/admin/assignment/view', admin_assignment.ManageAssignments),
+    ('/admin/courses/add', admin_course.AddCourse),
+    ('/admin/courses/activate', admin_course.ActivateCourse),
+    ('/admin/courses/deactivate', admin_course.DeactivateCourse),
+    ('/admin/courses/view', admin_course.ViewCourses),
+    ('/admin/cleardb', admin_misc.ClearDB),
     ('/admin/cleardb', admin_misc.ClearDB),
     ('/admin/evaluations/view', admin_eval.ViewEvals),
+    ('/admin/instructor/add', admin_instructor.AddInstructor),
+    ('/admin/instructor/view', admin_instructor.ViewInstructors),
     ('/admin/partners/add', admin_partnership.AddPartnership),
     ('/admin/partners/view', admin_partnership.ViewPartnerships),
     ('/admin/roster/upload', admin_roster.UploadRoster),

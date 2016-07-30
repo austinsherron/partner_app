@@ -38,6 +38,16 @@
 					</ul>
 				{% endif %}
 				<ul class="right">
+                                            {% if courses %}
+						<li class="has-dropdown">
+							<a href="#">Courses</a>
+							<ul class="dropdown">
+                                                            {% for course in courses %}
+                                                                <li><a href="partner?course={{ course.key.urlsafe() }}">{{ course.abbr_name }}</a></li>
+                                                            {% endfor %}
+							</ul>
+						</li>
+                                            {% endif %}
 					<li>
 						<a href="/partner/instructions">Help</a>
 					</li>

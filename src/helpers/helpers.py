@@ -5,6 +5,9 @@
 
 import datetime as dt
 
+from google.appengine.ext import ndb
+from src.models.course import CourseModel
+
 
 ################################################################################
 ################################################################################
@@ -97,6 +100,21 @@ def split_last(s, char=','):
 	splt = [char.join(splt[:-1]), splt[-1]]	
 	print(splt)
 	return list(filter(lambda x: x != '', splt))
+
+
+def get_active_course(session, request, key, student=True):
+    active_course = request.get('course')
+    if not active_course:
+        active_course = get_sess_val(session, 'course')
+    if not active_course:
+        if student:
+            active_course = CourseModel.get_courses_by_student(key).get()
+        else:
+            active_course = CourseModel.get_courses_by_instructor(key).get()
+    if not active_course:
+        return False
+
+    return ndb.Key(urlsafe=active_course)
 
 
 ################################################################################

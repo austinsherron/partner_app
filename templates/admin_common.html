@@ -29,10 +29,12 @@
 						</ul>
 					</li>
 					<li class="has-dropdown">	
-						<a href="#">Students</a>
+						<a href="#">Users</a>
 						<ul class="dropdown">
-							<li><a href="/admin/student/add">Add</a></li>
-							<li><a href="/admin/roster/view">View</a></li>
+							<li><a href="/admin/student/add">Add Student</a></li>
+							<li><a href="/admin/instructor/add">Add Instructor</a></li>
+							<li><a href="/admin/roster/view">Students</a></li>
+							<li><a href="/admin/instructor/view">Instructors</a></li>
 						</ul>
 					</li>
 					<li class="has-dropdown">	
@@ -57,8 +59,17 @@
 							<li><a href="/admin/roster/view">View</a></li>
 						</ul>
 					</li>
+                                        <li class="has-dropdown">
+                                            <a href="#">Courses</a>
+                                            <ul class="dropdown">
+                                                <li>
+                                                    <a href="/admin/courses/add">Add</a>
+                                                </li>
+                                                <li><a href="/admin/courses/view">View</a></li>
+                                            </ul>
+                                        </li>
 					<li>
-						<a href="/admin/settings/update">Config</a>
+                                            <a href="/admin/settings/update">Config</a>
 					</li>
 				</ul>
 			</section>
@@ -67,17 +78,26 @@
 
 				<form method="GET" action=".">
 					<ul class="right">
-						<li><input name="year"/></li>
-						<li><a href="/partner/instructions">Help</a></li>
-						{% if sign_out %}
-							<li class="active">
-								<a href="{{ sign_out }}">Logout</a>
-							</li>
-						{% elif sign_in %}
-							<li class="active">
-								<a href="{{ sign_in }}">Login</a>
-							</li>
-						{% endif %}
+                                            {% if courses %}
+						<li class="has-dropdown">
+						    <a href="#">Courses</a>
+						    <ul class="dropdown">
+                                                        {% for course in courses %}
+                                                            <li><a href="admin?course={{ course.key.urlsafe() }}">{{ course.abbr_name }}</a></li>
+                                                        {% endfor %}
+						    </ul>
+						</li>
+                                            {% endif %}
+					    <li><a href="/partner/instructions">Help</a></li>
+					    {% if sign_out %}
+						<li class="active">
+						    <a href="{{ sign_out }}">Logout</a>
+						</li>
+					    {% elif sign_in %}
+						<li class="active">
+						    <a href="{{ sign_in }}">Login</a>
+						</li>
+					    {% endif %}
 					</ul>
 				</form>
 			</section>
