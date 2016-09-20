@@ -88,35 +88,47 @@
 			<div class="row panel">
 				<div class="small-6 columns">
 					{% for assignment in all_assigns %}
-					{% if assignment in active %}
-						<table style="border-style:solid; border-color: yellow">
-						<th style="background-color: #4CAF50" class="text-center">Assign Num {{ assignment.number }}</th>
-					{% else %}
-						<table>
-						<th style="background-color: #F08080" class="text-center">Assign Num {{ assignment.number }}</th>
-					{% endif %}
-
-						<tr>
-						<td class="text-center">Select Partner</td>
-						</tr>
-						<tr>
-						<td class="text-center">Have Partner?</td>
-						</tr>
-						<tr>
-						<td class="text-center">Partner Evaluation Opens</td>
-						</tr>
-						<!-- {% for assignment in active %}
+						{% if assignment in active %}
+							<table style="border-style:solid; border-color: yellow">
+							<th style="background-color: #4CAF50" class="text-center">Assignment Number {{ assignment.number }}</th>
 							<tr>
-								<td class="num-cell text-center">{{ assignment.number }}</td>
-								<td class="text-center">{{ assignment.due_date.strftime("%m-%d-%Y\n%I:%M %p") }}</td>
-								<td class="text-center">{{ assignment.eval_open_date.strftime("%m-%d-%Y\n%I:%M %p") }}</td>
-								{% if partners[assignment.number]%}
-									<td class="text-center"><span class="label success">Yes</span></td>
-								{% else %}
-									<td class="text-center"><span class="label alert">No</span></td>
-								{% endif %}
+								<td><a href="/partner/selection" data-reveal-id="selectionModal" class="button expand"
+								data-reveal-ajax="true">Send Partner Invitation</a></td>
+								<!-- <div class="reveal-modal small" id="selectionModal" data-reveal></div></td> -->
 							</tr>
-						{% endfor %} -->
+						{% elif current_time > assignment.close_date %}
+							<table>
+							<th style="background-color: #F08080" class="text-center">Assignment Number {{ assignment.number }}</th>
+							<tr>
+							<td class="text-center">Partner Selection Closed: <b>{{ assignment.close_date.strftime("%m-%d-%Y\n%I:%M %p") }}</b> </td>
+							</tr>
+						{% else %}
+							<table>
+							<th style="background-color: #FFFACD" class="text-center">Assignment Number {{ assignment.number }}</th>
+							<tr>
+							<td class="text-center">Partner Selection Opens: <b>{{ assignment.fade_in_date.strftime("%m-%d-%Y\n%I:%M %p") }}</b> </td>
+							</tr>
+						{% endif %}
+						<tr>
+							{% if partners[assignment.number]%}
+								<!-- Add partner name and email to yes logic-->
+								<td class="text-center"><b>Have Partner:&nbsp</b><span class="label success">Yes</span></td>
+							{% else %}
+								<td class="text-center"><b>Have Partner:&nbsp</b><span class="label alert">No</span></td>
+							{% endif %}
+						</tr>
+						<tr>
+							{% if submitted_evals[assignment.number]%}
+								<td class="text-center"><span class="label success">Eval complete!</span></td>
+							{% elif current_time > assignment.eval_date %}
+								<td class="text-center">Partner Eval Closed: <b>{{ assignment.eval_date.strftime("%m-%d-%Y\n%I:%M %p") }}</b> </td>
+							{% elif current_time < assignment.eval_open_date %}
+								<td class="text-center">Partner Eval Opens: <b>{{ assignment.eval_open_date.strftime("%m-%d-%Y\n%I:%M %p") }}</b> </td>
+							{% else %}
+								<!-- Add button logic for evals-->
+								<td class="text-center"><span class="label alert">No</span></td>
+							{% endif %}
+						</tr>
 					</table>
 					{% endfor %}
 				</div>
@@ -133,11 +145,7 @@
 							<tr>
 								<td class="num-cell text-center">{{ assignment.number }}</td>
 								<td class="text-center">{{ assignment.eval_date.strftime("%m-%d-%Y\n%I:%M %p") }}</td>
-								{% if submitted_evals[assignment.number]%}
-									<td class="text-center"><span class="label success">Yes</span></td>
-								{% else %}
-									<td class="text-center"><span class="label alert">No</span></td>
-								{% endif %}
+
 							</tr>
 						{% endfor %}
 					</table>

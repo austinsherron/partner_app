@@ -1,6 +1,7 @@
 import jinja2
 import os
 import webapp2
+import datetime
 
 from google.appengine.api import users
 from webapp2_extras.appengine.users import login_required
@@ -40,6 +41,8 @@ class MainPage(BaseHandler):
             self.session['quarter'] = quarter
             self.session['year']    = year
             self.session['student'] = student.key.urlsafe()
+            # current time
+            current_time = datetime.datetime.now()
             #get all assignments
             all_assigns = sorted(AssignmentModel.get_all_assign(quarter, year), key = lambda x: x.number)
             # get active assignments
@@ -75,6 +78,7 @@ class MainPage(BaseHandler):
         template_values = {
             'user': user,
             'student': student,
+            'current_time': current_time,
             'all_assigns': all_assigns,
             'active': active_assigns,
             'evals': eval_assigns,
