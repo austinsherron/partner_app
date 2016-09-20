@@ -6,6 +6,13 @@ from src.helpers.admin_helpers import make_date
 class AssignmentModel:
 
     @staticmethod
+    def get_all_assign(quarter, year):
+        return Assignment.query(
+            Assignment.quarter == quarter,
+            Assignment.year == year
+        ).order(Assignment.number).fetch()
+
+    @staticmethod
     def get_active_assign_with_latest_fade_in_date(quarter, year):
         assigns_after_now = Assignment.query(
             Assignment.quarter == quarter,
@@ -75,7 +82,7 @@ class AssignmentModel:
             Assignment.number == number,
         ).get()
 
-    
+
     @staticmethod
     def get_assigns_for_quarter(quarter, year):
         return Assignment.query(

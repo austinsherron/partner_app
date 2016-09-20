@@ -40,7 +40,8 @@ class MainPage(BaseHandler):
             self.session['quarter'] = quarter
             self.session['year']    = year
             self.session['student'] = student.key.urlsafe()
-
+            #get all assignments
+            all_assigns = sorted(AssignmentModel.get_all_assign(quarter, year), key = lambda x: x.number)
             # get active assignments
             active_assigns = sorted(AssignmentModel.get_active_assigns(quarter, year), key=lambda x: x.number)
             # get active eval assigns
@@ -73,14 +74,15 @@ class MainPage(BaseHandler):
 
         template_values = {
             'user': user,
-            'student': student,                             
+            'student': student,
+            'all_assigns': all_assigns,
             'active': active_assigns,
             'evals': eval_assigns,
             'submitted_evals': evals,
-            'sent_invitations': sorted(sent_invitations, key=lambda x: x.assignment_number),    
-            'received_invitations': sorted(received_invitations.items(), key=lambda x: x[0]),  
-            'partners': partners,                            
-            'sign_out': users.create_logout_url('/'),       
+            'sent_invitations': sorted(sent_invitations, key=lambda x: x.assignment_number),
+            'received_invitations': sorted(received_invitations.items(), key=lambda x: x[0]),
+            'partners': partners,
+            'sign_out': users.create_logout_url('/'),
             'message': message,
             'profile': student.bio is None or student.availability is None or student.programming_ability is None,
             'dropped': dropped,
@@ -102,5 +104,3 @@ class Main(webapp2.RequestHandler):
             template_values['sign_in'] = users.create_login_url('/partner')
 
         self.response.write(template.render(template_values))
-
-

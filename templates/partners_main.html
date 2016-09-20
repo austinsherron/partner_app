@@ -72,7 +72,7 @@
 				</div>
 				<div class="small-4 columns">
 					{% if evals %}
-						<a href="/partner/evaluation" data-reveal-id="evalModal" 
+						<a href="/partner/evaluation" data-reveal-id="evalModal"
 						class="button expand" data-reveal-ajax="true">Partner Evaluation</a>
 						<div class="reveal-modal medium" id="evalModal" data-reveal></div>
 					{% endif %}
@@ -87,15 +87,25 @@
 		<div class="small-12 columns">
 			<div class="row panel">
 				<div class="small-6 columns">
-					<span class="label">Assignments Open for Partner Selection</span> 
-					<table>
+					{% for assignment in all_assigns %}
+					{% if assignment in active %}
+						<table style="border-style:solid; border-color: yellow">
+						<th style="background-color: #4CAF50" class="text-center">Assign Num {{ assignment.number }}</th>
+					{% else %}
+						<table>
+						<th style="background-color: #F08080" class="text-center">Assign Num {{ assignment.number }}</th>
+					{% endif %}
+
 						<tr>
-							<th class="num-cell text-center">Assign Num</th>
-							<th class="text-center">Partner Selection Closes</th>
-							<th class="text-center">Partner Evaluation Opens</th>
-							<th class="text-center">Have Partner?</th>
+						<td class="text-center">Select Partner</td>
 						</tr>
-						{% for assignment in active %}
+						<tr>
+						<td class="text-center">Have Partner?</td>
+						</tr>
+						<tr>
+						<td class="text-center">Partner Evaluation Opens</td>
+						</tr>
+						<!-- {% for assignment in active %}
 							<tr>
 								<td class="num-cell text-center">{{ assignment.number }}</td>
 								<td class="text-center">{{ assignment.due_date.strftime("%m-%d-%Y\n%I:%M %p") }}</td>
@@ -106,12 +116,13 @@
 									<td class="text-center"><span class="label alert">No</span></td>
 								{% endif %}
 							</tr>
-						{% endfor %}
+						{% endfor %} -->
 					</table>
+					{% endfor %}
 				</div>
 
-				<div class="small-6 columns">
-					<span class="label">Assignments Open for Partner Evaluation</span> 
+				<!-- <div class="small-6 columns">
+					<span class="label">Assignments Open for Partner Evaluation</span>
 					<table>
 						<tr>
 							<th class="num-cell text-center">Assign Num</th>
@@ -130,7 +141,7 @@
 							</tr>
 						{% endfor %}
 					</table>
-				</div>
+				</div> -->
 			</div>
 		</div>
 	</div>
@@ -204,12 +215,12 @@
 							{% endfor %}
 						</table>
 					</div>
-					<div class="small-6 columns small-centered"> 
+					<div class="small-6 columns small-centered">
 						<h4>
 							Note: if any of these deactivated partnerships are unexpected, <strong>contact your
-							TA and the student with whom the partnership was deactivated. 					
+							TA and the student with whom the partnership was deactivated.
 						</h4>
-					</div> 
+					</div>
 				</div>
 			</div>
 		</div>
@@ -226,14 +237,14 @@
 	  		<div class="row">
 				<div class="small-6 column small-offset-3 text-justify">
 		  			<p>
-						We're having some trouble finding you in our database. 
+						We're having some trouble finding you in our database.
 						<br>
 						<br>
-						The email address that the system is detecting for you is 
+						The email address that the system is detecting for you is
 						<strong>{{ email }}</strong>.
 						<br>
 						<br>
-						Please make sure that you're signing in with your UCI gmail account.  
+						Please make sure that you're signing in with your UCI gmail account.
 						Sign out <a href="{{ sign_out }}">here</a>, and sign back in with
 						your UCI Gmail credentials.
 						<br>
