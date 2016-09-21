@@ -84,39 +84,45 @@
 	<div class="row fullwidth" data-magellan-destination="assignments">
 		<a name="assignments"></a>
 		<span class="label">Assignments</span>
-		<div class="small-12 columns">
-			<div class="row panel">
-				<div class="small-6 columns">
+		<div class="small-12 columns div-scroll">
+				<div class="row panel">
+				<!-- <div class="small-6 columns"> -->
 					{% for assignment in all_assigns %}
+						<!-- First if/elif/else block: Logic for table, assignment header, and partner information -->
 						{% if assignment in active %}
-							<table style="border-style:solid; border-color: yellow">
-							<th style="background-color: #4CAF50" class="text-center">Assignment Number {{ assignment.number }}</th>
-							<tr>
-								<td><a href="/partner/selection" data-reveal-id="selectionModal" class="button expand"
-								data-reveal-ajax="true">Send Partner Invitation</a></td>
-								<!-- <div class="reveal-modal small" id="selectionModal" data-reveal></div></td> -->
-							</tr>
-						{% elif current_time > assignment.close_date %}
 							<table>
-							<th style="background-color: #F08080" class="text-center">Assignment Number {{ assignment.number }}</th>
+							<th class="assgn_head">Assignment {{ assignment.number }}</th>
+							<!-- Case: Have a partner (but can still change partner)-->
+							{% if assignment.number in assgn_nums_with_partner %}
+							<tr>
+								<td><div class="col-md-4 text-center"><a href="/partner/selection" data-reveal-id="selectionModal" class="button info"
+								data-reveal-ajax="true">Partner: {{ partners[assignment.number][0].first_name }} {{ partners[assignment.number][0].last_name}}</a></div></td>
+							</tr>
+							<!-- Case: No partner and past recommended "choose partner" time period -->
+							{% elif current_time > assignment.due_date %}
+								<td><div class="col-md-4 text-center"><a href="/partner/selection" data-reveal-id="selectionModal" class="button alert"
+								data-reveal-ajax="true">Choose Partner for Assignment {{ assignment.number }}</a></div></td>
+							</tr>
+							<!-- Case: No partner during recommended "choose partner" time period-->
+							{% else %}
+							<tr>
+								<td><div class="col-md-4 text-center"><a href="/partner/selection" data-reveal-id="selectionModal" class="button success"
+								data-reveal-ajax="true">Choose Partner for Assignment {{ assignment.number }}</a></div></td>
+							</tr>
+							{% endif %}
+						{% elif current_time > assignment.close_date %}
+							<table class="grayout">
+							<th class="assgn_head">Assignment {{ assignment.number }}</th>
 							<tr>
 							<td class="text-center">Partner Selection Closed: <b>{{ assignment.close_date.strftime("%m-%d-%Y\n%I:%M %p") }}</b> </td>
 							</tr>
 						{% else %}
-							<table>
-							<th style="background-color: #FFFACD" class="text-center">Assignment Number {{ assignment.number }}</th>
+							<table class="grayout">
+							<th class="assgn_head">Assignment {{ assignment.number }}</th>
 							<tr>
 							<td class="text-center">Partner Selection Opens: <b>{{ assignment.fade_in_date.strftime("%m-%d-%Y\n%I:%M %p") }}</b> </td>
 							</tr>
 						{% endif %}
-						<tr>
-							{% if partners[assignment.number]%}
-								<!-- Add partner name and email to yes logic-->
-								<td class="text-center"><b>Have Partner:&nbsp</b><span class="label success">Yes</span></td>
-							{% else %}
-								<td class="text-center"><b>Have Partner:&nbsp</b><span class="label alert">No</span></td>
-							{% endif %}
-						</tr>
 						<tr>
 							{% if submitted_evals[assignment.number]%}
 								<td class="text-center"><span class="label success">Eval complete!</span></td>
@@ -132,28 +138,8 @@
 					</table>
 					{% endfor %}
 				</div>
-
-				<!-- <div class="small-6 columns">
-					<span class="label">Assignments Open for Partner Evaluation</span>
-					<table>
-						<tr>
-							<th class="num-cell text-center">Assign Num</th>
-							<th class="text-center">Partner Evaluation Closes</th>
-							<th class="text-center">Eval Submitted?</th>
-						</tr>
-						{% for assignment in evals %}
-							<tr>
-								<td class="num-cell text-center">{{ assignment.number }}</td>
-								<td class="text-center">{{ assignment.eval_date.strftime("%m-%d-%Y\n%I:%M %p") }}</td>
-
-							</tr>
-						{% endfor %}
-					</table>
-				</div> -->
-			</div>
 		</div>
 	</div>
-
 	<br>
 
 	<div class="row fullwidth">

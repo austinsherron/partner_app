@@ -56,11 +56,17 @@ class MainPage(BaseHandler):
             # find any partnerships in which the student has been involved
             partners = PartnershipModel.get_active_partner_history_for_student(student, quarter, year)
             partners = dict([(x.number,PartnershipModel.get_partner_from_partner_history_by_assign(student, partners, x.number)) for x in active_assigns])
+            # create list of assignment numbers which student has a partner for (IF PYTHON 3, use .items() instead of .iteritems())
+            assgn_nums_with_partner = []
+            for assgn_num, partner in partners.iteritems():
+                if len(partner):
+                    assgn_nums_with_partner.append(assgn_num)
             # find evals the student has submitted
             evals = EvalModel.get_eval_history_by_evaluator(student, True, quarter, year)
             evals = dict([(x.assignment_number,x) for x in evals])
             # get activity message, if any
             message = self.request.get('message')
+            print assgn_nums_with_partner
             dropped = []
             for x in active_assigns:
                 dropped += PartnershipModel.get_inactive_partnerships_by_student_and_assign(student, x.number).fetch()
@@ -80,6 +86,7 @@ class MainPage(BaseHandler):
             'student': student,
             'current_time': current_time,
             'all_assigns': all_assigns,
+            'assgn_nums_with_partner': assgn_nums_with_partner,
             'active': active_assigns,
             'evals': eval_assigns,
             'submitted_evals': evals,
