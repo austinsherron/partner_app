@@ -15,9 +15,14 @@
     <form action="/partner/selection" method="post" enctype="multipart/form-data">
 	  <span class="label">Assignment</span>
 	  <select name="selected_assign">
+        {% if default_assgn != -1 %}
+          <option value="{{ default_assgn }}">Assignment {{ default_assgn }}</option>
+        {% endif %}
 		{% for assign in active %}
-		  <option value="{{ assign.number }}">Assignment {{ assign.number }}</option>
-		{% endfor %}
+          {% if assign.number != default_assgn %}
+            <option value="{{ assign.number }}">Assignment {{ assign.number }}</option>
+          {% endif %}
+        {% endfor %}
 	  </select>
 	  <span class="label">Partner</span>
 	  <select name="selected_partner">
@@ -38,7 +43,7 @@
       manager at 31-manager@ics.uci.edu
     </h5>
 	<h5>
-	  Remember that your partner must be someone enrolled in your lab section that 
+	  Remember that your partner must be someone enrolled in your lab section that
 	  you haven't worked with before.
 	</h5>
     <h5>
@@ -51,4 +56,3 @@
 </div>
 
 {% endblock %}
-

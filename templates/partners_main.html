@@ -95,18 +95,19 @@
 							<!-- Case: Have a partner (but can still change partner)-->
 							{% if assignment.number in assgn_nums_with_partner %}
 							<tr>
-								<td><div class="col-md-4 text-center"><a href="/partner/selection" data-reveal-id="selectionModal" class="button info"
+								<td><div class="col-md-4 text-center"><a href="/partner/selection?assgn={{ assignment.number }}" data-reveal-id="selectionModal" class="button info"
 								data-reveal-ajax="true">Partner: {{ partners[assignment.number][0].first_name }} {{ partners[assignment.number][0].last_name}}</a></div></td>
 							</tr>
 							<!-- Case: No partner and past recommended "choose partner" time period -->
 							{% elif current_time > assignment.due_date %}
-								<td><div class="col-md-4 text-center"><a href="/partner/selection" data-reveal-id="selectionModal" class="button alert"
+							<tr>
+								<td><div class="col-md-4 text-center"><a href="/partner/selection?assgn={{ assignment.number }}" data-reveal-id="selectionModal" class="button alert"
 								data-reveal-ajax="true">Choose Partner for Assignment {{ assignment.number }}</a></div></td>
 							</tr>
 							<!-- Case: No partner during recommended "choose partner" time period-->
 							{% else %}
 							<tr>
-								<td><div class="col-md-4 text-center"><a href="/partner/selection" data-reveal-id="selectionModal" class="button success"
+								<td><div class="col-md-4 text-center"><a href="/partner/selection?assgn={{ assignment.number }}" data-reveal-id="selectionModal" class="button success"
 								data-reveal-ajax="true">Choose Partner for Assignment {{ assignment.number }}</a></div></td>
 							</tr>
 							{% endif %}

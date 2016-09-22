@@ -1,5 +1,6 @@
 import jinja2
 import os
+import webapp2
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -14,7 +15,7 @@ from src.models.message import MessageModel
 from src.models.partnership import PartnershipModel
 from src.models.settings import SettingModel
 from src.models.student import StudentModel
-from src.send_mail import SendMail 
+from src.send_mail import SendMail
 
 
 JINJA_ENV = jinja2.Environment(
@@ -92,7 +93,7 @@ class ConfirmPartner(BaseHandler):
 
         # pass template values...
         template_values = {
-            'student':          student,             
+            'student':          student,
             'selection_closed': selection_closed,
             'invitations':      invitations,
         }
@@ -158,7 +159,7 @@ class DeclineInvitation(BaseHandler):
         InvitationModel.update_invitation_status(invitation.key, active=False)
         message = MessageModel.invitation_declined()
         return self.redirect('/partner?message=' + message)
-            
+
 
 class SelectPartner(BaseHandler):
     @login_required
@@ -172,20 +173,24 @@ class SelectPartner(BaseHandler):
         if not SettingModel.cross_section_partners():
             selectees = StudentModel.get_students_by_lab(quarter, year, selector.lab)
         else:
-            selectees = StudentModel.get_students_by_active_status(quarter, year)                
+            selectees = StudentModel.get_students_by_active_status(quarter, year)
 
         active_assigns = AssignmentModel.get_active_assigns(quarter, year)
+
+        # get default parameter
+        default_assgn = int(self.request.get("assgn")) if self.request.get("assgn") is not "" else -1
+
         # get error message, if any
-        e = self.request.get('error')        
+        e = self.request.get('error')
         # check to see if partner selection period has closed
         selection_closed = len(active_assigns) == 0
-
         template_values = {
             'error': e,
-            'selector': selector,                                  
-            'selectees': selectees.order(Student.last_name),    
+            'selector': selector,
+            'selectees': selectees.order(Student.last_name),
             'selection_closed': selection_closed,
             'active': active_assigns,
+            'default_assgn': default_assgn,
         }
         template = JINJA_ENV.get_template('/templates/partner_selection.html')
         self.response.write(template.render(template_values))
@@ -213,5 +218,3 @@ class SelectPartner(BaseHandler):
         else:
             InvitationModel.create_invitation(selector, selected, selected_assign)
             return self.redirect('/partner?message=' + MessageModel.sent_invitation(selected))
-
-
