@@ -26,7 +26,7 @@ class PartnershipModel:
             constraints += [Partnership.members == student.key]
         return Partnership.query(*constraints).fetch()
 
-    
+
     @staticmethod
     def get_active_partner_history_for_student(student, quarter, year, fill_gaps=None):
         history = Partnership.query(
@@ -61,8 +61,8 @@ class PartnershipModel:
             Partnership.quarter == quarter,
             Partnership.year == year
         ).order(Partnership.assignment_number)
-        
-        
+
+
     @staticmethod
     def get_partner_from_partner_history_by_assign(student, partners, assign_num):
         current_partnership = partners.filter(
@@ -106,7 +106,7 @@ class PartnershipModel:
         for student in students:
             constraints += [Partnership.members == student.key]
         return Partnership.query(*constraints).fetch()
-        
+
 
     @staticmethod
     def get_inactive_partnerships_by_student_and_assign(student, assign_num):
@@ -158,9 +158,9 @@ class PartnershipModel:
     def create_partnership(students, assign):
         partnership = Partnership(
             members           = map(lambda x: x.key, students),
-            assignment_number = assign, 
+            assignment_number = assign,
             active            = True,
-            year              = students[0].year, 
+            year              = students[0].year,
             quarter           = students[0].quarter
         )
 

@@ -2,6 +2,7 @@ import jinja2
 import os
 import webapp2
 import datetime
+import time
 
 from google.appengine.api import users
 from webapp2_extras.appengine.users import login_required
@@ -41,8 +42,11 @@ class MainPage(BaseHandler):
             self.session['quarter'] = quarter
             self.session['year']    = year
             self.session['student'] = student.key.urlsafe()
-            # current time
-            current_time = datetime.datetime.now()
+
+            # Get current time in UTC, then convert to PDT
+            current_time = datetime.datetime.fromtimestamp(time.time())
+            current_time = current_time - datetime.timedelta(hours=7)
+
             #get all assignments
             all_assigns = sorted(AssignmentModel.get_all_assign(quarter, year), key = lambda x: x.number)
             # get active assignments
@@ -54,8 +58,9 @@ class MainPage(BaseHandler):
             # find any active invitations for the current assignment that the student has received
             received_invitations = InvitationModel.get_recvd_invites_by_student_and_mult_assigns(student, [x.number for x in active_assigns])
             # find any partnerships in which the student has been involved
-            partners = PartnershipModel.get_active_partner_history_for_student(student, quarter, year)
-            partners = dict([(x.number,PartnershipModel.get_partner_from_partner_history_by_assign(student, partners, x.number)) for x in active_assigns])
+            partners = PartnershipModel.get_all_partner_history_for_student(student, quarter, year)
+            partners = dict([(x.number,PartnershipModel.get_partner_from_partner_history_by_assign(student, partners, x.number)) for x in all_assigns])
+            print partners
             # create list of assignment numbers which student has a partner for (IF PYTHON 3, use .items() instead of .iteritems())
             assgn_nums_with_partner = []
             for assgn_num, partner in partners.iteritems():
@@ -66,7 +71,6 @@ class MainPage(BaseHandler):
             evals = dict([(x.assignment_number,x) for x in evals])
             # get activity message, if any
             message = self.request.get('message')
-            print assgn_nums_with_partner
             dropped = []
             for x in active_assigns:
                 dropped += PartnershipModel.get_inactive_partnerships_by_student_and_assign(student, x.number).fetch()
