@@ -96,18 +96,21 @@
 							<tr>
 								<td><div class="col-md-4 text-center"><a href="/partner/selection?assgn={{ assignment.number }}" data-reveal-id="selectionModal" class="button info"
 								data-reveal-ajax="true">Partner: <b>{{ partners[assignment.number][0].first_name }} {{ partners[assignment.number][0].last_name}}</b></a></div></td>
+								<div class="reveal-modal small" id="selectionModal" data-reveal></div>
 							</tr>
 							<!-- Case: No partner and past recommended "choose partner" time period -->
 							{% elif current_time > assignment.due_date %}
 							<tr>
 								<td><div class="col-md-4 text-center"><a href="/partner/selection?assgn={{ assignment.number }}" data-reveal-id="selectionModal" class="button alert"
 								data-reveal-ajax="true">Choose Partner for Assignment {{ assignment.number }}</a></div></td>
+								<div class="reveal-modal small" id="selectionModal" data-reveal></div>
 							</tr>
 							<!-- Case: No partner during recommended "choose partner" time period-->
 							{% else %}
 							<tr>
 								<td><div class="col-md-4 text-center"><a href="/partner/selection?assgn={{ assignment.number }}" data-reveal-id="selectionModal" class="button success"
 								data-reveal-ajax="true">Choose Partner for Assignment {{ assignment.number }}</a></div></td>
+								<div class="reveal-modal small" id="selectionModal" data-reveal></div>
 							</tr>
 							{% endif %}
 						{% elif current_time > assignment.close_date %}
@@ -152,6 +155,7 @@
 									<td><div class="col-md-4 text-center"><a href="/partner/evaluation" data-reveal-id="selectionModal" class="button info"
 									data-reveal-ajax="true">Evaluation submitted for <b>{{ partners[assignment.number][0].first_name }} {{ partners[assignment.number][0].last_name}}</b></a>
 								</div></td>
+								<div class="reveal-modal medium" id="evalModal" data-reveal></div>
 							<!-- Evaluation past due date -->
 							{% elif current_time > assignment.eval_date %}
 								<!-- past due date + not submitted (with or without partner)-->
@@ -160,6 +164,7 @@
 											Failed to submit evaluation by deadline:
 										<b>{{ assignment.eval_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b></a>
 									</div></td>
+									<div class="reveal-modal medium" id="evalModal" data-reveal></div>
 								<!-- past due date + submitted -->
 								{% else %}
 									<td><div class="col-md-4 text-center"><a class="button info">
@@ -176,6 +181,7 @@
 									data-reveal-ajax="true">Submit Evaluation for <b>{{ partners[assignment.number][0].first_name }} {{ partners[assignment.number][0].last_name}}</b>
 									<br><br>Due: <b>{{ assignment.eval_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b></a></div>
 								</td>
+								<div class="reveal-modal medium" id="evalModal" data-reveal></div>
 							{% else %}
 								<!-- Evaluation open (no partner) and not submitted-->
 								<td class="text-center">
@@ -183,6 +189,7 @@
 									data-reveal-ajax="true">Please select a partner to evaluate!</b>
 									<br><br>Due: <b>{{ assignment.eval_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b></a></div>
 								</td>
+								<div class="reveal-modal small" id="selectionModal" data-reveal></div>
 							{% endif %}
 						</tr>
 					</table>
