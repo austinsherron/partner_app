@@ -137,7 +137,7 @@ class ConfirmPartner(BaseHandler):
         elif PartnershipModel.student_has_partner_for_assign(confirming, for_assign):
             message = MessageModel.already_has_partner(admin)
         else:
-            message     = MessageModel.confirm_partnership([being_confirmed, confirming], admin, being_confirmed)
+            message     = MessageModel.confirm_partnership([being_confirmed, confirming], admin, confirming)
             partnership = PartnershipModel.create_partnership([being_confirmed, confirming], for_assign)
 
         # set invitations between invitor and invitee (for current assignment) to inactive
