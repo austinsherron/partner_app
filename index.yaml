@@ -119,12 +119,27 @@ indexes:
 
 - kind: Partnership
   properties:
+  - name: active
+  - name: members
+  - name: quarter
+  - name: year
+  - name: assignment_number
+
+- kind: Partnership
+  properties:
   - name: initiator
   - name: assignment_number
 
 - kind: Partnership
   properties:
   - name: initiator
+  - name: quarter
+  - name: year
+  - name: assignment_number
+
+- kind: Partnership
+  properties:
+  - name: members
   - name: quarter
   - name: year
   - name: assignment_number

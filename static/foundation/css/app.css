@@ -16,9 +16,9 @@ a {
   font-family: 'Open Sans', sans-serif;
 }
 
-.button {
-  background: #00B0D4;
-  font-family: 'Open Sans', sans-serif;
+.div-scroll {
+    height: 600px !important;
+    overflow: scroll;
 }
 
 .num-cell {
@@ -41,14 +41,18 @@ a {
   color: white;
 }
 
+.white-link {
+  color: white;
+}
+
 /*
 
 .button:hover {
- background: #009bbb; 
+ background: #009bbb;
 }
 
 .label {
- background: #00B0D4; 
+ background: #00B0D4;
 }
 
 /* Custom top-bar formatting */
@@ -180,4 +184,17 @@ a {
 
 .label {
   font-family: 'Open Sans', sans-serif;
-}	
+}
+
+/* for partners_main.html header*/
+.assgn_head{
+    font-size:24px;
+    font-family:verdana;
+    background-color: white;
+}
+
+/* Graying out text*/
+.grayout {
+    opacity: 0.5; /* Real browsers */
+    filter: alpha(opacity = 60); /* MSIE */
+}

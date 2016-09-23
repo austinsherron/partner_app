@@ -15,88 +15,174 @@
 	<div class="small-12 column panel text-center">
 	  <div class="row">
 	    <div class="small-10 column small-offset-1 text-justify">
-		  <p>
-			The partner app main page is divided into two panels: 
-			<br>
-			<br>
-			<h4>1) The information panel</h4>
-			<br>
-			The top half of the information panel contains: the current
-			assignment number, the date by which a partner must be chosen,
-			the date that partner evaluations open, and the date by which a
-			partner evaluation must be submitted.
-			<br>
-			<br>
-			The top half of information panel also displays a number of 
-			different notifications:
-			<br>
-			<br>
-			<h5 class="alert-box info text-center">Current Partner Notifications</h5>
-			<br>
-			This info box will either tell you that you don't have a partner,
-			the name of your current partner (if you have one), or that you
-			were given permission to work alone for the current assignment.
-			<br>
-			<br>
-			<h5 class="alert-box info text-center">Invitation Notification</h5>
-			<br>
-			This info box will inform you if you've received new partner
-			invitations for the current assignment.
-			<br>
-			<br>
-			<h5 class="alert-box warning text-center">No Partner Notification</h5>
-			<br>
-			This info box will inform you if haven't yet confirmed a partnership for
-			the current assignment.
-			<br>
-			<br>
-			<h5 class="alert-box alert text-center">Dropped Partner Notification:</h5>
-			<br>
-			This info box will inform you if your partner for the current
-			assignment accepted an invitation from another student
-			and dissovled your partnership. If you see this notification, it is 
-			your responsibility to find a new partner, reinstate your dissolved
-			partnership, or contact your TA to determine an appropriate course of action 
-			for the current assignment.
-			<br>
-			<br>
-			<h4>2) The action panel</h4>
-			<br>
-			The action panel contains three buttons:
-			<br>
-			<br>
-			<h5>a) Send Partner Invitations</h5>
-			<br>
-			This button brings up a window that allows you to send parntership
-			invitations to students in your lab sections. By default, the app
-			does not allow you to send invitations to students with whom you're
-			currently partnered, or with whom you've had a partnership. 
-			<strong>If you think you need to work alone or repeat a partnership,
-			please contact your TA. Only TAs can confirm NO PARTNER partnerships
-			or repeated partnerships.</strong>
-			<br>
-			<br>
-			<h5>b) View Invitations from Others</h5>
-			<br>
-			This button allows you to confirm invitations that you've received
-			from other students. <strong>Only after an invitation is confirmed will a
-			partnership be considered active.</strong>  Once an invitation is
-			confirmed, all other invitations involving you (all invitations you've
-			sent and received) and the student who sent the invitation will be deactivated.
-			<br>
-			<br>
-			<h5>c) Partner Evaluation</h5>
-			<br>
-			This button allows you to fill out an evaluation for your partner
-			for the current assignment.  The evaluation form will only be
-			available after the partner selection period closes.  If you worked
-			alone--with or without the permission of a TA--you will not be able to submit an
-			evaluation.
-			<br>
-			<br>
-			The bottom half of the action panel displays invitations that
-			you've sent that are currently active.
-		  </p>
+	        <p>
+                    The partner app main page is divided into various UI components. I'll list them here
+                    as they appear from top to bottom on the main partner landing page (the page you
+                    see by default after successfully logging into the partner app):
+                </p>
+
+                <h3>1) The Navigation Bar</h3>
+
+                <p>
+                    Once logged in, the navigation bar contains 6 buttons (1 of them is a dropdown).
+                    From left to right, they are:
+                </p>
+
+                <h4>a) The Partner App Button</h4>
+
+                <p>
+                    If logged in, this button will take you to the main partner app
+                    page (the page that you first see when you log in).
+                </p>
+
+
+                <h4>b) The Partner/Eval History Button</h4>
+
+                <p>
+                    This button takes you to a page that displays three panels.
+                </p>
+
+                <ul>
+                    <li>
+                        <strong>The Abbreviated Partner History panel</strong> This panel displays your
+                        partner history as your TAs see it.
+                    </li>
+                    <li>
+                        <strong>The Complete Partner History panel</strong> This panel displays your
+                        complete partner history, including any inactive (cancelled) partnerships you've had.
+                        <strong>You may also cancel partnerships here, but cancellations will only be reflected if
+                        both parties mutually cancel a partnership.</strong>
+                    </li>
+                    <li>
+                        <strong>The Eval History panel </strong> This panel displays all the partner
+                        evaluations you've submitted, including inactive evaluations.
+                    </li>
+                </ul>
+
+                <h4>c) The Invitation History Button</h4>
+
+                <p>
+                    This button takes you to a page that displays all invitations you've
+                    ever sent/received. If you know you've sent/received an invitation, but you don't see
+                    it on this page, <strong>please report it to your TA</strong>.
+                </p>
+
+                <h4>d) The Profile Button</h4>
+
+                <p>
+                    This button takes you to a page in which you can add information about
+                    yourself to your profile. Other students will be able to see this information
+                    on the Browse Partners page.
+                </p>
+
+                <h4>e) The Browse Partners Button</h4>
+
+                <p>
+                    This button takes you to the Browse Partners page. Here, you
+                    can see the profiles of and send invitations to all students who don't have partners
+                    for the current assignment (if there is more than one active assignment, the
+                    current assignment is the one with the later due date).
+                </p>
+
+                <h4>e) The Help Button</h4>
+
+                <p>
+                    If you're reading this, you already know where the help button takes you!
+                </p>
+
+                <h4>f) The Logout Button</h4>
+
+                <p>
+                    The logout button logs you out of the partner app. Note: Logging our of the
+                    partner app will also log you out of other Google services that you're logged into.
+                </p>
+
+                <h3>2) The Notification Area</h3>
+
+                <p>
+                    The notification area is the white space directly below the nav bar (where you see
+                    the "Hello, [student]" greeting). Whenever something needs your attention, you'll
+                    see a notification banner under the greeting. These banners will call your attention
+                    to things like partner invitations you've received, an unused student profile, and
+                    any cancelled partnerships you were involved in.
+                </p>
+
+                <h3>3) The Assignment Panel</h3>
+
+                <p>
+                    The assignments panel contains a table per assignment that gives the status
+                    of each and every assignments as well as provides actions you can take such as
+                    selecting a partner for a particular assignment or evaluating a partner. Inactive
+                    assignments are grayed out whereas active assignments are not.
+                </p>
+
+                <p>
+                    The first row will either tell you when partner selections open, prompt you to select a
+                    partner, or show your already selected partner.
+                </p>
+
+                <p>
+                    The second row will either tell you when partner evaluations open, prompt you to evaluate
+                    your partner, or tell you you have already evaluated your partner
+                </p>
+
+                <h4>a) The Assignments Open for Partner Selection Table</h4>
+
+                <p>
+                    This table shows information about assingments that have open partner selection
+                    periods. This table shows you--from left to right--the assignment's number, the
+                    date/time when you need to have a partner for this assingment, the date/time
+                    when partner evaluations open for this assignment, and whether or not you have
+                    a partner for this assignment. <strong>If you thought you or your partner confirmed
+                    an invitation for an assignment, but this table shows that you don't have a partner,
+                    please contact your TA.</strong>
+                </p>
+
+                <h4>b) The Assignments Open for Partner Evalution Table</h4>
+
+                <p>
+                    This table shows information about assingments that have open partner evalution
+                    periods. This table shows you--from left to right--the assignment's number, the
+                    date/time when partner evaluations are due, and whether you've submitted an evalution
+                    for this assignment. <strong>Partner evaluations cannot be reopened for students who
+                    miss deadlines, so please make sure you submit your evaluations in a timely
+                    manner.</strong>
+                </p>
+
+                <h3>4) The Invitation Panel</h3>
+
+                <p>
+                    The invitation panel contains two tables that give you information about the
+                    open invitations that you've send/received. <strong>Note: your invitations
+                    (send and received) are deactivated (closed) when you enter into a partnership.
+                    </strong> From left to right:
+                </p>
+
+                <h4>The Open Invitations You've Sent to Others Table</h4>
+
+                <p>
+                    This table contains information about open invitations that you've
+                    sent to others.
+                </p>
+
+                <h4>The Invitations Others Have Sent to You Table</h4>
+
+                <p>
+                    This table contains information about open invitations that you've
+                    received from others.
+                </p>
+
+                <h3>5) The Cancelled Partnerships Panel</h3>
+
+                <p>
+                    You'll only be able to see this panel if there is an assignment with and active
+                    partner selection period for which you have cancelled partnerships. A partnership
+                    can only be cancelled if you/your partner enters into a partnership (for the same
+                    assignment) with another student or if you both cancel a partnership via
+                    the Partnerships/Evals partner history table. <strong>Please contact your TA if you have
+                    unexpected cancelled partnerships.</strong>
+                </p>
+
 	    </div>
 	  </div>
 	</div>
