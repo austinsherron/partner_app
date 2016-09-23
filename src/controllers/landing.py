@@ -71,7 +71,6 @@ class MainPage(BaseHandler):
             # get activity message, if any
             message = self.request.get('message')
             dropped = []
-            print partners
             for x in active_assigns:
                 dropped += PartnershipModel.get_inactive_partnerships_by_student_and_assign(student, x.number).fetch()
             dropped = sorted(dropped, key=lambda x: x.assignment_number)
