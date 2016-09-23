@@ -19,7 +19,7 @@ JINJA_ENV = jinja2.Environment(
 
 class ClearDB(BaseHandler):
 
-    @admin_required
+    #@admin_required
     def get(self):
         template = JINJA_ENV.get_template('/templates/admin_cleardb.html')
         self.response.write(template.render())

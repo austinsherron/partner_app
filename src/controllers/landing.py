@@ -46,11 +46,12 @@ class MainPage(BaseHandler):
             # Get current time in UTC, then convert to PDT
             current_time = datetime.datetime.fromtimestamp(time.time())
             current_time = current_time - datetime.timedelta(hours=7)
-
+            print current_time
             #get all assignments
             all_assigns = sorted(AssignmentModel.get_all_assign(quarter, year), key = lambda x: x.number)
             # get active assignments
             active_assigns = sorted(AssignmentModel.get_active_assigns(quarter, year), key=lambda x: x.number)
+            print active_assigns
             # get active eval assigns
             eval_assigns = sorted(AssignmentModel.get_active_eval_assigns(quarter, year), key=lambda x: x.number)
             # find any active invitations for the current assignment that student has sent

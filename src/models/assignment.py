@@ -17,7 +17,7 @@ class AssignmentModel:
         assigns_after_now = Assignment.query(
             Assignment.quarter == quarter,
             Assignment.year == year,
-            Assignment.fade_in_date < dt.now() - td(hours=8)
+            Assignment.fade_in_date < dt.now() - td(hours=7)
         ).order(Assignment.fade_in_date).fetch()
 
         try:
@@ -31,7 +31,7 @@ class AssignmentModel:
         evals_after_now = Assignment.query(
             Assignment.quarter == quarter,
             Assignment.year == year,
-            Assignment.eval_date > dt.now() - td(hours=8)
+            Assignment.eval_date > dt.now() - td(hours=7)
         ).order(Assignment.eval_date).fetch()
 
         if len(evals_after_now) > 0:
@@ -45,13 +45,13 @@ class AssignmentModel:
         assigns_before_now = Assignment.query(
             Assignment.quarter == quarter,
             Assignment.year == year,
-            Assignment.fade_in_date < dt.now() - td(hours=8)
+            Assignment.fade_in_date < dt.now() - td(hours=7)
         ).order(Assignment.fade_in_date).fetch()
 
         to_return = []
 
         for i in range(len(assigns_before_now) - 1, -1, -1):
-            if assigns_before_now[i].close_date > dt.now() - td(hours=8):
+            if assigns_before_now[i].close_date > dt.now() - td(hours=7):
                 to_return.append(assigns_before_now[i])
 
         return to_return
@@ -62,13 +62,13 @@ class AssignmentModel:
         assigns_before_now = Assignment.query(
             Assignment.quarter == quarter,
             Assignment.year == year,
-            Assignment.eval_date > dt.now() - td(hours=8)
+            Assignment.eval_date > dt.now() - td(hours=7)
         ).order(Assignment.eval_date).fetch()
 
         to_return = []
 
         for i in range(len(assigns_before_now)):
-            if assigns_before_now[i].eval_open_date < dt.now() - td(hours=8):
+            if assigns_before_now[i].eval_open_date < dt.now() - td(hours=7):
                 to_return.append(assigns_before_now[i])
 
         return to_return
