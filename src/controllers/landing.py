@@ -60,7 +60,6 @@ class MainPage(BaseHandler):
             # find any partnerships in which the student has been involved
             partners = PartnershipModel.get_all_partner_history_for_student(student, quarter, year)
             partners = dict([(x.number,PartnershipModel.get_partner_from_partner_history_by_assign(student, partners, x.number)) for x in all_assigns])
-            print partners
             # create list of assignment numbers which student has a partner for (IF PYTHON 3, use .items() instead of .iteritems())
             assgn_nums_with_partner = []
             for assgn_num, partner in partners.iteritems():
@@ -72,6 +71,7 @@ class MainPage(BaseHandler):
             # get activity message, if any
             message = self.request.get('message')
             dropped = []
+            print partners
             for x in active_assigns:
                 dropped += PartnershipModel.get_inactive_partnerships_by_student_and_assign(student, x.number).fetch()
             dropped = sorted(dropped, key=lambda x: x.assignment_number)
@@ -84,7 +84,6 @@ class MainPage(BaseHandler):
                 'email': user.email()
             }
             return self.response.write(template.render(template_values))
-
         template_values = {
             'user': user,
             'student': student,
