@@ -169,17 +169,29 @@ class SelectPartner(BaseHandler):
 
         user     = users.get_current_user()
         selector = StudentModel.get_student_by_email(quarter, year, user.email())
-        # if cross section partnership aren't allowed, use selector info to find students in same lab section
-        if not SettingModel.cross_section_partners():
-            selectees = StudentModel.get_students_by_lab(quarter, year, selector.lab)
-        else:
-            selectees = StudentModel.get_students_by_active_status(quarter, year)
+
+        selectees          = StudentModel.get_students_by_lab(quarter, year, selector.lab)
+        # get current active assignment
+        current_assignment = AssignmentModel.get_active_assign_with_latest_fade_in_date(quarter, year)
 
         active_assigns = AssignmentModel.get_active_assigns(quarter, year)
 
         # get default parameter
         default_assgn = int(self.request.get("assgn")) if self.request.get("assgn") is not "" else -1
 
+        # get all current_partnerships for partnership status
+        partnerships = PartnershipModel.get_all_partnerships_for_assign(quarter, year, current_assignment.number)
+        members      = []
+        for p in partnerships:
+            members += p.members
+
+        # build dict to store information about partnership status
+        available = []
+        for s in selectees:
+            if s.key not in members:
+                available.append((s.ucinetid,(s.key in partnerships, s)))
+        available = sorted(available, key=lambda x: x[1][1].last_name)
+        print available
         # get error message, if any
         e = self.request.get('error')
         # check to see if partner selection period has closed
@@ -187,8 +199,10 @@ class SelectPartner(BaseHandler):
         template_values = {
             'error': e,
             'selector': selector,
-            'selectees': selectees.order(Student.last_name),
+            'selectees': available,
             'selection_closed': selection_closed,
+            'current':          current_assignment,
+            'assgn': default_assgn,
             'active': active_assigns,
             'default_assgn': default_assgn,
         }

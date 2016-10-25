@@ -18,7 +18,7 @@ JINJA_ENV = jinja2.Environment(
     autoescape=True)
 
 
-class BrowseForPartners(BaseHandler):
+class PartnerMoreInfo(BaseHandler):
 
     @login_required
     def get(self):
@@ -67,5 +67,5 @@ class BrowseForPartners(BaseHandler):
             'user':             user,
             'sign_out':         users.create_logout_url('/'),
         }
-        template = JINJA_ENV.get_template('/templates/partner_browse.html')
+        template = JINJA_ENV.get_template('/templates/partner_more_info.html')
         self.response.write(template.render(template_values))

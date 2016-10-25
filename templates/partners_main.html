@@ -85,7 +85,7 @@
 	<div class="row fullwidth" data-magellan-destination="assignments">
 		<a name="assignments"></a>
 		<span class="label">Assignments</span>
-		<div class="small-12 columns div-scroll">
+		<div class="small-12 columns div-scroll" style="margin-bottom:20px">
 				<div class="row panel">
 					{% for assignment in all_assigns %}
 						<!-- First if/elif/else block: Logic for table, assignment header, and partner information -->
@@ -95,23 +95,23 @@
 							<!-- Case: Have a partner (but can still change partner)-->
 							{% if assignment.number in assgn_nums_with_partner %}
 							<tr>
-								<td><div class="col-md-4 text-left"><a href="/partner/selection?assgn={{ assignment.number }}" data-reveal-id="selectionModal" class="button info"
-								data-reveal-ajax="true">Partner: <b>{{ partners[assignment.number][0].first_name }} {{ partners[assignment.number][0].last_name}}</b></a></div></td>
-								<div class="reveal-modal small" id="selectionModal" data-reveal></div>
+								<td><div class="col-md-4 text-left active-assgn-text">
+								<a href="/partner/selection?assgn={{ assignment.number }}" class="button small round info"
+								>Partner Info</a>
+							Partner: <b>{{ partners[assignment.number][0].first_name }} {{ partners[assignment.number][0].last_name}}</b>
+							</div></td>
 							</tr>
 							<!-- Case: No partner and past recommended "choose partner" time period -->
 							{% elif current_time > assignment.due_date %}
 							<tr>
-								<td><div class="col-md-4 text-left"><a href="/partner/selection?assgn={{ assignment.number }}" data-reveal-id="selectionModal" class="button round alert"
-								data-reveal-ajax="true">Choose Partner</a></div></td>
-								<div class="reveal-modal small" id="selectionModal" data-reveal></div>
+								<td><div class="col-md-4 text-left"><a href="/partner/selection?assgn={{ assignment.number }}"  class="button small round alert"
+								>Choose Partner</a></div></td>
 							</tr>
 							<!-- Case: No partner during recommended "choose partner" time period-->
 							{% else %}
 							<tr>
-								<td><div class="col-md-4 text-left"><a href="/partner/selection?assgn={{ assignment.number }}" data-reveal-id="selectionModal" class="button round success"
-								data-reveal-ajax="true">Choose Partner</a></div></td>
-								<div class="reveal-modal small" id="selectionModal" data-reveal></div>
+								<td><div class="col-md-4 text-left"><a href="/partner/selection?assgn={{ assignment.number }}" class="button small round success"
+								>Choose Partner</a></div></td>
 							</tr>
 							{% endif %}
 						{% elif current_time > assignment.close_date %}
@@ -147,16 +147,21 @@
 						{% endif %}
 						<!-- Evaluation display logic -->
 						<tr>
-							<!-- Evaluation submitted -->
+							<!-- Evaluation submitted (solo partnership) -->
 							{% if partners[assignment.number][0] is string %}
-								<td><div class="col-md-4 text-left"><a class="button info">
-										Solo partnership: no evaluation needed!</a>
+								<td><div class="col-md-4 text-left">
+										<b>Solo partnership: no evaluation needed!</b>
 								</div></td>
+							<!-- Evalution submitted (normal partnership) -->
 							{% elif submitted_evals[assignment.number] %}
-									<td><div class="col-md-4 text-left"><a href="/partner/evaluation" data-reveal-id="selectionModal" class="button info"
-									data-reveal-ajax="true">Evaluation submitted for <b>{{ partners[assignment.number][0].first_name }} {{ partners[assignment.number][0].last_name}}</b></a>
-								</div></td>
-								<div class="reveal-modal medium" id="evalModal" data-reveal></div>
+								{% if assignment in active %}
+										<td><div class="col-md-4 text-left active-assgn-text"><a href="/partner/evaluation" class="button small round info"
+										>Resubmit</a>&nbspEvaluation submitted!
+									</div></td>
+								{% else %}
+									<td><div class="col-md-4 text-left assgn-text"><b>Evaluation submitted!</b>
+									</div></td>
+								{% endif %}
 							<!-- Evaluation past due date -->
 							{% elif current_time > assignment.eval_date %}
 								<!-- past due date + not submitted (with or without partner)-->
@@ -165,30 +170,29 @@
 											Failed to submit evaluation by deadline:
 										<b>{{ assignment.eval_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b></a>
 									</div></td>
-									<div class="reveal-modal medium" id="evalModal" data-reveal></div>
-								<!-- past due date + submitted -->
-								{% else %}
-									<td><div class="col-md-4 text-left">
-										Successfully submitted evaluation!</a>
-								</div></td>
 								{% endif %}
 							<!-- Evaluation not open yet -->
 							{% elif current_time < assignment.eval_open_date %}
-								<td class="text-left">Partner Eval Opens: <b>{{ assignment.eval_open_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b> </td>
+								{% if assignment in active %}
+									<td class="text-left active-assgn-text">Partner Eval Opens: <b>{{ assignment.eval_open_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b> </td>
+								{% else %}
+									<td class="text-left">Partner Eval Opens: <b>{{ assignment.eval_open_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b> </td>
+								{% endif %}
 							{% elif partners[assignment.number] != [] %}
 								<!-- Evaluation open (have partner) and not submitted-->
 								<td class="text-left">
-									<div class="col-md-4 text-left"><a href="/partner/evaluation" data-reveal-id="selectionModal" class="button success"
-									data-reveal-ajax="true">Submit Evaluation for <b>{{ partners[assignment.number][0].first_name }} {{ partners[assignment.number][0].last_name}}</b>
-									<br><br>Due: <b>{{ assignment.eval_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b></a></div>
+									<div class="col-md-4 text-left active-assgn-text">
+										<a href="/partner/evaluation" class="button small round success"
+										>Submit Eval
+										</a>
+									Eval Due Date: <b>{{ assignment.eval_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b>
+									</div>
 								</td>
-								<div class="reveal-modal medium" id="evalModal" data-reveal></div>
 							{% else %}
 								<!-- Evaluation open (no partner) and not submitted-->
 								<td class="text-left">
-									<div class="col-md-4 text-left"><a href="/partner/selection?assgn={{ assignment.number }}" data-reveal-id="selectionModal" class="button alert"
-									data-reveal-ajax="true">Please select a partner to evaluate!</b>
-									<br><br>Due: <b>{{ assignment.eval_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b></a></div>
+									<div class="col-md-4 text-left active-assgn-text">
+									Eval Due Date: <b>{{ assignment.eval_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b></a></div>
 								</td>
 								<div class="reveal-modal small" id="selectionModal" data-reveal></div>
 							{% endif %}
@@ -199,7 +203,7 @@
 	</div>
 	<br>
 	<div class="row fullwidth">
-		<br><br>
+		<br><br><br>
 		<span class="label">Invitations</span>
 		<div class="small-12 columns">
 			<div class="row panel">
@@ -243,10 +247,10 @@
 		</div>
 	</div>
 
-	<br>
-
 	{% if dropped|length > 0%}
-
+	<br>
+	<br>
+	<br>
 		<div class="row fullwidth">
 			<span class="label alert">Deactivated Partnerships</span>
 			<div class="small-12 columns">
@@ -282,7 +286,8 @@
 
 
 {% else %}
-
+	<br>
+	<br>
 	<br>
 	<div class="row text-left">
 		<div class="small-12 column panel">

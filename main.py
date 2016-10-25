@@ -14,6 +14,7 @@ from src.controllers import landing
 from src.controllers import misc
 from src.controllers import profile
 from src.controllers import view_history
+from src.controllers import partner_more_info
 
 
 config = {}
@@ -35,6 +36,7 @@ application = webapp2.WSGIApplication([
     ('/partner/instructions', misc.HelpPage),
     ('/partner/invitation/confirm', partners.ConfirmInvitation),
     ('/partner/invitation/decline', partners.DeclineInvitation),
+    ('/partner/more', partner_more_info.PartnerMoreInfo),
     ('/images/(.*)', misc.ImageHandler),
     ('/admin', admin_landing.MainAdmin),
     ('/admin/assignment/add', admin_assignment.AddAssignment),
