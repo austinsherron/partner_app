@@ -26,6 +26,7 @@ class BrowseForPartners(BaseHandler):
         year     = SettingModel.year()
         user     = users.get_current_user()
         selector = StudentModel.get_student_by_email(quarter, year, user.email())
+        student = StudentModel.get_student_by_email(quarter, year, user.email())
 
         if not selector:
             return self.redirect('/partner')
@@ -46,9 +47,13 @@ class BrowseForPartners(BaseHandler):
 
         # get all current_partnerships for partnership status
         partnerships = PartnershipModel.get_all_partnerships_for_assign(quarter, year, current_assignment.number)
+        partner_history = PartnershipModel.get_all_partner_history_for_student(student, quarter, year)
         members      = []
-        for p in partnerships:
+        for p in partner_history:
             members += p.members
+        for p in partnerships:
+            if p.members not in members:
+                members += p.members
 
         # build dict to store information about partnership status
         available = []
