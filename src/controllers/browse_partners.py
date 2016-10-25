@@ -37,9 +37,9 @@ class BrowseForPartners(BaseHandler):
         # if there are no assignments for this quarter, redirect to avoid errors
         if not current_assignment:
             return self.redirect('/partner?message=There are no assignments open for partner selection.')
-            
+
         # get error message, if any
-        e = self.request.get('error')        
+        e = self.request.get('error')
 
         # check to see if partner selection period has closed
         selection_closed = (datetime.now() - timedelta(hours=7) > current_assignment.close_date)
@@ -49,15 +49,19 @@ class BrowseForPartners(BaseHandler):
         members      = []
         for p in partnerships:
             members += p.members
-        partnership = members
+
         # build dict to store information about partnership status
-        selectees = sorted({s.ucinetid: (s.key in partnerships,s) for s in selectees}.items(), key=lambda x: x[1][1].last_name)
+        available = []
+        for s in selectees:
+            if s.key not in members:
+                available.append((s.ucinetid,(s.key in partnerships, s)))
+        available = sorted(available, key=lambda x: x[1][1].last_name)
 
         # pass template values...
         template_values = {
             'error':            e,
-            'selector':         selector,                                  
-            'selectees':        selectees,                                
+            'selector':         selector,
+            'selectees':        available,
             'selection_closed': selection_closed,
             'current':          current_assignment,
             'user':             user,
@@ -65,4 +69,3 @@ class BrowseForPartners(BaseHandler):
         }
         template = JINJA_ENV.get_template('/templates/partner_browse.html')
         self.response.write(template.render(template_values))
-
