@@ -52,8 +52,8 @@ class BrowseForPartners(BaseHandler):
         for p in partner_history:
             members += p.members
         for p in partnerships:
-            print p
-            members += p.members
+            if p.members not in members:
+                members += p.members
 
         # build dict to store information about partnership status
         available = []
