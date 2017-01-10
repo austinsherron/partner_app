@@ -23,7 +23,6 @@ JINJA_ENV = jinja2.Environment(
     extensions = ['jinja2.ext.autoescape'],
     autoescape=True)
 
-
 class CancelPartner(BaseHandler):
     @login_required
     def get(self):
@@ -31,18 +30,24 @@ class CancelPartner(BaseHandler):
         year    = SettingModel.year()
         user    = users.get_current_user()
         student = StudentModel.get_student_by_email(quarter, year, user.email())
+        assgn_num = 0
 
         cancel      = int(self.request.get('cancel'))
         partnership = ndb.Key(urlsafe=self.request.get('p')).get()
 
         if cancel:
-            partnership = PartnershipModel.cancel_partnership(student, partnership)
+            assgn_num = partnership.assignment_number
+
+        if cancel:
+            # refine implementation of cancellation eventually
+            for s in partnership.members:
+                partnership = PartnershipModel.cancel_partnership(s, partnership)
             if not partnership.active:
                 EvalModel.cancel_evals_for_partnership(partnership)
-            return self.redirect('/partner/history?message=' + MessageModel.partnership_cancelled())
+            return self.redirect('/partner?message=' + MessageModel.partnership_cancelled(assgn_num))
         else:
             PartnershipModel.uncancel_partnership(student, partnership)
-            return self.redirect('/partner/history?message=' + MessageModel.partnership_uncancelled())
+            return self.redirect('/partner?message=' + MessageModel.partnership_uncancelled())
 
 
 class ConfirmInvitation(BaseHandler):
@@ -168,6 +173,7 @@ class SelectPartner(BaseHandler):
         year    = SettingModel.year()
 
         user     = users.get_current_user()
+        student = StudentModel.get_student_by_email(quarter, year, user.email())
         selector = StudentModel.get_student_by_email(quarter, year, user.email())
 
         selectees          = StudentModel.get_students_by_lab(quarter, year, selector.lab)
@@ -181,9 +187,14 @@ class SelectPartner(BaseHandler):
 
         # get all current_partnerships for partnership status
         partnerships = PartnershipModel.get_all_partnerships_for_assign(quarter, year, current_assignment.number)
+        partner_history = PartnershipModel.get_all_partner_history_for_student(student, quarter, year)
         members      = []
+        for p in partner_history:
+            if p.active:
+                members += p.members
         for p in partnerships:
-            members += p.members
+            if p.members not in members:
+                members += p.members
 
         # build dict to store information about partnership status
         available = []
@@ -191,7 +202,6 @@ class SelectPartner(BaseHandler):
             if s.key not in members:
                 available.append((s.ucinetid,(s.key in partnerships, s)))
         available = sorted(available, key=lambda x: x[1][1].last_name)
-        print available
         # get error message, if any
         e = self.request.get('error')
         # check to see if partner selection period has closed

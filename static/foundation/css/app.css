@@ -16,6 +16,13 @@ a {
   font-family: 'Open Sans', sans-serif;
 }
 
+#selectable .ui-selecting {
+ background-color: gray;
+}
+#selectable .ui-selected {
+ background-color: #008cba;
+}
+
 .div-scroll {
     height: 550px !important;
     overflow: scroll;
@@ -207,4 +214,8 @@ a {
 .active-assgn-text {
     color: #008cba;
     font-size: 16px;
+}
+
+.left-justify {
+    text-align: left;
 }

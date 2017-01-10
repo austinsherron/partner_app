@@ -24,11 +24,21 @@
   					{% else %}
   						<div class="row">
   					{% endif %}
-  						<div class="small-3 columns">
-  							<div class="small-12 columns small-centered">
-  								<img height="100px" width="100px" src="/images/{{ student.key.urlsafe() }}"/>
-  							</div>
-  						</div>
+                    <div class="small-3 columns">
+                        <div class="small-12 columns small-centered">
+                            <img height="100px" width="100px" src="/images/{{ student.key.urlsafe() }}"/>
+                            {% if not selection_closed %}
+                                <div class="row">
+                                    <br>
+                                    {% if status %}
+                                        <input class="button round expand alert" type="submit" value="Send Invitation">
+                                    {% else %}
+                                        <input class="button round expand success" type="submit" value="Send Invitation">
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
   						<div class="small-9 columns">
   							<div class="small-6 columns">
   								{% set name = student.preferred_name if student.preferred_name else student.first_name%}
@@ -67,7 +77,6 @@
 		  {% endif %}
 	    {% endfor %}
 	  </select> -->
-	  <input class="button expand" type="submit" value="Send Invitation">
     </form>
   <div class="text-center">
     <h5>

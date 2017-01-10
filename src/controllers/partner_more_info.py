@@ -10,6 +10,7 @@ from src.models.assignment import AssignmentModel
 from src.models.partnership import PartnershipModel
 from src.models.settings import SettingModel
 from src.models.student import StudentModel
+from src.models.message import MessageModel
 
 
 JINJA_ENV = jinja2.Environment(
@@ -22,48 +23,55 @@ class PartnerMoreInfo(BaseHandler):
 
     @login_required
     def get(self):
-        quarter  = SettingModel.quarter()
-        year     = SettingModel.year()
-        user     = users.get_current_user()
-        selector = StudentModel.get_student_by_email(quarter, year, user.email())
+        # delcare page template
+        template = JINJA_ENV.get_template('/templates/partners_main.html')
+        # get current user
+        user = users.get_current_user()
+        student = None
 
-        if not selector:
-            return self.redirect('/partner')
+        try:
+            quarter  = SettingModel.quarter()
+            year     = SettingModel.year()
+            user     = users.get_current_user()
+            selector = StudentModel.get_student_by_email(quarter, year, user.email())
+            if not selector:
+                return self.redirect('/partner')
+            # get error message, if any
+            e = self.request.get('error')
 
-        # use selector info to find students in same lab section
-        selectees          = StudentModel.get_students_by_lab(quarter, year, selector.lab)
-        current_assignment = AssignmentModel.get_active_assign_with_latest_fade_in_date(quarter, year)
+            # get own email to query partner information.
+            assgn_num = int(self.request.get('assgn'))
 
-        # if there are no assignments for this quarter, redirect to avoid errors
-        if not current_assignment:
-            return self.redirect('/partner?message=There are no assignments open for partner selection.')
+            # get list of all partners for student (roundabout solution)
+            all_assigns = sorted(AssignmentModel.get_all_assign(quarter, year), key = lambda x: x.number)
+            partner_history = PartnershipModel.get_all_partner_history_for_student(selector, quarter, year)
+            all_partners = dict([(x.number,PartnershipModel.get_partner_from_partner_history_by_assign(selector, partner_history, x.number)) for x in all_assigns])
 
-        # get error message, if any
-        e = self.request.get('error')
+            # get queried partnership
+            partnership = None
+            for p in partner_history:
+                if p.assignment_number == assgn_num:
+                    partnership = p
 
-        # check to see if partner selection period has closed
-        selection_closed = (datetime.now() - timedelta(hours=7) > current_assignment.close_date)
+            # Redirect to landing if query for that assignment's partnership turns up empty
+            if not len(all_partners[assgn_num]):
+                message = MessageModel.page_not_found()
+                return self.redirect('/partner?message=' + message)
 
-        # get all current_partnerships for partnership status
-        partnerships = PartnershipModel.get_all_partnerships_for_assign(quarter, year, current_assignment.number)
-        members      = []
-        for p in partnerships:
-            members += p.members
-
-        # build dict to store information about partnership status
-        available = []
-        for s in selectees:
-            if s.key not in members:
-                available.append((s.ucinetid,(s.key in partnerships, s)))
-        available = sorted(available, key=lambda x: x[1][1].last_name)
-
+        except (AttributeError, IndexError):
+            template_values = {
+                'user': user,
+                'student': student,
+                'sign_out': users.create_logout_url('/'),
+                'email': user.email()
+            }
+            return self.response.write(template.render(template_values))
         # pass template values...
         template_values = {
             'error':            e,
             'selector':         selector,
-            'selectees':        available,
-            'selection_closed': selection_closed,
-            'current':          current_assignment,
+            'partner':          all_partners[assgn_num][0],
+            'partnership':      partnership,
             'user':             user,
             'sign_out':         users.create_logout_url('/'),
         }

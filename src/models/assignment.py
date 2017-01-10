@@ -45,13 +45,13 @@ class AssignmentModel:
         assigns_before_now = Assignment.query(
             Assignment.quarter == quarter,
             Assignment.year == year,
-            Assignment.fade_in_date < dt.now() - td(hours=7)
+            Assignment.fade_in_date < dt.now() - td(hours=8)
         ).order(Assignment.fade_in_date).fetch()
 
         to_return = []
 
         for i in range(len(assigns_before_now) - 1, -1, -1):
-            if assigns_before_now[i].close_date > dt.now() - td(hours=7):
+            if assigns_before_now[i].close_date > dt.now() - td(hours=8):
                 to_return.append(assigns_before_now[i])
 
         return to_return

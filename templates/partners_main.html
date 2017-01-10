@@ -23,7 +23,7 @@
 	{% if profile %}
     	<div class="row text-center">
 	  		<div class="small-6 column small-centered">
-   	    		<div class="alert-box warning"><a href="partner/edit/profile"><h4>Please Update Your Profile!</a></h4></div>
+   	    		<div class="alert-box round warning"><a href="partner/edit/profile"><h4>Please Update Your Profile!</a></h4></div>
 	  		</div>
     	</div>
 	{% endif %}
@@ -33,7 +33,7 @@
 	  		<div class="small-6 column small-centered">
 				<h4>
 					<a href="/partner/confirm" data-reveal-id="confirmModal"
-					class="button expand" data-reveal-ajax="true">You Have Received Partner Invitations!</a>
+					class="button round expand" data-reveal-ajax="true">You Have Received Partner Invitations!</a>
 					<div class="reveal-modal small" id="confirmModal" data-reveal></div>
 				</h4>
 	  		</div>
@@ -85,7 +85,7 @@
 	<div class="row fullwidth" data-magellan-destination="assignments">
 		<a name="assignments"></a>
 		<span class="label">Assignments</span>
-		<div class="small-12 columns div-scroll" style="margin-bottom:20px">
+		<div class="small-12 columns div-scroll" style="margin-bottom:5px">
 				<div class="row panel">
 					{% for assignment in all_assigns %}
 						<!-- First if/elif/else block: Logic for table, assignment header, and partner information -->
@@ -96,13 +96,14 @@
 							{% if assignment.number in assgn_nums_with_partner %}
 							<tr>
 								<td><div class="col-md-4 text-left active-assgn-text">
-								<a href="/partner/selection?assgn={{ assignment.number }}" class="button small round info"
-								>Partner Info</a>
-							Partner: <b>{{ partners[assignment.number][0].first_name }} {{ partners[assignment.number][0].last_name}}</b>
+							Partner:
+							<a href="/partner/more?assgn={{ assignment.number }}">
+								<b><u>{{ partners[assignment.number][0].first_name }} {{ partners[assignment.number][0].last_name}}</u></b>
+							</a>
 							</div></td>
 							</tr>
 							<!-- Case: No partner and past recommended "choose partner" time period -->
-							{% elif current_time > assignment.due_date %}
+							{% elif current_time > assignment.close_date %}
 							<tr>
 								<td><div class="col-md-4 text-left"><a href="/partner/selection?assgn={{ assignment.number }}"  class="button small round alert"
 								>Choose Partner</a></div></td>
@@ -155,8 +156,8 @@
 							<!-- Evalution submitted (normal partnership) -->
 							{% elif submitted_evals[assignment.number] %}
 								{% if assignment in active %}
-										<td><div class="col-md-4 text-left active-assgn-text"><a href="/partner/evaluation" class="button small round info"
-										>Resubmit</a>&nbspEvaluation submitted!
+										<td><div class="col-md-4 text-left active-assgn-text"><a href="/partner/evaluation" class="button small round info">
+											Resubmit</a>
 									</div></td>
 								{% else %}
 									<td><div class="col-md-4 text-left assgn-text"><b>Evaluation submitted!</b>
@@ -201,7 +202,6 @@
 					{% endfor %}
 		</div>
 	</div>
-	<br>
 	<div class="row fullwidth">
 		<br><br><br>
 		<span class="label">Invitations</span>
@@ -265,9 +265,9 @@
 							{% for partner in dropped %}
 								<tr>
 									<td class="text-left num-cell">{{ partner.assignment_number }}</td>
-                                                                        {% for member in partner.members %}
-                                                                            <td class="text-left">{{ member.get().ucinetid }}</td>
-                                                                        {% endfor %}
+                                    {% for member in partner.members %}
+                                    	<td class="text-left">{{ member.get().ucinetid }}</td>
+                                    {% endfor %}
 								</tr>
 							{% endfor %}
 						</table>
