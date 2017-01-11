@@ -175,7 +175,7 @@ class PartnershipModel:
 
     @staticmethod
     def cancel_partnership(student, partnership):
-        partnership.cancelled.append(student.key)
+        partnership.cancelled.append(student)
         if set(partnership.members) == set(partnership.cancelled):
             partnership.active = False
 

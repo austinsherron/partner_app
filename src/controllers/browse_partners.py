@@ -50,11 +50,11 @@ class BrowseForPartners(BaseHandler):
         partner_history = PartnershipModel.get_all_partner_history_for_student(student, quarter, year)
         members      = []
         for p in partner_history:
-            members += p.members
+            if p.active:
+                members += p.members
         for p in partnerships:
             if p.members not in members:
                 members += p.members
-
         # build dict to store information about partnership status
         available = []
         for s in selectees:

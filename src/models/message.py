@@ -47,24 +47,27 @@ class MessageModel:
         e += str(student.last_name) + ', ' + str(student.first_name)
         return e
 
+    @staticmethod
+    def page_not_found():
+        return "The page you are looking for does not exist!"
 
     @staticmethod
     def sent_invitation(student):
         message  = 'Invitation to ' + str(student.last_name) + ', '
-        message += str(student.first_name) + ' confirmed. Please refresh the page.'
+        message += str(student.first_name) + ' confirmed.'
         return message
 
 
     @staticmethod
-    def partnership_cancelled():
-        message  = 'You have requested to opt-out of this partnership.'
-        message += ' All group members must opt-out before the partnership is dissolved.'
+    def partnership_cancelled(assgn_num):
+        message  = 'You have requested to opt-out of your partnership for assignment %d.' % assgn_num
+        message += 'Please make sure to notify your old partner of your decision.'
         return message
 
 
     @staticmethod
     def partnership_uncancelled():
-        message  = 'You have requested to opt-in to this partnership.'
+        message  = 'You have requested to uncancel your partnership for this assignment.'
         message += ' This partnership can\'t be dissolved without your consent.'
         return message
 
@@ -72,9 +75,9 @@ class MessageModel:
     @staticmethod
     def assignment_edited_or_added(quarter, year, assign, edit):
         message  = 'Assignment ' + str(assign) + ' for quarter '
-        message += str(quarter) + ' ' + str(year) 
+        message += str(quarter) + ' ' + str(year)
         # changed success message depending on whether an assignment was just create/updated
-        message += ' successfully ' + ('updated' if edit else 'added')        
+        message += ' successfully ' + ('updated' if edit else 'added')
         return message
 
 

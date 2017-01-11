@@ -45,8 +45,7 @@ class MainPage(BaseHandler):
 
             # Get current time in UTC, then convert to PDT
             current_time = datetime.datetime.fromtimestamp(time.time())
-            current_time = current_time - datetime.timedelta(hours=7)
-
+            current_time = current_time - datetime.timedelta(hours=8)
             #get all assignments
             all_assigns = sorted(AssignmentModel.get_all_assign(quarter, year), key = lambda x: x.number)
             # get active assignments
@@ -74,7 +73,6 @@ class MainPage(BaseHandler):
             for x in active_assigns:
                 dropped += PartnershipModel.get_inactive_partnerships_by_student_and_assign(student, x.number).fetch()
             dropped = sorted(dropped, key=lambda x: x.assignment_number)
-
         except (AttributeError, IndexError):
             template_values = {
                 'user': user,

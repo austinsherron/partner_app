@@ -1,42 +1,81 @@
 {% extends 'templates/base.html' %}
 {% block content %}
-<a class="close-reveal-modal">&#215;</a>
-<div class="row">
+
 {% if selection_closed %}
 <h5 class="text-center">
   There are currently no assignments that have active partner selection periods.
 </h5>
 {% else %}
-  {% if selector %}
-    {% if error %}
-  	  <h4 class="text-center">{{ error }}</h4>
-    {% endif %}
-    <h3 class="text-center">Partner Selection</h3>
-    <form action="/partner/selection" method="post" enctype="multipart/form-data">
-	  <span class="label">Assignment</span>
-	  <select name="selected_assign">
-        {% if default_assgn != -1 %}
-          <option value="{{ default_assgn }}">Assignment {{ default_assgn }}</option>
-        {% endif %}
-		{% for assign in active %}
-          {% if assign.number != default_assgn %}
-            <option value="{{ assign.number }}">Assignment {{ assign.number }}</option>
-          {% endif %}
-        {% endfor %}
-	  </select>
-	  <span class="label">Partner</span>
-	  <select name="selected_partner">
-	    {% for student in selectees %}
-		  {% if selector.ucinetid != student.ucinetid %}
-		    <option value="{{ student.studentid }}">
-			  {{ student.last_name }}, {{ student.first_name }} - {{
-			  student.ucinetid }}
-		    </option>
-		  {% endif %}
-	    {% endfor %}
-	  </select>
-	  <input class="button expand" type="submit" value="Submit">
-    </form>
+	<div class="row">
+		<div class="small-12 columns">
+			<h4 class="text-center">Viewing Students for Lab Section {{ selector.lab }}, Assignment {{ current.number }}</h4>
+			<br>
+		</div>
+	</div>
+
+	<div class="small-12 columns panel div-scroll">
+		{% for ucinetid,info in selectees %}
+			{% if ucinetid != selector.ucinetid %}
+				{% set status,student = info %}
+
+				<form action="/partner/selection?selected_partner={{ student.studentid }}&selected_assign={{ current.number }}"
+					enctype="multipart/form-data" method="POST">
+
+					{% if status %}
+						<div class="row" style="display: none;">
+					{% else %}
+						<div class="row">
+					{% endif %}
+
+						<div class="small-3 columns">
+							<div class="small-12 columns small-centered">
+								<img height="100px" width="100px" src="/images/{{ student.key.urlsafe() }}"/>
+								{% if not selection_closed %}
+									<div class="row">
+										<br>
+										{% if status %}
+											<input class="button expand alert" type="submit" value="Send Invitation">
+										{% else %}
+											<input class="button expand success" type="submit" value="Send Invitation">
+										{% endif %}
+									</div>
+								{% endif %}
+							</div>
+						</div>
+
+						<div class="small-9 columns">
+							<div class="small-6 columns">
+								{% set name = student.preferred_name if student.preferred_name else student.first_name%}
+								<h3>{{ name }} {{ student.last_name }}</h3>
+								{% if status %}
+									<span class="label warning">{{ name }} already has a partner for this assignment</span>
+								{% endif %}
+								<span class="label">{{ name }}'s bio</span>
+								<p>{{ student.bio if student.bio else '' }}</p>
+								<span class="label">Availability</span>
+								<p>{{ student.availability if student.availability else '' }}</p>
+							</div>
+							<div class="small-6 columns">
+								<span class="label">{{ name }}'s email address</span>
+								<p>{{ student.email }}</p>
+								<span class="label">{{ name }}'s phone number</span>
+								<p>{{ student.phone_number if student.phone_number else '' }}</p>
+								<span class="label">{{ name }}'s programming experience</span>
+								<p>{{ student.programming_ability + ' (out of 5)' if student.programming_ability else '' }}</p>
+							</div>
+						</div>
+
+						<hr>
+
+					</div>
+
+				</form>
+
+			{% endif %}
+		{% endfor %}
+	</div>
+</div>
+
   <div class="text-center">
     <h5>
       If your partner isn't listed here, please contact the ICS 31 course
@@ -51,8 +90,6 @@
       please contact your TA.
     </h5>
   </div>
-  {% endif %}
-{% endif %}
-</div>
 
+{% endif %}
 {% endblock %}

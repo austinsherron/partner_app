@@ -6,18 +6,17 @@ class StudentModel:
     @staticmethod
     def get_student_by_email(quarter, year, email):
         return Student.query(
-            Student.quarter == quarter, 
-            Student.year == year, 
+            Student.quarter == quarter,
+            Student.year == year,
             Student.email == unicode(email),
             Student.active == True
-        ).get() 
-
+        ).get()
 
     @staticmethod
     def get_students_by_active_status(quarter, year, active=True):
         return Student.query(
-            Student.quarter == quarter, 
-            Student.year == year, 
+            Student.quarter == quarter,
+            Student.year == year,
             Student.active == active
         )
 
@@ -26,7 +25,7 @@ class StudentModel:
     def get_student_by_student_id(quarter, year, studentid, active=True):
         return Student.query(
             Student.quarter == quarter,
-            Student.year == year, 
+            Student.year == year,
             Student.studentid == int(studentid),
             Student.active == active
         ).get()
@@ -36,7 +35,7 @@ class StudentModel:
     def get_students_by_lab(quarter, year, lab, active=True):
         return Student.query(
             Student.quarter == quarter,
-            Student.year == year, 
+            Student.year == year,
             Student.lab == lab,
             Student.active == active
         )

@@ -23,7 +23,6 @@ JINJA_ENV = jinja2.Environment(
     extensions = ['jinja2.ext.autoescape'],
     autoescape=True)
 
-
 class CancelPartner(BaseHandler):
     @login_required
     def get(self):
@@ -31,18 +30,24 @@ class CancelPartner(BaseHandler):
         year    = SettingModel.year()
         user    = users.get_current_user()
         student = StudentModel.get_student_by_email(quarter, year, user.email())
+        assgn_num = 0
 
         cancel      = int(self.request.get('cancel'))
         partnership = ndb.Key(urlsafe=self.request.get('p')).get()
 
         if cancel:
-            partnership = PartnershipModel.cancel_partnership(student, partnership)
+            assgn_num = partnership.assignment_number
+
+        if cancel:
+            # refine implementation of cancellation eventually
+            for s in partnership.members:
+                partnership = PartnershipModel.cancel_partnership(s, partnership)
             if not partnership.active:
                 EvalModel.cancel_evals_for_partnership(partnership)
-            return self.redirect('/partner/history?message=' + MessageModel.partnership_cancelled())
+            return self.redirect('/partner?message=' + MessageModel.partnership_cancelled(assgn_num))
         else:
             PartnershipModel.uncancel_partnership(student, partnership)
-            return self.redirect('/partner/history?message=' + MessageModel.partnership_uncancelled())
+            return self.redirect('/partner?message=' + MessageModel.partnership_uncancelled())
 
 
 class ConfirmInvitation(BaseHandler):
@@ -168,18 +173,35 @@ class SelectPartner(BaseHandler):
         year    = SettingModel.year()
 
         user     = users.get_current_user()
+        student = StudentModel.get_student_by_email(quarter, year, user.email())
         selector = StudentModel.get_student_by_email(quarter, year, user.email())
-        # if cross section partnership aren't allowed, use selector info to find students in same lab section
-        if not SettingModel.cross_section_partners():
-            selectees = StudentModel.get_students_by_lab(quarter, year, selector.lab)
-        else:
-            selectees = StudentModel.get_students_by_active_status(quarter, year)
+
+        selectees          = StudentModel.get_students_by_lab(quarter, year, selector.lab)
+        # get current active assignment
+        current_assignment = AssignmentModel.get_active_assign_with_latest_fade_in_date(quarter, year)
 
         active_assigns = AssignmentModel.get_active_assigns(quarter, year)
 
         # get default parameter
         default_assgn = int(self.request.get("assgn")) if self.request.get("assgn") is not "" else -1
 
+        # get all current_partnerships for partnership status
+        partnerships = PartnershipModel.get_all_partnerships_for_assign(quarter, year, current_assignment.number)
+        partner_history = PartnershipModel.get_all_partner_history_for_student(student, quarter, year)
+        members      = []
+        for p in partner_history:
+            if p.active:
+                members += p.members
+        for p in partnerships:
+            if p.members not in members:
+                members += p.members
+
+        # build dict to store information about partnership status
+        available = []
+        for s in selectees:
+            if s.key not in members:
+                available.append((s.ucinetid,(s.key in partnerships, s)))
+        available = sorted(available, key=lambda x: x[1][1].last_name)
         # get error message, if any
         e = self.request.get('error')
         # check to see if partner selection period has closed
@@ -187,8 +209,10 @@ class SelectPartner(BaseHandler):
         template_values = {
             'error': e,
             'selector': selector,
-            'selectees': selectees.order(Student.last_name),
+            'selectees': available,
             'selection_closed': selection_closed,
+            'current':          current_assignment,
+            'assgn': default_assgn,
             'active': active_assigns,
             'default_assgn': default_assgn,
         }
@@ -210,11 +234,11 @@ class SelectPartner(BaseHandler):
 
         # redirect with errors...
         if PartnershipModel.were_partners_previously([selector, selected]) and not SettingModel.repeat_partners():
-            return self.redirect('/partner/selection?error=' + MessageModel.worked_previously(selected))
+            return self.redirect('/partner?message=' + MessageModel.worked_previously(selected))
         elif InvitationModel.have_open_invitations(selector, selected, selected_assign):
-            return self.redirect('/partner/selection?error=' + MessageModel.have_open_invitations(selected))
+            return self.redirect('/partner?message=' + MessageModel.have_open_invitations(selected))
         elif PartnershipModel.student_has_partner_for_assign(selector, selected_assign):
-            return self.redirect('/partner/selection?error=' + MessageModel.already_has_partner(False, False))
+            return self.redirect('/partner?message=' + MessageModel.already_has_partner(False, False))
         else:
             InvitationModel.create_invitation(selector, selected, selected_assign)
             return self.redirect('/partner?message=' + MessageModel.sent_invitation(selected))
