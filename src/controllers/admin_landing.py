@@ -20,7 +20,7 @@ JINJA_ENV = jinja2.Environment(
 
 class MainAdmin(BaseHandler):
 
-    #@admin_required
+    @admin_required
     def get(self):
         user    = users.get_current_user()                                        
         quarter = SettingModel.quarter()

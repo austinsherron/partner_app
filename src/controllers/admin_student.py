@@ -22,7 +22,7 @@ JINJA_ENV = jinja2.Environment(
 
 class AddStudent(BaseHandler):
 
-    #@admin_required
+    @admin_required
     def get(self):
         # pass map of quarter DB representations (ints) to string representation
         # TODO:
@@ -88,7 +88,7 @@ class DeactivateStudents(BaseHandler):
 
 class EditStudent(BaseHandler):
 
-    #@admin_required
+    @admin_required
     def get(self):
         # pass map of quarter DB representations (ints) to string representation
         # TODO:
