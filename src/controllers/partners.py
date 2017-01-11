@@ -234,11 +234,11 @@ class SelectPartner(BaseHandler):
 
         # redirect with errors...
         if PartnershipModel.were_partners_previously([selector, selected]) and not SettingModel.repeat_partners():
-            return self.redirect('/partner/selection?error=' + MessageModel.worked_previously(selected))
+            return self.redirect('/partner?message=' + MessageModel.worked_previously(selected))
         elif InvitationModel.have_open_invitations(selector, selected, selected_assign):
-            return self.redirect('/partner/selection?error=' + MessageModel.have_open_invitations(selected))
+            return self.redirect('/partner?message=' + MessageModel.have_open_invitations(selected))
         elif PartnershipModel.student_has_partner_for_assign(selector, selected_assign):
-            return self.redirect('/partner/selection?error=' + MessageModel.already_has_partner(False, False))
+            return self.redirect('/partner?message=' + MessageModel.already_has_partner(False, False))
         else:
             InvitationModel.create_invitation(selector, selected, selected_assign)
             return self.redirect('/partner?message=' + MessageModel.sent_invitation(selected))

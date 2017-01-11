@@ -54,7 +54,7 @@ class MessageModel:
     @staticmethod
     def sent_invitation(student):
         message  = 'Invitation to ' + str(student.last_name) + ', '
-        message += str(student.first_name) + ' confirmed. Please refresh the page.'
+        message += str(student.first_name) + ' confirmed.'
         return message
 
 

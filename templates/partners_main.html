@@ -90,7 +90,7 @@
 					{% for assignment in all_assigns %}
 						<!-- First if/elif/else block: Logic for table, assignment header, and partner information -->
 						{% if assignment in active %}
-							<table>
+							<table class="fullwidth">
 							<th class="assgn_head">Assignment {{ assignment.number }}</th>
 							<!-- Case: Have a partner (but can still change partner)-->
 							{% if assignment.number in assgn_nums_with_partner %}
@@ -204,7 +204,7 @@
 	</div>
 	<div class="row fullwidth">
 		<br><br><br>
-		<span class="label">Invitations</span>
+		<span class="label" style="margin-left:15px">Invitations</span>
 		<div class="small-12 columns">
 			<div class="row panel">
 				<div class="small-6 columns">
@@ -252,7 +252,7 @@
 	<br>
 	<br>
 		<div class="row fullwidth">
-			<span class="label alert">Deactivated Partnerships</span>
+			<span class="label alert "style="margin-left:15px">Deactivated Partnerships</span>
 			<div class="small-12 columns">
 				<div class="row panel">
 					<div class="small-12 columns">
