@@ -177,8 +177,6 @@ class SelectPartner(BaseHandler):
         selector = StudentModel.get_student_by_email(quarter, year, user.email())
 
         selectees          = StudentModel.get_students_by_lab(quarter, year, selector.lab)
-        # get current active assignment
-        current_assignment = AssignmentModel.get_active_assign_with_latest_fade_in_date(quarter, year)
 
         active_assigns = AssignmentModel.get_active_assigns(quarter, year)
 
@@ -186,7 +184,7 @@ class SelectPartner(BaseHandler):
         default_assgn = int(self.request.get("assgn")) if self.request.get("assgn") is not "" else -1
 
         # get all current_partnerships for partnership status
-        partnerships = PartnershipModel.get_all_partnerships_for_assign(quarter, year, current_assignment.number)
+        partnerships = PartnershipModel.get_all_partnerships_for_assign(quarter, year, default_assgn)
         partner_history = PartnershipModel.get_all_partner_history_for_student(student, quarter, year)
         members      = []
         for p in partner_history:
@@ -211,7 +209,6 @@ class SelectPartner(BaseHandler):
             'selector': selector,
             'selectees': available,
             'selection_closed': selection_closed,
-            'current':          current_assignment,
             'assgn': default_assgn,
             'active': active_assigns,
             'default_assgn': default_assgn,

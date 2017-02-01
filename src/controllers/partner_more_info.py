@@ -71,6 +71,7 @@ class PartnerMoreInfo(BaseHandler):
             'error':            e,
             'selector':         selector,
             'partner':          all_partners[assgn_num][0],
+            'assgn_num':        assgn_num,
             'partnership':      partnership,
             'user':             user,
             'sign_out':         users.create_logout_url('/'),

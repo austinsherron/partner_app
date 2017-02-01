@@ -20,7 +20,7 @@ JINJA_ENV = jinja2.Environment(
 
 class UploadRoster(BaseHandler):
 
-    @admin_required
+    #@admin_required
     def get(self):
         quarter = self.request.get('quarter')                                  # try grabbing quarter/year from URL
         year    = self.request.get('year')
@@ -140,7 +140,7 @@ class UploadRoster(BaseHandler):
 
 class ViewRoster(BaseHandler):
 
-    @admin_required
+    #@admin_required
     def get(self):
         # pass map of quarter DB representations (ints) to string representation
         # TODO:
