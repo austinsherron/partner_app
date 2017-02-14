@@ -51,14 +51,13 @@
     	</div>
 	{% endif %}
 
+	<!-- Active assignment table -->
 	<div class="row fullwidth" data-magellan-destination="assignments">
 		<a name="assignments"></a>
-		<span class="label">Assignments</span>
-		<div class="small-12 columns div-scroll" style="margin-bottom:5px">
+		<span class="label">Active Assignments</span>
+		<div class="small-12 columns div-scroll">
 				<div class="row panel">
-					{% for assignment in all_assigns %}
-						<!-- First if/elif/else block: Logic for table, assignment header, and partner information -->
-						{% if assignment in active %}
+					{% for assignment in active %}
 							<table class="fullwidth">
 							<th class="assgn_head">Assignment {{ assignment.number }}</th>
 							<!-- Case: Have a partner (but can still change partner)-->
@@ -84,37 +83,6 @@
 								>Choose Partner</a></div></td>
 							</tr>
 							{% endif %}
-						{% elif current_time > assignment.close_date %}
-							<!-- Case: assignment date closed-->
-							<table class="grayout">
-							<th class="assgn_head">Assignment {{ assignment.number }}</th>
-							{% if assignment.number in assgn_nums_with_partner %}
-								<!-- Case: assignment closed and partner was chosen -->
-								<tr>
-									{% if partners[assignment.number][0] is string %}
-										<td><div class="col-md-4 text-left">Authorized no partner</b></a></div>
-										</td>
-									{% else %}
-										<td><div class="col-md-4 text-left">Partner: <b>{{ partners[assignment.number][0].first_name }} {{ partners[assignment.number][0].last_name}}</b></a></div>
-										</td>
-									{% endif %}
-								</tr>
-							{% else %}
-								<!-- Case: assignment closed and partner was not chosen -->
-								<tr>
-									<td><div class="col-md-4 text-left">
-										Partner Selection Closed: <b>{{ assignment.close_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b></a></div>
-									</td>
-								</tr>
-							{% endif %}
-						{% else %}
-							<!-- Case: partner selection time not open yet-->
-							<table class="grayout">
-							<th class="assgn_head">Assignment {{ assignment.number }}</th>
-							<tr>
-							<td class="text-left">Partner Selection Opens: <b>{{ assignment.fade_in_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b> </td>
-							</tr>
-						{% endif %}
 						<!-- Evaluation display logic -->
 						<tr>
 							<!-- Evaluation submitted (solo partnership) -->
@@ -131,22 +99,6 @@
 								{% else %}
 									<td><div class="col-md-4 text-left assgn-text"><b>Evaluation submitted!</b>
 									</div></td>
-								{% endif %}
-							<!-- Evaluation past due date -->
-							{% elif current_time > assignment.eval_date %}
-								<!-- past due date + not submitted (with or without partner)-->
-								{% if partners[assignment.number] == [] or not submitted_evals[assignment.number] %}
-										<td><div class="col-md-4 text-left">
-											Failed to submit evaluation by deadline:
-										<b>{{ assignment.eval_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b></a>
-									</div></td>
-								{% endif %}
-							<!-- Evaluation not open yet -->
-							{% elif current_time < assignment.eval_open_date %}
-								{% if assignment in active %}
-									<td class="text-left active-assgn-text">Partner Eval Opens: <b>{{ assignment.eval_open_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b> </td>
-								{% else %}
-									<td class="text-left">Partner Eval Opens: <b>{{ assignment.eval_open_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b> </td>
 								{% endif %}
 							{% elif partners[assignment.number] != [] %}
 								<!-- Evaluation open (have partner) and not submitted-->
@@ -171,6 +123,59 @@
 					{% endfor %}
 		</div>
 	</div>
+	<br><br><br>
+	<!-- Inactive Assignment table -->
+	<div class ="row fullwidth">
+		<span class="label" style="margin-left:15px">Inactive Assignments</span>
+		<div class="small-12 columns div-scroll" style="margin-bottom:5px">
+		        <div class="row panel">
+		            {% for assignment in inactive_assigns %}
+	                    <!-- Case: assignment date closed-->
+	                    <table class="grayout">
+	                    <th class="assgn_head">Assignment {{ assignment.number }}</th>
+	                    {% if assignment.number in assgn_nums_with_partner %}
+	                        <!-- Case: assignment closed and partner was chosen -->
+	                        <tr>
+	                            {% if partners[assignment.number][0] is string %}
+	                                <td><div class="col-md-4 text-left">Authorized no partner</b></a></div>
+	                                </td>
+	                            {% else %}
+	                                <td><div class="col-md-4 text-left">Partner: <b>{{ partners[assignment.number][0].first_name }} {{ partners[assignment.number][0].last_name}}</b></a></div>
+	                                </td>
+	                            {% endif %}
+	                        </tr>
+	                    {% else %}
+	                        <!-- Case: assignment closed and partner was not chosen -->
+	                        <tr>
+	                            <td><div class="col-md-4 text-left">
+	                                Partner Selection Closed: <b>{{ assignment.close_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b></a></div>
+	                            </td>
+	                        </tr>
+	                    {% endif %}
+		                <!-- Evaluation display logic -->
+		                <tr>
+	                        <!-- past due date + not submitted (with or without partner)-->
+	                        {% if partners[assignment.number] == [] or not submitted_evals[assignment.number] %}
+	                                <td><div class="col-md-4 text-left">
+	                                    Failed to submit evaluation by deadline:
+	                                <b>{{ assignment.eval_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b></a>
+	                            </div></td>
+	                        {% endif %}
+		                    <!-- Evaluation not open yet -->
+		                    {% if current_time < assignment.eval_open_date %}
+		                        {% if assignment in active %}
+		                            <td class="text-left active-assgn-text">Partner Eval Opens: <b>{{ assignment.eval_open_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b> </td>
+		                        {% else %}
+		                            <td class="text-left">Partner Eval Opens: <b>{{ assignment.eval_open_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b> </td>
+		                        {% endif %}
+		                    {% endif %}
+		                </tr>
+		            </table>
+		            {% endfor %}
+		</div>
+		</div>
+	</div>
+
 	<div class="row fullwidth">
 		<br><br><br>
 		<span class="label" style="margin-left:15px">Invitations</span>

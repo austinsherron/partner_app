@@ -50,6 +50,8 @@ class MainPage(BaseHandler):
             all_assigns = sorted(AssignmentModel.get_all_assign(quarter, year), key = lambda x: x.number)
             # get active assignments
             active_assigns = sorted(AssignmentModel.get_active_assigns(quarter, year), key=lambda x: x.number)
+            # get inactive assignments
+            inactive_assigns = sorted(AssignmentModel.get_inactive_assigns(quarter, year), key=lambda x: x.number)
             # get active eval assigns
             eval_assigns = sorted(AssignmentModel.get_active_eval_assigns(quarter, year), key=lambda x: x.number)
             # find any active invitations for the current assignment that student has sent
@@ -73,6 +75,7 @@ class MainPage(BaseHandler):
             for x in active_assigns:
                 dropped += PartnershipModel.get_inactive_partnerships_by_student_and_assign(student, x.number).fetch()
             dropped = sorted(dropped, key=lambda x: x.assignment_number)
+            print inactive_assigns
         except (AttributeError, IndexError):
             template_values = {
                 'user': user,
@@ -86,6 +89,7 @@ class MainPage(BaseHandler):
             'student': student,
             'current_time': current_time,
             'all_assigns': all_assigns,
+            'inactive_assigns': inactive_assigns,
             'assgn_nums_with_partner': assgn_nums_with_partner,
             'active': active_assigns,
             'evals': eval_assigns,
