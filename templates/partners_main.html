@@ -23,7 +23,7 @@
 	{% if profile %}
     	<div class="row text-center">
 	  		<div class="small-6 column small-centered">
-   	    		<div class="alert-box round warning"><a href="partner/edit/profile"><h4>Please Update Your Profile!</a></h4></div>
+   	    		<div class="alert-box round warning"><a href="partner/edit/profile"><h4>Please Update Your Profile</a></h4></div>
 	  		</div>
     	</div>
 	{% endif %}
@@ -33,7 +33,7 @@
 	  		<div class="small-6 column small-centered">
 				<h4>
 					<a href="/partner/confirm" data-reveal-id="confirmModal"
-					class="button round expand" data-reveal-ajax="true">You Have Received Partner Invitations!</a>
+					class="button round expand" data-reveal-ajax="true">You Have Received Partner Invitations</a>
 					<div class="reveal-modal small" id="confirmModal" data-reveal></div>
 				</h4>
 	  		</div>
@@ -45,7 +45,7 @@
     	<div class="row text-center">
 	  		<div class="small-7 column small-centered">
 				<div class="alert-box alert">
-					<h4><a href="#">You Have Deactivated Partnerships! (See Below)</a></h4>
+					<h4><a href="#">You Have Deactivated Partnerships (See Below)</a></h4>
 				</div>
 	  		</div>
     	</div>
@@ -85,38 +85,46 @@
 							{% endif %}
 						<!-- Evaluation display logic -->
 						<tr>
-							<!-- Evaluation submitted (solo partnership) -->
-							{% if partners[assignment.number][0] is string %}
-								<td><div class="col-md-4 text-left">
-										<b>Solo partnership: no evaluation needed!</b>
-								</div></td>
-							<!-- Evalution submitted (normal partnership) -->
-							{% elif submitted_evals[assignment.number] %}
-								{% if assignment in active %}
-										<td><div class="col-md-4 text-left active-assgn-text"><a href="/partner/evaluation" class="button small round info">
-											Resubmit</a>
+							<!-- Only display partner eval information if a partner is chosen -->
+							{% if assignment.number in assgn_nums_with_partner %}
+								<!-- Evaluation not open yet -->
+								{% if current_time <  assignment.eval_open_date %}
+									<td><div class="col-md-4 text-left active-assgn-text">
+										Partner Selection Opens: <b>{{ assignment.eval_open_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b></a></div>
+									</td>
+								<!-- Evaluation submitted (solo partnership) -->
+								{% elif partners[assignment.number][0] is string %}
+									<td><div class="col-md-4 text-left">
+											<b>Solo partnership: no evaluation needed!</b>
 									</div></td>
+								<!-- Evalution submitted (normal partnership) -->
+								{% elif submitted_evals[assignment.number] %}
+									{% if assignment in active %}
+											<td><div class="col-md-4 text-left active-assgn-text"><a href="/partner/evaluation" class="button small round info">
+												Resubmit Evaluation</a>
+										</div></td>
+									{% else %}
+										<td><div class="col-md-4 text-left assgn-text"><b>Evaluation submitted!</b>
+										</div></td>
+									{% endif %}
+								{% elif partners[assignment.number] != [] %}
+									<!-- Evaluation open (have partner) and not submitted-->
+									<td class="text-left">
+										<div class="col-md-4 text-left active-assgn-text">
+											<a href="/partner/evaluation" class="button small round success"
+											>Submit Eval
+											</a>
+										Partner Eval Due Date: <b>{{ assignment.eval_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b>
+										</div>
+									</td>
 								{% else %}
-									<td><div class="col-md-4 text-left assgn-text"><b>Evaluation submitted!</b>
-									</div></td>
+									<!-- Evaluation open (no partner) and not submitted-->
+									<td class="text-left">
+										<div class="col-md-4 text-left active-assgn-text">
+										Partner Eval Due Date: <b>{{ assignment.eval_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b></a></div>
+									</td>
+									<div class="reveal-modal small" id="selectionModal" data-reveal></div>
 								{% endif %}
-							{% elif partners[assignment.number] != [] %}
-								<!-- Evaluation open (have partner) and not submitted-->
-								<td class="text-left">
-									<div class="col-md-4 text-left active-assgn-text">
-										<a href="/partner/evaluation" class="button small round success"
-										>Submit Eval
-										</a>
-									Eval Due Date: <b>{{ assignment.eval_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b>
-									</div>
-								</td>
-							{% else %}
-								<!-- Evaluation open (no partner) and not submitted-->
-								<td class="text-left">
-									<div class="col-md-4 text-left active-assgn-text">
-									Eval Due Date: <b>{{ assignment.eval_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b></a></div>
-								</td>
-								<div class="reveal-modal small" id="selectionModal" data-reveal></div>
 							{% endif %}
 						</tr>
 					</table>
@@ -133,7 +141,14 @@
 	                    <!-- Case: assignment date closed-->
 	                    <table class="grayout">
 	                    <th class="assgn_head">Assignment {{ assignment.number }}</th>
-	                    {% if assignment.number in assgn_nums_with_partner %}
+						{% if current_time <  assignment.fade_in_date %}
+						<!-- Case: assignment not open yet -->
+						<tr>
+							<td><div class="col-md-4 text-left">
+								Partner Selection Opens: <b>{{ assignment.fade_in_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b></a></div>
+							</td>
+						</tr>
+	                    {% elif assignment.number in assgn_nums_with_partner %}
 	                        <!-- Case: assignment closed and partner was chosen -->
 	                        <tr>
 	                            {% if partners[assignment.number][0] is string %}
@@ -154,20 +169,18 @@
 	                    {% endif %}
 		                <!-- Evaluation display logic -->
 		                <tr>
+							<!-- Evaluation not open yet -->
+							{% if current_time <  assignment.eval_open_date %}
+								<td class="text-left">Partner Eval Opens: <b>{{ assignment.eval_open_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b> </td>
 	                        <!-- past due date + not submitted (with or without partner)-->
-	                        {% if partners[assignment.number] == [] or not submitted_evals[assignment.number] %}
+	                        {% elif partners[assignment.number] == [] or not submitted_evals[assignment.number] %}
 	                                <td><div class="col-md-4 text-left">
-	                                    Failed to submit evaluation by deadline:
+	                                    No evaluation submitted by deadline:
 	                                <b>{{ assignment.eval_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b></a>
 	                            </div></td>
-	                        {% endif %}
-		                    <!-- Evaluation not open yet -->
-		                    {% if current_time < assignment.eval_open_date %}
-		                        {% if assignment in active %}
-		                            <td class="text-left active-assgn-text">Partner Eval Opens: <b>{{ assignment.eval_open_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b> </td>
-		                        {% else %}
-		                            <td class="text-left">Partner Eval Opens: <b>{{ assignment.eval_open_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b> </td>
-		                        {% endif %}
+		                    <!-- Past due date and submitted -->
+		                    {% else %}
+		                           <td class="text-left ">Partner Eval submitted!</b> </td>
 		                    {% endif %}
 		                </tr>
 		            </table>

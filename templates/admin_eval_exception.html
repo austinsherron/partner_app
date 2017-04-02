@@ -1,0 +1,66 @@
+{% extends '/templates/admin_common.html' %}
+{% block content %}
+
+<div class="row">
+
+	<br>
+
+	{% if message %}
+		<div class="small-12 columns">
+			<h3 class="text-center">{{ message }}</h3>
+		</div>
+	{% endif %}
+
+	<div class="small-12 columns">
+		<h3 class="text-center">Select Partnership to Extend Evaluation date
+		{{ 'for the Whole Class' if view_by == 'class' else 'for Lab ' + view_by }}</h3>
+		<br>
+		<div class="row small-centered">
+			<ul class="pagination small-centered" style="display: table; margin: 0 auto">
+				{% for i in range(num_labs) %}
+					{% if (i + 1)|string == view_by %}
+						<li class="current small-centered"><a href="/admin/evaluations/extension?view_by={{ i + 1 }}">Lab {{ i + 1}}</a></li>
+					{% else %}
+						<li class="small-centered"><a href="/admin/evaluations/extension?view_by={{ i + 1 }}">Lab {{ i + 1}}</a></li>
+					{% endif %}
+				{% endfor %}
+
+				{% if view_by == 'class' %}
+					<li class="current small-centered"><a href="/admin/evaluations/extension?view_by=class">Class</a></li>
+				{% else %}
+					<li class="small-centered"><a href="/admin/evaluations/extension?view_by=class">Class</a></li>
+				{% endif %}
+			</ul>
+			<br>
+		</div>
+	</div>
+
+	<div class="small-12 columns panel">
+		<table>
+		  <tr>
+			<th class="text-center">StudentID</th>
+			<th class="text-center">UCInetID</th>
+			<th class="text-center">Last Name</th>
+			<th class="text-center">First Name</th>
+			<th class="text-center num-cell">Section</th>
+			{% for i in range(first_num, last_num + 1) %}
+				<th class="text-center">{{ i }}</th>
+			{% endfor %}
+		  </tr>
+		{% for k, v in partnerships %}
+		  <tr>
+			<td class="text-center overflow">{{ k[0] }}</td>
+			<td class="text-center overflow">{{ k[1] }}</td>
+			<td class="text-center overflow">{{ k[2] }}</td>
+			<td class="text-center overflow">{{ k[3] }}</td>
+			<td class="text-center overflow num-cell">{{ k[4] }}</td>
+			{% for partner in v %}
+			  <td class="text-center overflow">{{ partner }}</td>
+			{% endfor %}
+		  </tr>
+		{% endfor %}
+		</table>
+	</div>
+</div>
+
+{% endblock %}

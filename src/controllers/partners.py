@@ -1,6 +1,8 @@
 import jinja2
 import os
 import webapp2
+import datetime
+import time
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -22,6 +24,40 @@ JINJA_ENV = jinja2.Environment(
     loader = jinja2.FileSystemLoader(os.path.dirname('app.yaml')),
     extensions = ['jinja2.ext.autoescape'],
     autoescape=True)
+
+class CancelModal(BaseHandler):
+    @login_required
+    def get(self):
+        quarter = SettingModel.quarter()
+        year    = SettingModel.year()
+        user    = users.get_current_user()
+        student = StudentModel.get_student_by_email(quarter, year, user.email())
+
+        assgn_num = int(self.request.get('n'))
+        assignment = AssignmentModel.get_assign_by_number(quarter, year, assgn_num)
+        partnership = PartnershipModel.get_active_partnerships_involving_students_by_assign([student], assgn_num).get()
+
+        # get list of all partners for student (roundabout solution)
+        all_assigns = sorted(AssignmentModel.get_all_assign(quarter, year), key = lambda x: x.number)
+        partner_history = PartnershipModel.get_all_partner_history_for_student(student, quarter, year)
+        all_partners = dict([(x.number,PartnershipModel.get_partner_from_partner_history_by_assign(student, partner_history, x.number)) for x in all_assigns])
+
+        current_time = datetime.datetime.fromtimestamp(time.time())
+        current_time = current_time - datetime.timedelta(hours=7)
+
+        # pass template values...
+        template_values = {
+            'student':          student,
+            'partnership':      partnership,
+            'partner':          all_partners[assgn_num][0],
+            'assignment':       assignment,
+            'current_time':     current_time,
+            'assgn_num':        assgn_num
+
+        }
+        template = JINJA_ENV.get_template('/templates/cancel_partner_modal.html')
+        self.response.write(template.render(template_values))
+
 
 class CancelPartner(BaseHandler):
     @login_required
@@ -115,14 +151,19 @@ class ConfirmPartner(BaseHandler):
         confirming_key      = self.request.get('admin_confirming')
         being_confirmed_key = self.request.get('admin_being_confirmed')
 
+        if confirming_key == '':
+            confirming_key = 'None'
+
         # if not admin...
         if not confirming_key or not being_confirmed_key:
+            print "NOT ADMIN CODE"
             invitation      = ndb.Key(urlsafe=self.request.get('confirmed')).get()
             confirming      = StudentModel.get_student_by_email(quarter, year, user.email())
             being_confirmed = invitation.invitor.get()
             for_assign      = invitation.assignment_number
             admin           = False
         else:
+            print "ADMIN CODE"
             for_assign      = int(self.request.get('assign_num'))
             being_confirmed = ndb.Key(urlsafe=being_confirmed_key).get()
             confirming      = ndb.Key(urlsafe=confirming_key).get() if confirming_key != 'None' else None
@@ -180,6 +221,10 @@ class SelectPartner(BaseHandler):
 
         active_assigns = AssignmentModel.get_active_assigns(quarter, year)
 
+        # get course config
+        repeat = SettingModel.repeat_partners()
+        cross_section = SettingModel.cross_section_partners()
+
         # get default parameter
         default_assgn = int(self.request.get("assgn")) if self.request.get("assgn") is not "" else -1
 
@@ -212,6 +257,8 @@ class SelectPartner(BaseHandler):
             'assgn': default_assgn,
             'active': active_assigns,
             'default_assgn': default_assgn,
+            'repeat': repeat,
+            'cross_section': cross_section
         }
         template = JINJA_ENV.get_template('/templates/partner_selection.html')
         self.response.write(template.render(template_values))

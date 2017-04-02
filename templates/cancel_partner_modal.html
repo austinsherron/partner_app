@@ -1,0 +1,30 @@
+{% extends '/templates/base.html' %}
+{% block content %}
+
+<a class="close-reveal-modal">&#215;</a>
+	<h4>Cancel partnership</h4>
+	  <div>
+		{% if current_time < assignment.due_date %}
+		{% set name = partner.preferred_name if partner.preferred_name else partner.first_name %}
+
+		<p>Are you sure you want to dissolve (break) your partnership with {{ name }} {{ partner.last_name }}?
+			If so, please let your partner know.
+	   </p>
+	   {% else %}
+	   <p>
+		   Are you sure you want to dissolve this partnership now? Most pairs have already
+		   started working; you'll be leaving your partner stranded and he or she may not be able to
+		   find a new partner, and the same may apply to you. If you must dissolve the
+		   partnership at this late date, let your partner and your TA know.
+	   </p>
+	   {% endif %}
+	  </div>
+	  <div>
+		  <a href ="" class="button small round info">Leave Partnership Unchanged</a>
+		  <a href ="/partner/cancel?p={{ partnership.key.urlsafe() }}&cancel=1" class="button small round alert">
+			  Dissolve Partnership
+		  </a>
+	  </div>
+
+
+{% endblock %}

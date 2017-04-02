@@ -31,9 +31,9 @@ class EditProfile(BaseHandler):
             # redirect to main page if the student doesn't exist in the DB
             return self.redirect('/partner')
 
-        programming_ability  = ['0: Never, or just a few times', '1: Occaisionally, but not regularly']
-        programming_ability += ['2: Regularly, but without much comfort or expertise']
-        programming_ability += ['3: Regularly, with comfortable proficiency', '4: Frequently and with some expertise']
+        programming_ability  = ['0: Never before this class, or just a few times', '1: I\'ve done some programming, but not as much as a whole class']
+        programming_ability += ['2: I\'ve done the equivalent of one programming course, but not a whole year\'s worth']
+        programming_ability += ['3: I have one to two years of programming experience', '4: I have been programming for more than two years']
 
         template_values = {
             'user':                user,
@@ -53,9 +53,9 @@ class EditProfile(BaseHandler):
 
         student.preferred_name      = self.request.get('preferred_name').strip()
         bio                         = self.request.get('bio').strip()
-        student.bio                 = bio if bio != '' else student.bio         
+        student.bio                 = bio if bio != '' else student.bio
         availability                = self.request.get('availability').strip()
-        student.availability        = availability if availability != '' else student.availability 
+        student.availability        = availability if availability != '' else student.availability
         programming_ability         = self.request.get('programming_ability')
         student.programming_ability = programming_ability
 
@@ -69,5 +69,3 @@ class EditProfile(BaseHandler):
 
         # redirect to main page
         return self.redirect('/partner/edit/profile')
-
-

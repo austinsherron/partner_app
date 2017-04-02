@@ -96,6 +96,15 @@ class AssignmentModel:
             Assignment.number == number,
         ).get()
 
+    @staticmethod
+    def delete_assign_by_number(quarter,year,number):
+        assgn = Assignment.query(
+            Assignment.quarter == quarter,
+            Assignment.year == year,
+            Assignment.number == number,
+        ).get()
+        assgn.key.delete()
+
 
     @staticmethod
     def get_assigns_for_quarter(quarter, year):

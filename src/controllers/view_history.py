@@ -67,7 +67,7 @@ class ViewInvitationHistory(BaseHandler):
         year    = SettingModel.year()
         user    = users.get_current_user()
         student = StudentModel.get_student_by_email(quarter, year, user.email())
-    
+
         # redirect to main page if student doesn't exist
         if not student:
             return self.redirect('/partner')
@@ -87,7 +87,7 @@ class ViewInvitationHistory(BaseHandler):
         # dict for custom ordering of invite info fields
         ordering = {'Assign Num': 0, 'Who': 1, 'To/From': 2, 'Accepted': 3, 'Active': 4}
         for invite in invites:
-            # organize invite info by time 
+            # organize invite info by time
             i = (invite.created - timedelta(hours=7)).strftime('%m-%d-%Y %H:%M:%S')
             invite_info[i] = {}
 
@@ -112,5 +112,3 @@ class ViewInvitationHistory(BaseHandler):
             'active_range': active_range,
         }
         return self.response.write(template.render(template_values))
-
-

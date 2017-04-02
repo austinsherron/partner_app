@@ -80,6 +80,13 @@ class MessageModel:
         message += ' successfully ' + ('updated' if edit else 'added')
         return message
 
+    @staticmethod
+    def assignment_deleted(quarter, year, assign):
+        message  = 'Assignment ' + str(assign) + ' for quarter '
+        message += str(quarter) + ' ' + str(year)
+        # changed success message depending on whether an assignment was just create/updated
+        message += ' successfully deleted'
+        return message
 
     @staticmethod
     def invitation_declined():

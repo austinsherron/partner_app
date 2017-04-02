@@ -1,6 +1,5 @@
 {% extends '/templates/admin_common.html' %}
 {% block content %}
-
 <div class="row">
 
 	<br>
@@ -12,23 +11,23 @@
 	{% endif %}
 
 	<div class="small-12 columns">
-		<h3 class="text-center">Add Partnerships
+		<h3 class="text-center">Add Solo Partnerships
 		{{ 'for Whole Class' if view == 'class' else 'for Lab ' + view }}</h3>
 		<br>
 		<div class="row small-centered">
 			<ul class="pagination small-centered" style="display: table; margin: 0 auto">
 				{% for i in range(num_labs) %}
 					{% if (i + 1)|string == view %}
-						<li class="current small-centered"><a href="/admin/partners/add?view={{ i + 1 }}">Lab {{ i + 1}}</a></li>
+						<li class="current small-centered"><a href="/admin/partners/add/solo?view={{ i + 1 }}">Lab {{ i + 1}}</a></li>
 					{% else %}
-						<li class="small-centered"><a href="/admin/partners/add?view={{ i + 1 }}">Lab {{ i + 1}}</a></li>
+						<li class="small-centered"><a href="/admin/partners/add/solo?view={{ i + 1 }}">Lab {{ i + 1}}</a></li>
 					{% endif %}
 				{% endfor %}
 
 				{% if view == 'class' %}
-					<li class="current small-centered"><a href="/admin/partners/add?view=class">Class</a></li>
+					<li class="current small-centered"><a href="/admin/partners/add/solo?view=class">Class</a></li>
 				{% else %}
-					<li class="small-centered"><a href="/admin/partners/add?view=class">Class</a></li>
+					<li class="small-centered"><a href="/admin/partners/add/solo?view=class">Class</a></li>
 				{% endif %}
 			</ul>
 			<br>
@@ -42,6 +41,7 @@
 	  <li><a href="/admin/partners/add/solo">Add Solo Partnership</a></li>
 	</ul>
 
+
 	<div class="small-12 columns panel">
 
 		<form action="/partner/confirm" method="post" enctype="multipart/form-data">
@@ -51,7 +51,7 @@
 					<span class="label">Assignment Number</span>
 					<br>
 					<input name="assign_num" value="{{ current_num }}" type="number">
-					<span class="label">Partner 1</span>
+					<span class="label">Student</span>
 					<br>
 					<select name="admin_being_confirmed">
 						{% for student in students %}
@@ -60,15 +60,8 @@
 							</option>
 						{% endfor %}
 					</select>
-					<span class="label">Partner 2</span>
-					<br>
-					<select name="admin_confirming">
-						<option value="None">No Partner</option>
-						{% for student in students %}
-							<option value="{{ student.key.urlsafe() }}">
-								{{ student.last_name }}, {{ student.first_name }} - {{ student.ucinetid }}
-							</option>
-						{% endfor %}
+
+					<select hidden name="admin_confirming">
 					</select>
 					<input name="quarter" value="{{ quarter }}" style="display:none">
 					<input name="year" value="{{ year }}" style="display:none">
