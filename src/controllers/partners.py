@@ -156,14 +156,12 @@ class ConfirmPartner(BaseHandler):
 
         # if not admin...
         if not confirming_key or not being_confirmed_key:
-            print "NOT ADMIN CODE"
             invitation      = ndb.Key(urlsafe=self.request.get('confirmed')).get()
             confirming      = StudentModel.get_student_by_email(quarter, year, user.email())
             being_confirmed = invitation.invitor.get()
             for_assign      = invitation.assignment_number
             admin           = False
         else:
-            print "ADMIN CODE"
             for_assign      = int(self.request.get('assign_num'))
             being_confirmed = ndb.Key(urlsafe=being_confirmed_key).get()
             confirming      = ndb.Key(urlsafe=confirming_key).get() if confirming_key != 'None' else None

@@ -21,7 +21,7 @@ JINJA_ENV = jinja2.Environment(
 
 class AddAssignment(BaseHandler):
 
-    #@admin_required
+    @admin_required
     def get(self):
         template = JINJA_ENV.get_template('/templates/admin_add_assignment.html')
 
@@ -153,7 +153,7 @@ class EditAssignment(BaseHandler):
 
 class ManageAssignments(BaseHandler):
 
-    #@admin_required
+    @admin_required
     def get(self):
         quarter_map = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
         quarter     = self.request.get('quarter')                           # try grabbing quarter/year from URL

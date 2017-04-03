@@ -42,7 +42,6 @@ class ExtendEvals(BaseHandler):
             students = StudentModel.get_students_by_lab(quarter, year, int(view_by)).fetch()
 
         all_partners = PartnershipModel.get_all_partnerships(quarter, year).fetch()
-        print all_partners
         last_assign  = AssignmentModel.get_assign_n(quarter, year, -1)
         last_num     = 1 if not last_assign else last_assign.number
         first_assign = AssignmentModel.get_assign_n(quarter, year, 0)
