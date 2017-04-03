@@ -117,6 +117,8 @@ class Partnership(ndb.Model):
 	created           = ndb.DateTimeProperty(auto_now_add=True)
         cancelled         = ndb.KeyProperty(repeated=True)
         solo              = ndb.ComputedProperty(lambda p: len(p.members) == 1)
+	extension         = ndb.IntegerProperty(default=0)
+	extension_date    = ndb.DateTimeProperty()
 
 
 ################################################################################
