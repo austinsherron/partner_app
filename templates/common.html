@@ -22,25 +22,12 @@
 			<section class="top-bar-section">
 				{% if user %}
 					<ul class="left">
-                                                <li>
-                                                    <a href="/partner/history">Partnerships & Evals</a>
-                                                </li>
-                                                <li>
-                                                    <a href="/partner/history/invitations">Invitations</a>
-                                                </li>
-						</li>
 						<li>
-                                                    <a href="/partner/edit/profile">Profile</a>
-						</li>
-						<li>
-                                                    <a href="/partner/browse">Browse Partners</a>
+                        <a href="/partner/edit/profile">Profile</a>
 						</li>
 					</ul>
 				{% endif %}
 				<ul class="right">
-					<li>
-						<a href="/partner/instructions">Help</a>
-					</li>
 					{% if sign_out %}
 						<li class="active">
 							<a href="{{ sign_out }}">Logout</a>

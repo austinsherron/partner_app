@@ -80,9 +80,11 @@ class CancelPartner(BaseHandler):
                 partnership = PartnershipModel.cancel_partnership(s, partnership)
             if not partnership.active:
                 EvalModel.cancel_evals_for_partnership(partnership)
+            time.sleep(0.1)
             return self.redirect('/partner?message=' + MessageModel.partnership_cancelled(assgn_num))
         else:
             PartnershipModel.uncancel_partnership(student, partnership)
+            time.sleep(0.1)
             return self.redirect('/partner?message=' + MessageModel.partnership_uncancelled())
 
 
@@ -114,7 +116,7 @@ class ConfirmInvitation(BaseHandler):
         if partnership:
             InvitationModel.deactivate_invitations_for_students_and_assign(confirming, being_confirmed, for_assign)
             # SendMail(partnership, 'partner_confirm')
-
+        time.sleep(0.1)
         return self.redirect('/partner?message=' + message)
 
 
@@ -190,8 +192,10 @@ class ConfirmPartner(BaseHandler):
             # SendMail(partnership, 'partner_confirm')
 
         if not admin:
+            time.sleep(0.1)
             return self.redirect('/partner?message=' + message)
         else:
+            time.sleep(0.1)
             return self.redirect('/admin/partners/add?message=' + message)
 
 
@@ -202,6 +206,7 @@ class DeclineInvitation(BaseHandler):
         invitation = ndb.Key(urlsafe=self.request.get('confirmed')).get()
         InvitationModel.update_invitation_status(invitation.key, active=False)
         message = MessageModel.invitation_declined()
+        time.sleep(0.1)
         return self.redirect('/partner?message=' + message)
 
 
@@ -271,6 +276,7 @@ class SelectPartner(BaseHandler):
         selected = StudentModel.get_student_by_student_id(quarter, year, self.request.get('selected_partner'))
         try:
             selected_assign = int(self.request.get('selected_assign'))
+            time.sleep(0.1)
         except ValueError:
             return self.redirect('/partner/selection?error=You must choose an assignment number')
 
