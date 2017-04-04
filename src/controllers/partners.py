@@ -1,6 +1,8 @@
 import jinja2
 import os
 import webapp2
+import datetime
+import time
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -23,6 +25,40 @@ JINJA_ENV = jinja2.Environment(
     extensions = ['jinja2.ext.autoescape'],
     autoescape=True)
 
+class CancelModal(BaseHandler):
+    @login_required
+    def get(self):
+        quarter = SettingModel.quarter()
+        year    = SettingModel.year()
+        user    = users.get_current_user()
+        student = StudentModel.get_student_by_email(quarter, year, user.email())
+
+        assgn_num = int(self.request.get('n'))
+        assignment = AssignmentModel.get_assign_by_number(quarter, year, assgn_num)
+        partnership = PartnershipModel.get_active_partnerships_involving_students_by_assign([student], assgn_num).get()
+
+        # get list of all partners for student (roundabout solution)
+        all_assigns = sorted(AssignmentModel.get_all_assign(quarter, year), key = lambda x: x.number)
+        partner_history = PartnershipModel.get_all_partner_history_for_student(student, quarter, year)
+        all_partners = dict([(x.number,PartnershipModel.get_partner_from_partner_history_by_assign(student, partner_history, x.number)) for x in all_assigns])
+
+        current_time = datetime.datetime.fromtimestamp(time.time())
+        current_time = current_time - datetime.timedelta(hours=7)
+
+        # pass template values...
+        template_values = {
+            'student':          student,
+            'partnership':      partnership,
+            'partner':          all_partners[assgn_num][0],
+            'assignment':       assignment,
+            'current_time':     current_time,
+            'assgn_num':        assgn_num
+
+        }
+        template = JINJA_ENV.get_template('/templates/cancel_partner_modal.html')
+        self.response.write(template.render(template_values))
+
+
 class CancelPartner(BaseHandler):
     @login_required
     def get(self):
@@ -44,9 +80,11 @@ class CancelPartner(BaseHandler):
                 partnership = PartnershipModel.cancel_partnership(s, partnership)
             if not partnership.active:
                 EvalModel.cancel_evals_for_partnership(partnership)
+            time.sleep(0.1)
             return self.redirect('/partner?message=' + MessageModel.partnership_cancelled(assgn_num))
         else:
             PartnershipModel.uncancel_partnership(student, partnership)
+            time.sleep(0.1)
             return self.redirect('/partner?message=' + MessageModel.partnership_uncancelled())
 
 
@@ -78,7 +116,7 @@ class ConfirmInvitation(BaseHandler):
         if partnership:
             InvitationModel.deactivate_invitations_for_students_and_assign(confirming, being_confirmed, for_assign)
             # SendMail(partnership, 'partner_confirm')
-
+        time.sleep(0.1)
         return self.redirect('/partner?message=' + message)
 
 
@@ -114,6 +152,9 @@ class ConfirmPartner(BaseHandler):
         # these will only have values if this request is coming from an admin
         confirming_key      = self.request.get('admin_confirming')
         being_confirmed_key = self.request.get('admin_being_confirmed')
+
+        if confirming_key == '':
+            confirming_key = 'None'
 
         # if not admin...
         if not confirming_key or not being_confirmed_key:
@@ -151,8 +192,10 @@ class ConfirmPartner(BaseHandler):
             # SendMail(partnership, 'partner_confirm')
 
         if not admin:
+            time.sleep(0.1)
             return self.redirect('/partner?message=' + message)
         else:
+            time.sleep(0.1)
             return self.redirect('/admin/partners/add?message=' + message)
 
 
@@ -163,6 +206,7 @@ class DeclineInvitation(BaseHandler):
         invitation = ndb.Key(urlsafe=self.request.get('confirmed')).get()
         InvitationModel.update_invitation_status(invitation.key, active=False)
         message = MessageModel.invitation_declined()
+        time.sleep(0.1)
         return self.redirect('/partner?message=' + message)
 
 
@@ -177,16 +221,18 @@ class SelectPartner(BaseHandler):
         selector = StudentModel.get_student_by_email(quarter, year, user.email())
 
         selectees          = StudentModel.get_students_by_lab(quarter, year, selector.lab)
-        # get current active assignment
-        current_assignment = AssignmentModel.get_active_assign_with_latest_fade_in_date(quarter, year)
 
         active_assigns = AssignmentModel.get_active_assigns(quarter, year)
+
+        # get course config
+        repeat = SettingModel.repeat_partners()
+        cross_section = SettingModel.cross_section_partners()
 
         # get default parameter
         default_assgn = int(self.request.get("assgn")) if self.request.get("assgn") is not "" else -1
 
         # get all current_partnerships for partnership status
-        partnerships = PartnershipModel.get_all_partnerships_for_assign(quarter, year, current_assignment.number)
+        partnerships = PartnershipModel.get_all_partnerships_for_assign(quarter, year, default_assgn)
         partner_history = PartnershipModel.get_all_partner_history_for_student(student, quarter, year)
         members      = []
         for p in partner_history:
@@ -211,10 +257,11 @@ class SelectPartner(BaseHandler):
             'selector': selector,
             'selectees': available,
             'selection_closed': selection_closed,
-            'current':          current_assignment,
             'assgn': default_assgn,
             'active': active_assigns,
             'default_assgn': default_assgn,
+            'repeat': repeat,
+            'cross_section': cross_section
         }
         template = JINJA_ENV.get_template('/templates/partner_selection.html')
         self.response.write(template.render(template_values))
@@ -229,6 +276,7 @@ class SelectPartner(BaseHandler):
         selected = StudentModel.get_student_by_student_id(quarter, year, self.request.get('selected_partner'))
         try:
             selected_assign = int(self.request.get('selected_assign'))
+            time.sleep(0.1)
         except ValueError:
             return self.redirect('/partner/selection?error=You must choose an assignment number')
 

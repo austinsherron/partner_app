@@ -8,17 +8,35 @@
 {% else %}
 	<div class="row">
 		<div class="small-12 columns">
-			<h4 class="text-center">Viewing Students for Lab Section {{ selector.lab }}, Assignment {{ current.number }}</h4>
-			<br>
+			<h4 class="text-center">Available Students for Lab Section {{ selector.lab }}, Assignment {{ assgn }}</h4>
 		</div>
+        <div class="small-12 columns">
+            {% if repeat and not cross_section %}
+                <h5>
+                  Remember that your partner must be enrolled in your lab section
+                </h5>
+            {% elif cross_section and not repeat %}
+                <h5>
+                  Remember that your partner must be someone whom
+                  you haven't worked with before.
+                </h5>
+            {% elif cross_section and repeat %}
+                <h5>
+                </h5>
+            {% else %}
+                <h5>
+                  Remember that your partner must be someone enrolled in your lab section whom
+                  you haven't worked with before.
+                </h5>
+            {% endif %}
+        </div>
 	</div>
-
 	<div class="small-12 columns panel div-scroll">
 		{% for ucinetid,info in selectees %}
 			{% if ucinetid != selector.ucinetid %}
 				{% set status,student = info %}
 
-				<form action="/partner/selection?selected_partner={{ student.studentid }}&selected_assign={{ current.number }}"
+				<form action="/partner/selection?selected_partner={{ student.studentid }}&selected_assign={{ assgn }}"
 					enctype="multipart/form-data" method="POST">
 
 					{% if status %}
@@ -34,9 +52,9 @@
 									<div class="row">
 										<br>
 										{% if status %}
-											<input class="button expand alert" type="submit" value="Send Invitation">
+											<input class="button round expand alert" type="submit" value="Send Invitation">
 										{% else %}
-											<input class="button expand success" type="submit" value="Send Invitation">
+											<input class="button round expand success" type="submit" value="Send Invitation">
 										{% endif %}
 									</div>
 								{% endif %}
@@ -81,10 +99,6 @@
       If your partner isn't listed here, please contact the ICS 31 course
       manager at 31-manager@ics.uci.edu
     </h5>
-	<h5>
-	  Remember that your partner must be someone enrolled in your lab section that
-	  you haven't worked with before.
-	</h5>
     <h5>
       If you think you have a legitimate reason to work alone or to repeat a partnership,
       please contact your TA.

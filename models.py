@@ -54,6 +54,9 @@ class Instructor(ndb.Model):
 ## STUDENT MODEL ###############################################################
 ################################################################################
 
+class EvalExtension(ndb.Model):
+	assignment = ndb.IntegerProperty()
+	exception = ndb.IntegerProperty()
 
 class Student(ndb.Model):
 	ucinetid            = ndb.StringProperty()
@@ -66,6 +69,7 @@ class Student(ndb.Model):
 	quarter             = ndb.IntegerProperty()
 	year                = ndb.IntegerProperty()
 	active              = ndb.GenericProperty()
+	eval_exceptions     = ndb.StructuredProperty(EvalExtension, repeated=True)
 	bio                 = ndb.TextProperty()
 	programming_ability = ndb.StringProperty()
 	avatar              = ndb.BlobProperty()
@@ -113,7 +117,9 @@ class Partnership(ndb.Model):
 	created           = ndb.DateTimeProperty(auto_now_add=True)
         cancelled         = ndb.KeyProperty(repeated=True)
         solo              = ndb.ComputedProperty(lambda p: len(p.members) == 1)
-	
+	extension         = ndb.IntegerProperty(default=0)
+	extension_date    = ndb.DateTimeProperty()
+
 
 ################################################################################
 ################################################################################
@@ -153,7 +159,7 @@ class Setting(ndb.Model):
 	repeat_partners        = ndb.BooleanProperty(default=False)
 	cross_section_partners = ndb.BooleanProperty(default=False)
         group_max              = ndb.IntegerProperty()
-	
+
 
 ################################################################################
 ################################################################################

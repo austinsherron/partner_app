@@ -47,17 +47,17 @@ class AddAssignment(BaseHandler):
             'user':     users.get_current_user(),
             'sign_out': users.create_logout_url('/'),
             'fid':      (last_assign.fade_in_date + td(days=7)).strftime('%Y-%m-%d') if last_assign else today,
-            'fit':      last_assign.fade_in_date.strftime('%H:%M') if last_assign else '00:00',
+            'fit':      last_assign.fade_in_date.strftime('%H:%M') if last_assign else '07:00',
             'dd':       (last_assign.due_date + td(days=7)).strftime('%Y-%m-%d') if last_assign else today,
-            'dt':       last_assign.due_date.strftime('%H:%M') if last_assign else '00:00',
+            'dt':       last_assign.due_date.strftime('%H:%M') if last_assign else '07:00',
             'cd':       (last_assign.close_date + td(days=7)).strftime('%Y-%m-%d') if last_assign else today,
-            'ct':       last_assign.close_date.strftime('%H:%M') if last_assign else '00:00',
+            'ct':       last_assign.close_date.strftime('%H:%M') if last_assign else '07:00',
             'eod':      (last_assign.eval_open_date + td(days=7)).strftime('%Y-%m-%d') if last_assign else today,
-            'eot':      last_assign.eval_open_date.strftime('%H:%M') if last_assign else '00:00',
+            'eot':      last_assign.eval_open_date.strftime('%H:%M') if last_assign else '07:00',
             'ecd':      (last_assign.eval_date + td(days=7)).strftime('%Y-%m-%d') if last_assign else today,
-            'ect':      last_assign.eval_date.strftime('%H:%M') if last_assign else '00:00',
+            'ect':      last_assign.eval_date.strftime('%H:%M') if last_assign else '07:00',
             'fod':      (last_assign.fade_out_date + td(days=7)).strftime('%Y-%m-%d') if last_assign else today,
-            'fot':      last_assign.fade_out_date.strftime('%H:%M') if last_assign else '00:00',
+            'fot':      last_assign.fade_out_date.strftime('%H:%M') if last_assign else '07:00',
         }
         return self.response.write(template.render(template_values))
 
@@ -74,9 +74,14 @@ class AddAssignment(BaseHandler):
             # ...create new assignment and set PK values
             assignment = AssignmentModel.make_assignment_with_pk_vals(quarter, year, number)
         else:
+            # delete button pressed
+            if self.request.get('deleteButton', None):
+                AssignmentModel.delete_assign_by_number(quarter, year, number)
+                redirect_link = '/admin/assignment/view'
+                message       = MessageModel.assignment_deleted(quarter, year, number)
+                return self.redirect(redirect_link + '?message=' + message)
             # ...else get assignment
             assignment = AssignmentModel.get_assign_by_number(quarter, year, number)
-
         # if an assignment with the same PK values exist, redirect with error; assignment isn't created
         if AssignmentModel.get_assign_by_number(assignment.quarter, assignment.year, assignment.number) and not edit:
             message = 'That assignment is already in the database'

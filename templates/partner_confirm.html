@@ -6,7 +6,7 @@
   There are currently no assignments that have active partner selection periods.
 {% else %}
   {% if invitations|length > 0 %}
-    <h3>Which of these students did you agree to work with?</h3>
+    <h3>Which of these students do you choose as your partner?</h3>
     <form action="/partner/confirm" method="post" enctype="multipart/form-data">
 	  <select name="confirmed">
 	    {% for invitation in invitations %}
@@ -16,7 +16,7 @@
 			</option>
 	    {% endfor %}
 	  <select>
-	  <input class="button expand" type="submit" value="Confirm">
+	  <input class="button round expand" type="submit" value="Confirm">
     </form>
     <br>
   {% else %}

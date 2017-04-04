@@ -1,16 +1,26 @@
 {% extends 'templates/common.html' %}
 {% block content %}
 
+<div class="row fullwidth">
+    <div class="small-12 column text-center">
+            <h3>Your Partner for Assignment {{ assgn_num }}</h3>
+    </div>
+</div>
 <div class="small-12 columns panel">
             <div class="row">
             <div class="small-3 columns">
                 <div class="small-12 columns small-centered">
-                    <img height="100px" width="100px" src="/images/{{ partner.key.urlsafe() }}"/>
+                    <img height="500px" width="500px" src="/images/{{ partner.key.urlsafe() }}"/>
                 </div>
+                <br>
                 <div class="col-md-4 text-left">
-                    <a href ="/partner/cancel?p={{ partnership.key.urlsafe() }}&cancel=1" class="button small round alert">
+                    <a href="/partner/cancel_modal?n={{ assgn_num }}" data-reveal-id="cancelModal"
+                    class="button round expand alert" data-reveal-ajax="true">Dissolve (Cancel) Partnership</a>
+                    <div class="reveal-modal small" id="cancelModal" data-reveal></div>
+
+                    <!-- <a href ="/partner/cancel?p={{ partnership.key.urlsafe() }}&cancel=1" class="button small round alert">
                         Cancel Partnership
-                    </a>
+                    </a> -->
                 </div>
             </div>
             <div class="small-9 columns">

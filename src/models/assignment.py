@@ -51,11 +51,25 @@ class AssignmentModel:
         to_return = []
 
         for i in range(len(assigns_before_now) - 1, -1, -1):
-            if assigns_before_now[i].close_date > dt.now() - td(hours=7):
+            if assigns_before_now[i].fade_out_date > dt.now() - td(hours=7):
                 to_return.append(assigns_before_now[i])
 
         return to_return
 
+    @staticmethod
+    def get_inactive_assigns(quarter, year):
+        all_assigns = Assignment.query(
+            Assignment.quarter == quarter,
+            Assignment.year == year
+        ).order(Assignment.fade_in_date).fetch()
+
+        to_return = []
+
+        for i in range(len(all_assigns) - 1, -1, -1):
+            if all_assigns[i].fade_out_date < dt.now() - td(hours=7) or all_assigns[i].fade_in_date > dt.now() - td(hours=7):
+                to_return.append(all_assigns[i])
+
+        return to_return
 
     @staticmethod
     def get_active_eval_assigns(quarter, year):
@@ -81,6 +95,15 @@ class AssignmentModel:
             Assignment.year == year,
             Assignment.number == number,
         ).get()
+
+    @staticmethod
+    def delete_assign_by_number(quarter,year,number):
+        assgn = Assignment.query(
+            Assignment.quarter == quarter,
+            Assignment.year == year,
+            Assignment.number == number,
+        ).get()
+        assgn.key.delete()
 
 
     @staticmethod

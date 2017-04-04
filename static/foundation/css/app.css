@@ -24,7 +24,6 @@ a {
 }
 
 .div-scroll {
-    height: 550px !important;
     overflow: scroll;
 }
 
