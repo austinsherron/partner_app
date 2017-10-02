@@ -113,6 +113,8 @@ class UploadRoster(BaseHandler):
                 student.first_name = row[2].strip('"').title()
                 student.ucinetid   = row[3].lower().strip()
                 student.email      = row[4].lower().strip()
+                if not student.email.endswith("@uci.edu"):
+                    student.email = student.email + "@uci.edu"
                 student.lab        = int(row[5])
                 student.quarter    = quarter
                 student.year       = year

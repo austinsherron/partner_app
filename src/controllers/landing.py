@@ -109,7 +109,8 @@ class Main(webapp2.RequestHandler):
     def get(self):
         user = users.get_current_user()
         template = JINJA_ENV.get_template('/templates/index.html')
-        template_values = {}
+        #For use before the quarter begins, before you've set up the partner app
+        template_values = {'message' : ''}
 
         if user:
             template_values['user'] = user.email()

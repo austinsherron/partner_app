@@ -7,6 +7,12 @@
 	  {% if user %}
 	    <a href="{{ sign_out }}">Sign Out</a>
 	  {% endif %}
+	  
+	  {% if message %}
+		<div class="small-12 columns">
+			<h2 class="text-center">{{ message }}</h2>
+		</div>
+	  {% endif %}
 	  <br>
 	  <br>
 	  <div class="row">
