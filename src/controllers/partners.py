@@ -43,7 +43,7 @@ class CancelModal(BaseHandler):
         all_partners = dict([(x.number,PartnershipModel.get_partner_from_partner_history_by_assign(student, partner_history, x.number)) for x in all_assigns])
 
         current_time = datetime.datetime.fromtimestamp(time.time())
-        current_time = current_time - datetime.timedelta(hours=7)
+        current_time = current_time - datetime.timedelta(hours=8)
 
         # pass template values...
         template_values = {

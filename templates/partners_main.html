@@ -90,7 +90,7 @@
 								<!-- Evaluation not open yet -->
 								{% if current_time <  assignment.eval_open_date %}
 									<td><div class="col-md-4 text-left active-assgn-text">
-										Partner Selection Opens: <b>{{ assignment.eval_open_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b></a></div>
+										Partner Evaluations Open: <b>{{ assignment.eval_open_date.strftime("%A, %B %e, %Y\n at %I:%M %p") }}</b></a></div>
 									</td>
 								<!-- Evaluation submitted (solo partnership) -->
 								{% elif partners[assignment.number][0] is string %}

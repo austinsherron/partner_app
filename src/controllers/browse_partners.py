@@ -43,7 +43,7 @@ class BrowseForPartners(BaseHandler):
         e = self.request.get('error')
 
         # check to see if partner selection period has closed
-        selection_closed = (datetime.now() - timedelta(hours=7) > current_assignment.close_date)
+        selection_closed = (datetime.now() - timedelta(hours=8) > current_assignment.close_date)
 
         # get all current_partnerships for partnership status
         partnerships = PartnershipModel.get_all_partnerships_for_assign(quarter, year, current_assignment.number)
