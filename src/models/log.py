@@ -14,7 +14,7 @@ class LogModel:
 
 
     @staticmethod
-    def get_all_quarter_logs(student, quarter, year):
+    def get_all_quarter_logs(quarter, year):
         return Log.query(
             Log.quarter == quarter,
             Log.year == year

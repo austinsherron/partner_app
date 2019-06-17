@@ -83,7 +83,6 @@ class MainPage(BaseHandler):
                 'email': user.email()
             }
             return self.response.write(template.render(template_values))  
-        #AVAIL and SKILL
         template_values = {
             'user': user,
             'student': student,

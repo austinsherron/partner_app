@@ -47,20 +47,26 @@ class EvaluatePartner(BaseHandler):
         partners = list(filter(lambda x: x[1] != "No Partner" and x[1] != None, evaluatees))
         eval_closed = len(eval_assigns) == 0
 
+        #   Log when eval page is visited
+        #get current date (for timestamp)
         cur_date  = datetime.datetime.now().strftime("%m/%d/%Y %H:%M:%S")
+        #get current log, creating one if it does not exist
         current_log = LogModel.get_log_by_student(evaluator, quarter, year).get()
         if current_log == None:
             current_log = Log()
             current_log.owner = evaluator.key
             current_log.quarter=quarter
             current_log.year=year
+        #log if the student visited the page with all evals closed
         if eval_closed:
             current_log.log.append(cur_date+" Viewed eval page: ALL EVALS CLOSED")
         else:
+        #log all open evaluations when student visited the page
             open_evals = ""
             for ev in evaluatees:
                 open_evals += ev[1].ucinetid + " assgt. " + str(ev[0]) + " , "
             current_log.log.append(cur_date+" Viewed eval page: " + open_evals)
+        #save to log
         current_log.put()
             
             
@@ -101,14 +107,19 @@ class EvaluatePartner(BaseHandler):
         eval_assign     = int(num)
         current_partner = ndb.Key(urlsafe=eval_key).get()
 
+        #   Log when eval is submitted
+        #current date for timestamp
         cur_date  = datetime.datetime.now().strftime("%m/%d/%Y %H:%M:%S")
+        #get current log, creating one if it does not exist
         current_log = LogModel.get_log_by_student(evaluator, quarter, year).get()
         if current_log == None:
             current_log = Log()
             current_log.owner = evaluator.key
             current_log.quarter=quarter
             current_log.year=year
+        #log the submission of the eval
         current_log.log.append(cur_date+" Submitted eval for: " + current_partner.ucinetid + " assgt. " + str(eval_assign))
+        #save to log
         current_log.put()
 
         evaluations = EvalModel.get_existing_eval_by_assign(evaluator, current_partner, eval_assign)
@@ -125,15 +136,6 @@ class EvaluatePartner(BaseHandler):
             evaluation.responses.append(self.request.get('q' + str(i)))
         evaluation.put()
 
-        #Check to make sure evaluation is in database
-        #Block until put is complete
-        #check_eval = EvalModel.get_existing_eval_by_assign(evaluator, current_partner, eval_assign)
-        #if check_eval.get() != None:
-        #    message  = 'Evaluation for ' + str(current_partner.last_name) + ', '
-        #    message += str(current_partner.first_name) + ' successfully submitted'
-        #else:
-        #    message  = 'ERROR: Evaluation for ' + str(current_partner.last_name) + ', '
-        #    message += str(current_partner.first_name) + ' NOT submitted: Please try again.'
         message  = 'Evaluation for ' + str(current_partner.last_name) + ', '
         message += str(current_partner.first_name) + ' confirmed: Please refresh the page and confirm the evaluation was submitted.'
         self.redirect('/partner?message=' + message)

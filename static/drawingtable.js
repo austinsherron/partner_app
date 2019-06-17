@@ -1,16 +1,28 @@
+/*
+	This is the javascript source for the when-to-meet style availability table that we tried to implement
+	But had to sideline due to it causing instability for users.
+	
+	It essentially constructs an HTML table where the user can select their availablity,
+	Then extracts that availablity as a string of 0 and 1, representing unavailable 1/2 
+	hour blocks, and available 1/2 hour blocks respectively.
+*/
+
+//Initalize constants
 ROW_NUM = 30;
 COL_NUM = 5;
-
 SYMB_AVAIL = "✓";
 SYMB_UNAVAIL = "✕";
 COL_AVAIL = "#22aa44";
 COL_UNAVAIL = "#bbb";
 STRING_EMPTY = "";
+
+//Initialize a string to represent the table empty (completely unavailable)
 for (var i = 0; i < ROW_NUM*COL_NUM; i++)
 	STRING_EMPTY += "0";
 
+//Build the HTML of the table itself
+//It can take a string of the existing availablity, but defaults to an empty table
 function buildGrid(cols, rows, string_availability = STRING_EMPTY) {
-
 	var tableMarkup = "<tr><th></th><th>M</th><th>Tu</th><th>W</th><th>Th</th><th>F</th></tr>";
 	time = ["08:00AM","08:30AM","09:00AM","09:30AM","10:00AM","10:30AM","11:00AM","11:30AM","12:00PM","12:30PM",
 	"01:00PM","01:30PM","02:00PM","02:30PM","03:00PM","03:30PM","04:00PM","04:30PM","05:00PM","05:30PM",
@@ -33,6 +45,7 @@ function buildGrid(cols, rows, string_availability = STRING_EMPTY) {
 
 };
 
+//Extract the availability string from the HTML availability table
 function getGridString(cols, rows)
 {
 	var tableMarkup = $("#drawing-table").html();
@@ -52,10 +65,12 @@ function getGridString(cols, rows)
 	return result;
 }
 
+//Set an invisible field to the availability string
 function updateGrid(cols, rows) {
 	$('#availability_string_out').html(getGridString(cols,rows));
 }
 
+//Clears the table to all 0 (unavailable)
 function clearSelection()
 {
  if (window.getSelection) {window.getSelection().removeAllRanges();}

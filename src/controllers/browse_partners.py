@@ -77,6 +77,8 @@ class BrowseForPartners(BaseHandler):
         self.response.write(template.render(template_values))
 
 def get_shared_hours(a1, a2):
+    """Takes two availabilities (as strings of 0 and 1), and returns the number of hours in the overlap
+    """
     return 0
     total = 0;
     for i in range(len(a1)):
@@ -85,6 +87,9 @@ def get_shared_hours(a1, a2):
     return total/2.0
 
 def get_result_priority(result):
+    """This function returns a priority associated with matches in partner selection,
+        so that for example, people of the same programming are matched together
+    """
     return 0
     student = result[1][1]
     quarter  = SettingModel.quarter()
@@ -92,14 +97,18 @@ def get_result_priority(result):
     user     = users.get_current_user()
     selector = StudentModel.get_student_by_email(quarter, year, user.email())
 
+    #This used to take into account how many available hours in common the students
+    #had. There was a when-to-meet like availablity selector available on the student
+    #profiles that enabled this, but the system was unreliable and so we replaced it
+    #with simple open response string availablity until we could iron out the issues.
     their_availability = student.availability
-    my_availabiliy = selector.availability
-
-    #TODO RE IMPLIMENT THIS
-    shared_hours = 0#get_shared_hours(my_availability, their_availability)
+    my_availabiliy = selector.availability    
+    shared_hours = 0 #get_shared_hours(my_availability, their_availability)
     
     ability_dif = abs(student.programming_ability-selector.programming_ability)
 
+    #Prioritize having the same programming ability, if you have more than 4 hours a week in common
+    #Else weight the number of shared hours higher
     if shared_hours >= 4:
         return 10-ability_dif
     else:
