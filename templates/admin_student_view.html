@@ -177,4 +177,22 @@
 	</div>
 </div>
 
+<div class="row fullwidth">
+	<span class="label">Evaluation Logs</span>
+	<div class="small-12 columns">
+		<div class="row panel">
+			<div class="small-12 columns">
+				<table>
+					{% for log_entry in log %}
+					<tr>
+						<td class="text-center">{{ log_entry }}</td>
+					</tr>
+					{% endfor %}
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+
 {% endblock %}

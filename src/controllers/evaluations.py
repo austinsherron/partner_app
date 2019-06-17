@@ -5,14 +5,17 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 from webapp2_extras.appengine.users import login_required
 
-from models import Evaluation 
+from models import Evaluation
+from models import Log 
 from src.handler.base_handler import BaseHandler
 from src.helpers.helpers import split_last
 from src.models.assignment import AssignmentModel
 from src.models.eval import EvalModel
+from src.models.log import LogModel
 from src.models.partnership import PartnershipModel
 from src.models.settings import SettingModel
 from src.models.student import StudentModel
+import datetime
 
 
 JINJA_ENV = jinja2.Environment(
@@ -43,6 +46,24 @@ class EvaluatePartner(BaseHandler):
         # filter out No Partner partnerships
         partners = list(filter(lambda x: x[1] != "No Partner" and x[1] != None, evaluatees))
         eval_closed = len(eval_assigns) == 0
+
+        cur_date  = datetime.datetime.now().strftime("%m/%d/%Y %H:%M:%S")
+        current_log = LogModel.get_log_by_student(evaluator, quarter, year).get()
+        if current_log == None:
+            current_log = Log()
+            current_log.owner = evaluator.key
+            current_log.quarter=quarter
+            current_log.year=year
+        if eval_closed:
+            current_log.log.append(cur_date+" Viewed eval page: ALL EVALS CLOSED")
+        else:
+            open_evals = ""
+            for ev in evaluatees:
+                open_evals += ev[1].ucinetid + " assgt. " + str(ev[0]) + " , "
+            current_log.log.append(cur_date+" Viewed eval page: " + open_evals)
+        current_log.put()
+            
+            
     
         rate20scale  = ["0 -- Never, completely inadequate", "1", "2", "3", "4"]
         rate20scale += ["5 -- Seldom, poor quality", "6", "7", "8", "9"]
@@ -80,6 +101,16 @@ class EvaluatePartner(BaseHandler):
         eval_assign     = int(num)
         current_partner = ndb.Key(urlsafe=eval_key).get()
 
+        cur_date  = datetime.datetime.now().strftime("%m/%d/%Y %H:%M:%S")
+        current_log = LogModel.get_log_by_student(evaluator, quarter, year).get()
+        if current_log == None:
+            current_log = Log()
+            current_log.owner = evaluator.key
+            current_log.quarter=quarter
+            current_log.year=year
+        current_log.log.append(cur_date+" Submitted eval for: " + current_partner.ucinetid + " assgt. " + str(eval_assign))
+        current_log.put()
+
         evaluations = EvalModel.get_existing_eval_by_assign(evaluator, current_partner, eval_assign)
         for eval in evaluations:
             eval.active = False
@@ -94,7 +125,15 @@ class EvaluatePartner(BaseHandler):
             evaluation.responses.append(self.request.get('q' + str(i)))
         evaluation.put()
 
+        #Check to make sure evaluation is in database
+        #Block until put is complete
+        #check_eval = EvalModel.get_existing_eval_by_assign(evaluator, current_partner, eval_assign)
+        #if check_eval.get() != None:
+        #    message  = 'Evaluation for ' + str(current_partner.last_name) + ', '
+        #    message += str(current_partner.first_name) + ' successfully submitted'
+        #else:
+        #    message  = 'ERROR: Evaluation for ' + str(current_partner.last_name) + ', '
+        #    message += str(current_partner.first_name) + ' NOT submitted: Please try again.'
         message  = 'Evaluation for ' + str(current_partner.last_name) + ', '
-        message += str(current_partner.first_name) + ' successfully submitted'
-
+        message += str(current_partner.first_name) + ' confirmed: Please refresh the page and confirm the evaluation was submitted.'
         self.redirect('/partner?message=' + message)

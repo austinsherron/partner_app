@@ -12,6 +12,7 @@ from src.models.assignment import AssignmentModel
 from src.models.eval import EvalModel
 from src.models.partnership import PartnershipModel
 from src.models.student import StudentModel
+from src.models.log import LogModel
 
 
 JINJA_ENV = jinja2.Environment(
@@ -196,6 +197,12 @@ class ViewStudent(BaseHandler):
         evals_for += EvalModel.get_eval_history_by_evaluatee(student, False, quarter, year).fetch()
         evals_for  = sorted(evals_for, key=lambda x: x.assignment_number)
 
+        log = LogModel.get_log_by_student(student, quarter, year).get()
+        if log:
+            log_arr = log.log
+        else:
+            log_arr = []
+
         template = JINJA_ENV.get_template('/templates/admin_student_view.html')
         template_values = {
             'student':      student,
@@ -205,8 +212,8 @@ class ViewStudent(BaseHandler):
             'evals':        evals,
             'evals_for':    evals_for,
             'user':         users.get_current_user(),
+            'log':          log_arr,
             'sign_out':     users.create_logout_url('/'),
         }
         return self.response.write(template.render(template_values))
-
 

@@ -4,75 +4,99 @@
 <br>
 
 <div class="row">
-
-	<div class="row">
-		<div class="small-12 columns">
-			<h4 class="text-center">Viewing Eligible Students for Lab Section {{ selector.lab }}, Assignment {{ current.number }}</h4>
-			<br>
+	{% if student.availability and student.programming_ability %}
+		<div class="row">
+			<div class="small-12 columns">
+				<h4 class="text-center">Viewing Eligible Students for Lab Section {{ selector.lab }}, Assignment {{ current.number }}</h4>
+				<br>
+			</div>
 		</div>
-	</div>
 
-	<div class="small-12 columns panel">
-		{% for ucinetid,info in selectees %}
-			{% if ucinetid != selector.ucinetid %}
-				{% set status,student = info %}
+		<div class="small-12 columns panel">
+			{% for ucinetid,info in selectees %}
+				{% if ucinetid != selector.ucinetid %}
+					{% set status,student = info %}
 
-				<form action="/partner/selection?selected_partner={{ student.studentid }}&selected_assign={{ current.number }}"
-					enctype="multipart/form-data" method="POST">
+					<form action="/partner/selection?selected_partner={{ student.studentid }}&selected_assign={{ current.number }}"
+						enctype="multipart/form-data" method="POST">
 
-					{% if status %}
-						<div class="row" style="display: none;">
-					{% else %}
-						<div class="row">
-					{% endif %}
+						{% if status %}
+							<div class="row" style="display: none;">
+						{% else %}
+							<div class="row">
+						{% endif %}
 
-						<div class="small-3 columns">
-							<div class="small-12 columns small-centered">
-								<img height="100px" width="100px" src="/images/{{ student.key.urlsafe() }}"/>
-								{% if not selection_closed %}
-									<div class="row">
-										<br>
-										{% if status %}
-											<input class="button expand alert" type="submit" value="Send Invitation">
-										{% else %}
-											<input class="button expand success" type="submit" value="Send Invitation">
-										{% endif %}
-									</div>
-								{% endif %}
+							<div class="small-3 columns">
+								<div class="small-12 columns small-centered">
+									<img height="100px" width="100px" src="/images/{{ student.key.urlsafe() }}"/>
+									{% if not selection_closed %}
+										<div class="row">
+											<br>
+											{% if status %}
+												<input class="button expand alert" type="submit" value="Send Invitation">
+											{% else %}
+												<input class="button expand success" type="submit" value="Send Invitation">
+											{% endif %}
+										</div>
+									{% endif %}
+								</div>
 							</div>
+
+							<div class="small-9 columns">
+								<div class="small-6 columns">
+									{% set name = student.preferred_name if student.preferred_name else student.first_name%}
+									<h3>{{ name }} {{ student.last_name }}</h3>
+									{% if status %}
+										<span class="label warning">{{ name }} already has a partner for this assignment</span>
+									{% endif %}
+									<span class="label">{{ name }}'s bio</span>
+									<p>{{ student.bio if student.bio else '' }}</p>
+									<span class="label">Availability</span>
+									<p id="availability"></p>
+									<p>{{student.availability if student.availability else ""}}</p>
+									<!--<script> TODO RE IMPLIMENT
+											var string_avail_in = "{{ student.availability if student.availability else '""' }}";
+											var my_avail = "{{ selector.availability if selector.availability else '""' }}";
+											var total = 0;
+											for (var i = 0; i < my_avail.length; i++)
+											{
+												if (string_avail_in.charAt(i) == '1')
+												if (my_avail.charAt(i) == '1')
+													total++;
+											}
+											var string_avail_out = "You have " + (total/2.0) + " free hours in common";
+											document.getElementById("availability").innerHTML = string_avail_out;
+									</script>-->
+								</div>
+								<div class="small-6 columns">
+									<span class="label">{{ name }}'s email address</span>
+									<p>{{ student.email }}</p>
+									<span class="label">{{ name }}'s phone number</span>
+									<p>{{ student.phone_number if student.phone_number else '' }}</p>
+									<span class="label">{{ name }}'s programming experience</span>
+									<p>{{ student.programming_ability + ' (out of 5)' if student.programming_ability else '' }}</p>
+								</div>
+							</div>
+
+							<hr>
+
 						</div>
 
-						<div class="small-9 columns">
-							<div class="small-6 columns">
-								{% set name = student.preferred_name if student.preferred_name else student.first_name%}
-								<h3>{{ name }} {{ student.last_name }}</h3>
-								{% if status %}
-									<span class="label warning">{{ name }} already has a partner for this assignment</span>
-								{% endif %}
-								<span class="label">{{ name }}'s bio</span>
-								<p>{{ student.bio if student.bio else '' }}</p>
-								<span class="label">Availability</span>
-								<p>{{ student.availability if student.availability else '' }}</p>
-							</div>
-							<div class="small-6 columns">
-								<span class="label">{{ name }}'s email address</span>
-								<p>{{ student.email }}</p>
-								<span class="label">{{ name }}'s phone number</span>
-								<p>{{ student.phone_number if student.phone_number else '' }}</p>
-								<span class="label">{{ name }}'s programming experience</span>
-								<p>{{ student.programming_ability + ' (out of 5)' if student.programming_ability else '' }}</p>
-							</div>
-						</div>
+					</form>
 
-						<hr>
-
-					</div>
-
-				</form>
-
-			{% endif %}
-		{% endfor %}
-	</div>
+				{% endif %}
+			{% endfor %}
+		</div>
+	{% else %}
+	<div class="row text-center">
+	  		<div class="small-6 column small-centered">
+   	    		<div class="alert-box round warning"><a href="/partner/edit/profile"><h4>Please Update Your Profile</a></h4></div>
+	  		</div>
+    	</div>
+	<div class="row text-center">
+			<h5>You need to add your availability and programming background to your profile before you can select a partner.</h5>
+		</div>
+	{% endif %}
 </div>
 
 {% endblock %}

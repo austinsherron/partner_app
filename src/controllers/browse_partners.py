@@ -27,6 +27,7 @@ class BrowseForPartners(BaseHandler):
         user     = users.get_current_user()
         selector = StudentModel.get_student_by_email(quarter, year, user.email())
         student = StudentModel.get_student_by_email(quarter, year, user.email())
+        repeat = SettingModel.repeat_partners()
 
         if not selector:
             return self.redirect('/partner')
@@ -43,7 +44,7 @@ class BrowseForPartners(BaseHandler):
         e = self.request.get('error')
 
         # check to see if partner selection period has closed
-        selection_closed = (datetime.now() - timedelta(hours=8) > current_assignment.close_date)
+        selection_closed = (datetime.now() - timedelta(hours=7) > current_assignment.close_date)
 
         # get all current_partnerships for partnership status
         partnerships = PartnershipModel.get_all_partnerships_for_assign(quarter, year, current_assignment.number)
@@ -58,13 +59,13 @@ class BrowseForPartners(BaseHandler):
         # build dict to store information about partnership status
         available = []
         for s in selectees:
-            if s.key not in members:
+            if (s.key not in members) or repeat:
                 available.append((s.ucinetid,(s.key in partnerships, s)))
-        available = sorted(available, key=lambda x: x[1][1].last_name)
-
+        available = sorted(available, key=get_result_priority)
         # pass template values...
         template_values = {
             'error':            e,
+            'student': student,
             'selector':         selector,
             'selectees':        available,
             'selection_closed': selection_closed,
@@ -74,3 +75,34 @@ class BrowseForPartners(BaseHandler):
         }
         template = JINJA_ENV.get_template('/templates/partner_browse.html')
         self.response.write(template.render(template_values))
+
+def get_shared_hours(a1, a2):
+    return 0
+    total = 0;
+    for i in range(len(a1)):
+        if a1[i]=="1" and a2[i] == "1":
+            total += 1
+    return total/2.0
+
+def get_result_priority(result):
+    return 0
+    student = result[1][1]
+    quarter  = SettingModel.quarter()
+    year     = SettingModel.year()
+    user     = users.get_current_user()
+    selector = StudentModel.get_student_by_email(quarter, year, user.email())
+
+    their_availability = student.availability
+    my_availabiliy = selector.availability
+
+    #TODO RE IMPLIMENT THIS
+    shared_hours = 0#get_shared_hours(my_availability, their_availability)
+    
+    ability_dif = abs(student.programming_ability-selector.programming_ability)
+
+    if shared_hours >= 4:
+        return 10-ability_dif
+    else:
+        return 10-(ability_dif + (4-shared_hours)/(5*15))
+
+    

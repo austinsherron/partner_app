@@ -1,7 +1,7 @@
 import jinja2
 import os
 
-from google.appengine.api import users
+from google.appengine.api import users, images
 from google.appengine.ext import ndb
 from webapp2_extras.appengine.users import admin_required
 
@@ -179,3 +179,57 @@ class ViewRoster(BaseHandler):
         return self.response.write(template.render(template_values))        
 
 
+class UploadPictures(BaseHandler):
+    @admin_required
+    def get(self):
+        quarter = self.request.get('quarter')                                  # try grabbing quarter/year from URL
+        year    = self.request.get('year')
+
+        if not quarter or not year:                                            # if they don't exist, try grabbing from session
+            temp = get_sess_vals(self.session, 'quarter', 'year')              # try grabbing quarter/year from session
+            if not temp:                                                       # redirect with error if it doesn't exist
+                return self.redirect('/admin?message=Please set a current quarter and year')
+            quarter,year = temp
+
+        # pass map of quarter DB representations (ints) to string representation
+        # TODO:
+        #    quarters should not be hardcoded 
+        quarters = {1: 'Fall', 2: 'Winter', 3: 'Spring', 4: 'Summer'}
+
+        template_values = {                                                        
+            'user':     users.get_current_user(),
+            'sign_out': users.create_logout_url('/'),
+            'quarter':  int(quarter),
+            'year':     int(year),
+            'quarters': sorted(quarters.items()),
+            'message':  self.request.get('message'),
+        }
+        template = JINJA_ENV.get_template('/templates/admin_pictures.html')
+        return self.response.write(template.render(template_values))            
+
+
+    def post(self):
+        quarter = self.request.get('quarter')                                  # try grabbing quarter/year from URL
+        year    = self.request.get('year')
+
+        if not quarter or not year:                                            # if they don't exist, try grabbing from session
+            temp = get_sess_vals(self.session, 'quarter', 'year')              # try grabbing quarter/year from session
+            if not temp:                                                       # redirect with error if it doesn't exist
+                return self.redirect('/admin?message=Please set a current quarter and year')
+            quarter,year = temp
+        try:
+            students = []
+            files = [(f.filename,f.file.read()) for f in self.request.POST.getall('picture_files')]
+            for f in files:
+                student = StudentModel.get_student_by_student_id(quarter, year, f[0][:f[0].find(".")])
+                if student != None:
+                    student.avatar = images.resize(f[1], 320, 320)
+                    students.append(student)
+            # save student objects...
+            ndb.put_multi(students)
+            # ...and render the response
+            return self.redirect('/admin/roster/view?message=' + 'Successfully uploaded new pictures for ' + str(len(students)) + ' students')
+
+            
+        except Exception, e:
+            return self.redirect('/admin?message=' + 'There was a problem uploading the pictures: ' + str(e))    

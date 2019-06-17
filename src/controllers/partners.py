@@ -43,7 +43,7 @@ class CancelModal(BaseHandler):
         all_partners = dict([(x.number,PartnershipModel.get_partner_from_partner_history_by_assign(student, partner_history, x.number)) for x in all_assigns])
 
         current_time = datetime.datetime.fromtimestamp(time.time())
-        current_time = current_time - datetime.timedelta(hours=8)
+        current_time = current_time - datetime.timedelta(hours=7)
 
         # pass template values...
         template_values = {
@@ -245,9 +245,12 @@ class SelectPartner(BaseHandler):
         # build dict to store information about partnership status
         available = []
         for s in selectees:
-            if s.key not in members:
+            if (s.key not in members) or repeat:
                 available.append((s.ucinetid,(s.key in partnerships, s)))
-        available = sorted(available, key=lambda x: x[1][1].last_name)
+        available = sorted(available, key=get_result_priority)
+        av_list = []
+        for av in available:
+            av_list.append((av[0],get_shared_hours(selector.availability, av[1][1].availability)))
         # get error message, if any
         e = self.request.get('error')
         # check to see if partner selection period has closed
@@ -261,7 +264,8 @@ class SelectPartner(BaseHandler):
             'active': active_assigns,
             'default_assgn': default_assgn,
             'repeat': repeat,
-            'cross_section': cross_section
+            'cross_section': cross_section,
+            'availability_list': av_list,
         }
         template = JINJA_ENV.get_template('/templates/partner_selection.html')
         self.response.write(template.render(template_values))
@@ -290,3 +294,27 @@ class SelectPartner(BaseHandler):
         else:
             InvitationModel.create_invitation(selector, selected, selected_assign)
             return self.redirect('/partner?message=' + MessageModel.sent_invitation(selected))
+
+def get_shared_hours(a1, a2):
+    return 0
+    total = 0
+    for i in range(len(a1)):
+        if a1[i]=="1" and a2[i] == "1":
+            total += 1
+    return total/2.0
+
+def get_result_priority(result):
+    return 0
+    student = result[1][1]
+    quarter  = SettingModel.quarter()
+    year     = SettingModel.year()
+    user     = users.get_current_user()
+    selector = StudentModel.get_student_by_email(quarter, year, user.email())
+
+    their_availability = student.availability
+    my_availability = selector.availability
+    shared_hours = get_shared_hours(my_availability, their_availability)
+    
+    ability_dif = abs(int(student.programming_ability[0])-int(selector.programming_ability[0]))
+
+    return (shared_hours<4)*10+(ability_dif + 1 - float(shared_hours)/(5*15))

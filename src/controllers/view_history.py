@@ -88,7 +88,7 @@ class ViewInvitationHistory(BaseHandler):
         ordering = {'Assign Num': 0, 'Who': 1, 'To/From': 2, 'Accepted': 3, 'Active': 4}
         for invite in invites:
             # organize invite info by time
-            i = (invite.created - timedelta(hours=8)).strftime('%m-%d-%Y %H:%M:%S')
+            i = (invite.created - timedelta(hours=7)).strftime('%m-%d-%Y %H:%M:%S')
             invite_info[i] = {}
 
             invite_info[i]['Assign Num'] = invite.assignment_number

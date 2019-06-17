@@ -71,7 +71,23 @@
 								<span class="label">{{ name }}'s bio</span>
 								<p>{{ student.bio if student.bio else '' }}</p>
 								<span class="label">Availability</span>
-								<p>{{ student.availability if student.availability else '' }}</p>
+								{% if student.availability %}
+									{% if student.availability|length == 150 %}
+										{% if student.availability and selector.availability %}
+											{% set common = [0] %}
+											{% for abc in student.availability %}
+												{% if student.availability[loop.index0] == "1" and selector.availability[loop.index0] == "1" %}
+													{% if common.append(common.pop() + 1) %}{% endif %}
+												{% endif %}
+											{% endfor %}
+											{{common[0]/2}} hours in common
+										{% else %}
+											Unknown
+										{% endif %}
+									{% else %}
+										{{student.availability if student.availability else ''}}
+									{%endif%}
+								{%endif%}
 							</div>
 							<div class="small-6 columns">
 								<span class="label">{{ name }}'s email address</span>

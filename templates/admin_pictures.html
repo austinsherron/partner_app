@@ -1,0 +1,20 @@
+{% extends '/templates/base.html' %}
+{% block content %}
+
+<a class="close-reveal-modal">&#215;</a>
+
+<div class="row">
+	<div class="small-12 columns">
+		<h3 class="text-center">Upload Photos</h3>
+		<h6 class="text-center">Files should be .jpg files with their name as the student id of the corrisponding student</h6>
+		<h6 class="text-center">(250 Picture Max)</h6>
+
+		<form action="/admin/roster/pictures" method="post" enctype="multipart/form-data">
+			<div><input type="file" name="picture_files" multiple></div>
+			<div><input class="button expand" type="submit" value="Upload"<div>
+		</form> 
+
+	</div>
+</div>
+
+{% endblock %}

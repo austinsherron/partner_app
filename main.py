@@ -51,6 +51,7 @@ application = webapp2.WSGIApplication([
     ('/admin/partners/view', admin_partnership.ViewPartnerships),
     ('/admin/roster/upload', admin_roster.UploadRoster),
     ('/admin/roster/view', admin_roster.ViewRoster),
+    ('/admin/roster/pictures', admin_roster.UploadPictures),
     ('/admin/student/add', admin_student.AddStudent),
     ('/admin/students/deactivate', admin_student.DeactivateStudents),
     ('/admin/student/edit', admin_student.EditStudent),

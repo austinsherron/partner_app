@@ -112,7 +112,8 @@ def student_info_to_partner_list(last_num, first_num, keys_to_partnerships, keys
                                 for member in partnership.members:
                                     if member != student.key:
                                         member_object = member.get() if member not in keys_to_students else keys_to_students[member]
-                                        to_append    += member_object.email + ' '
+                                        if member_object:
+                                                to_append    += member_object.email + ' '
 
 			partnership_dict[student_info].append(to_append)
 

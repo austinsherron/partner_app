@@ -1,0 +1,21 @@
+/*
+	 CSS-Tricks Example
+	 by Chris Coyier
+	 http://css-tricks.com
+*/
+
+/* So you can drag around (drawing) in the table without selection color annoyance */
+/* Unfortunately didn't seem to work when applied ONLY to #drawing-table (at least in Firefox) */
+
+#page-wrap > p { margin: 0 0 10px 0; }
+
+#page-wrap { width: 960px; margin: 60px auto; }
+
+#drawing-table { table-layout: absolute; width: 500px; height: 500px; border-collapse: collapse;}
+#drawing-table tr *{ height: 10px; border: 1px dotted #ccc; text-align: center; padding: 0.0rem 0.0rem; !important; font-weight: lighter;}
+.selected { border: 3px solid black; }
+
+#clear {}
+
+#table-wrap { position: relative; width: 500px; }
+#table-wrap table { position: relative; z-index: 10; }

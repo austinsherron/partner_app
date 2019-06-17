@@ -1,6 +1,10 @@
 {% extends 'templates/common.html' %}
 {% block content %}
 
+<script src='http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js'></script>
+<!--<script src='/static/drawingtable.js'></script>-->
+<link type="text/css" rel='stylesheet' href='/static/table_style.css' />
+
 <br>
 
 <div class="row">
@@ -8,12 +12,22 @@
 		<form action="/partner/edit/profile" enctype="multipart/form-data" method="POST">
 
 			<div class="row">
+			<!--
 				<h4>&nbsp&nbsp&nbsp
-					This information is all optional, but it may help you identify suitable partners</h4>
+					It is required you enter your availability and programming background.</h4>
+				<h4>&nbsp&nbsp&nbsp
+					The rest is optional, but it may help you identify suitable partners.</h4>-->
+			{% if message %}
+				<div class="small-12 columns">
+					<h3 class="text-center">{{ message }}</h3>
+				</div>
+			{% endif %}
 			</div>
-			<div class="small-6 columns">
+			<!--<div class="small-6 columns">-->
+				<img src="/images/{{ key }}" style="right:3%;position:absolute;">
+				<br><br>
 				<div class="row">
-					<div class="small-12 columns">
+					<div class="small-6 columns">
 						<label class="label">Preferred Name (What do you like to be called? First name? Nickname?) </label>
 						<input type="text" name="preferred_name"
 						value="{{ student.preferred_name if student.preferred_name }}" />
@@ -21,21 +35,37 @@
 				</div>
 
 				<div class="row">
-					<div class="small-12 columns">
+					<div class="small-6 columns">
 						<label class="label">Brief Background (what would you like prospective partners to know about you?)</label>
 						<textarea name="bio">{{ student.bio if student.bio else '' }}</textarea>
 					</div>
 				</div>
 
 				<div class="row">
-					<div class="small-12 columns">
-						<label class="label">Availability (If you need to work outside of the scheduled lab, what times are impossible for you?)</label>
+					<div class="small-6 columns">
+						<label class="label">Availability (If you need to work outside of the scheduled lab, what times are available for you?)</label>
 						<textarea name="availability">{{ student.availability if student.availability else '' }}</textarea>
+						<br>
+						<!--
+						<div id="table-wrap">
+							<div id="clear" class="small button">Clear Availability</div>
+							<br>
+							<input type="radio" name="draw" value="avail" checked="checked" id="availR"><label for="availR">Set Availability</label>
+							<input type="radio" name="draw" value="erase" id="eraseR"><label for="eraseR">Erase Availablity</label>
+							<p id="availability_string_in" hidden>{{availability_string}}</p>	
+							<textarea id="availability_string_out" name="availability" style="display:none;">{{ student.availability if student.availability else '' }}</textarea>
+							<table id="drawing-table">
+								<tr>
+									<td></td>
+								</tr>
+							</table>
+						</div>
+						-->
 					</div>
 				</div>
 
 				<div class="row">
-					<div class="small-12 columns">
+					<div class="small-6 columns">
 						<label class="label">Background in computer programming</label>
 						<select name="programming_ability">
 							{% for ability in programming_ability %}
@@ -55,17 +85,17 @@
 					</div>
 				</div>
 
-			</div>
+			<!--</div>-->
 
-			<div class="small-6 columns">
+			<!--<div class="small-6 columns">
 				<div class="row">
 					<div class="small-6 columns small-centered">
-						<img src="/images/{{ key }}">
+						<img src="/images/{{ key }}" style="float:top;">
 						<br>
 						<br>
 					</div>
 				</div>
-			</div>
+			</div>-->
 
 			<div class="row">
 				<div class="small-6 column small-centered">

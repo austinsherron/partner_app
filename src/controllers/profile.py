@@ -34,13 +34,17 @@ class EditProfile(BaseHandler):
         programming_ability  = ['0: Never before this class, or just a few times', '1: I\'ve done some programming, but not as much as a whole class']
         programming_ability += ['2: I\'ve done the equivalent of one programming course, but not a whole year\'s worth']
         programming_ability += ['3: I have one to two years of programming experience', '4: I have been programming for more than two years']
-
+        o_message = self.request.get('message')
+        message = o_message#[:o_message.find("?ava")]
+        #ava = o_message[o_message.find("?ava")+5:]
         template_values = {
             'user':                user,
             'sign_out':            users.create_logout_url('/'),
             'student':             student,
             'programming_ability': programming_ability,
             'key':                 student.key.urlsafe(),
+            'availability_string': student.availability,#if ava=='' else ava,
+            'message': message,
         }
         return self.response.write(template.render(template_values))
 
@@ -68,4 +72,4 @@ class EditProfile(BaseHandler):
         student.put()
 
         # redirect to main page
-        return self.redirect('/partner/edit/profile')
+        return self.redirect('/partner/edit/profile?message=Profile Successfully Changed!')#?ava='+availability

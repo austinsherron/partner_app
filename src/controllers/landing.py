@@ -45,7 +45,7 @@ class MainPage(BaseHandler):
 
             # Get current time in UTC, then convert to PDT
             current_time = datetime.datetime.fromtimestamp(time.time())
-            current_time = current_time - datetime.timedelta(hours=8)
+            current_time = current_time - datetime.timedelta(hours=7)
             #get all assignments
             all_assigns = sorted(AssignmentModel.get_all_assign(quarter, year), key = lambda x: x.number)
             # get active assignments
@@ -82,7 +82,8 @@ class MainPage(BaseHandler):
                 'sign_out': users.create_logout_url('/'),
                 'email': user.email()
             }
-            return self.response.write(template.render(template_values))
+            return self.response.write(template.render(template_values))  
+        #AVAIL and SKILL
         template_values = {
             'user': user,
             'student': student,

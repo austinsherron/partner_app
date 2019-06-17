@@ -77,6 +77,13 @@ class Student(ndb.Model):
 	availability        = ndb.TextProperty()
 	created             = ndb.DateTimeProperty(auto_now_add=True)
 
+class Log(ndb.Model):
+        owner               = ndb.KeyProperty(kind=Student)
+        quarter             = ndb.IntegerProperty()
+	year                = ndb.IntegerProperty() 
+        log                 = ndb.StringProperty(repeated=True)
+
+
 
 ################################################################################
 ################################################################################
@@ -140,7 +147,6 @@ class Evaluation(ndb.Model):
 	quarter           = ndb.IntegerProperty()
 	active            = ndb.GenericProperty()
 	created           = ndb.DateTimeProperty(auto_now_add=True)
-
 
 ################################################################################
 ################################################################################
